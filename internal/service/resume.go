@@ -22,6 +22,17 @@ type ResumeService interface {
 	Update(ctx context.Context, resume *model.Resume) error
 	Delete(ctx context.Context, id string) error
 	UpdateJSON(ctx context.Context, id string, jsonData string) error
+
+	// RenameResume 修改简历标题
+	RenameResume(ctx context.Context, id string, title string) error
+	// DuplicateResume 复制简历（新记录 + "(副本)" 后缀）
+	DuplicateResume(ctx context.Context, id string) (*model.Resume, error)
+	// RestoreResume 恢复软删除（is_deleted = false, deleted_at = null）
+	RestoreResume(ctx context.Context, id string) error
+	// PermanentDeleteResume 物理删除记录
+	PermanentDeleteResume(ctx context.Context, id string) error
+	// ListDeletedResumes 查询已软删除的简历列表
+	ListDeletedResumes(ctx context.Context) ([]*model.ResumeListItem, error)
 }
 
 // ErrResumeNotFound is returned when a resume is not found
@@ -364,4 +375,111 @@ func hasBasicInfoData(info model.BasicInfo) bool {
 		info.GitHub != "" ||
 		info.Address != "" ||
 		info.Summary != ""
+}
+
+// RenameResume 修改简历标题
+func (s *resumeService) RenameResume(ctx context.Context, id string, title string) error {
+	query := `UPDATE resumes SET title = ?, updated_at = ? WHERE id = ? AND is_deleted = FALSE`
+	now := time.Now()
+	result, err := database.DB.ExecContext(ctx, query, title, now, id)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrResumeNotFound
+	}
+	return nil
+}
+
+// DuplicateResume 复制简历（新记录 + "(副本)" 后缀）
+func (s *resumeService) DuplicateResume(ctx context.Context, id string) (*model.Resume, error) {
+	// 查询原始简历
+	original, err := s.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// 创建副本，使用新的 UUID 和 "(副本)" 后缀标题
+	duplicate := &model.Resume{
+		Title:     original.Title + "(副本)",
+		BasicInfo: original.BasicInfo,
+		Modules:   original.Modules,
+		TemplateID: original.TemplateID,
+		CustomCSS: original.CustomCSS,
+		JobTarget: original.JobTarget,
+	}
+
+	if err := s.Create(ctx, duplicate); err != nil {
+		return nil, err
+	}
+	return duplicate, nil
+}
+
+// RestoreResume 恢复软删除（is_deleted = false, deleted_at = null）
+func (s *resumeService) RestoreResume(ctx context.Context, id string) error {
+	query := `UPDATE resumes SET is_deleted = FALSE, deleted_at = NULL, updated_at = ? WHERE id = ? AND is_deleted = TRUE`
+	now := time.Now()
+	result, err := database.DB.ExecContext(ctx, query, now, id)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrResumeNotFound
+	}
+	return nil
+}
+
+// PermanentDeleteResume 物理删除记录（仅限已软删除的简历）
+func (s *resumeService) PermanentDeleteResume(ctx context.Context, id string) error {
+	query := `DELETE FROM resumes WHERE id = ? AND is_deleted = TRUE`
+	result, err := database.DB.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrResumeNotFound
+	}
+	return nil
+}
+
+// ListDeletedResumes 查询已软删除的简历列表
+func (s *resumeService) ListDeletedResumes(ctx context.Context) ([]*model.ResumeListItem, error) {
+	query := `
+		SELECT id, title, updated_at
+		FROM resumes
+		WHERE is_deleted = TRUE
+		ORDER BY deleted_at DESC
+	`
+	rows, err := database.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []*model.ResumeListItem
+	for rows.Next() {
+		item := &model.ResumeListItem{}
+		if err := rows.Scan(&item.ID, &item.Title, &item.UpdatedAt); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }

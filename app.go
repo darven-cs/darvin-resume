@@ -85,6 +85,31 @@ func (a *App) UpdateResumeModule(id string, moduleType string, moduleData string
 	return a.svc.UpdateJSON(context.Background(), id, moduleData)
 }
 
+// RenameResume 修改简历标题
+func (a *App) RenameResume(id string, title string) error {
+	return a.svc.RenameResume(context.Background(), id, title)
+}
+
+// DuplicateResume 复制简历（新记录 + "(副本)" 后缀）
+func (a *App) DuplicateResume(id string) (*model.Resume, error) {
+	return a.svc.DuplicateResume(context.Background(), id)
+}
+
+// RestoreResume 恢复软删除的简历
+func (a *App) RestoreResume(id string) error {
+	return a.svc.RestoreResume(context.Background(), id)
+}
+
+// PermanentDeleteResume 物理删除已软删除的简历
+func (a *App) PermanentDeleteResume(id string) error {
+	return a.svc.PermanentDeleteResume(context.Background(), id)
+}
+
+// ListDeletedResumes 查询已软删除的简历列表
+func (a *App) ListDeletedResumes() ([]*model.ResumeListItem, error) {
+	return a.svc.ListDeletedResumes(context.Background())
+}
+
 // AI Configuration Bridge Methods
 
 // GetAIConfig returns the current AI configuration as a map.
