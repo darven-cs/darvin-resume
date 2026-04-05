@@ -36,15 +36,15 @@
 - [ ] **AIAI-02**: API Key采用AES-256-GCM算法加密存储，密钥基于设备唯一标识生成
 - [x] **AIAI-03**: 支持用户配置默认模型、单次调用最大Token数、请求超时时间
 - [ ] **AIAI-04**: 所有AI生成/修改操作以简历结构化JSON Schema为唯一标准，AI输出必须严格符合Schema
-- [ ] **AIAI-05**: 职位目标上下文管理 — 简历编辑页顶部可编辑目标岗位，AI调用默认传入
-- [ ] **AIAI-06**: 全文上下文参考开关 — 局部润色/翻译默认关闭，全文重写/结构化生成默认开启
+- [x] **AIAI-05**: 职位目标上下文管理 — 简历编辑页顶部可编辑目标岗位，AI调用默认传入
+- [x] **AIAI-06**: 全文上下文参考开关 — 局部润色/翻译默认关闭，全文重写/结构化生成默认开启
 - [x] **AIAI-07**: 流式传输 — 所有AI生成内容支持流式传输（SSE协议），打字机效果实时渲染
 - [ ] **AIAI-08**: AI对话侧边栏 — 编辑器右侧唤起，支持多轮对话，可引用选中文本，输出可一键插入编辑区
-- [ ] **AIAI-09**: 一键解析 — 用户粘贴纯文本/Markdown旧简历后AI自动解析生成结构化数据+Markdown内容
-- [ ] **AIAI-10**: 网络/API调用失败时弹窗提示错误原因，完整保留原始输入，提供一键重试
-- [ ] **AIAI-11**: Token超限时自动检测并分批生成，同时弹窗提示用户精简内容
-- [ ] **AIAI-12**: AI返回格式异常时先基于Schema校验，不通过自动重试1次，仍失败则完整返回原始内容
-- [ ] **AIAI-13**: 用户主动中断生成时保留已生成的有效内容，允许继续编辑或重新生成
+- [x] **AIAI-09**: 一键解析 — 用户粘贴纯文本/Markdown旧简历后AI自动解析生成结构化数据+Markdown内容
+- [x] **AIAI-10**: 网络/API调用失败时弹窗提示错误原因，完整保留原始输入，提供一键重试
+- [x] **AIAI-11**: Token超限时自动检测并分批生成，同时弹窗提示用户精简内容
+- [x] **AIAI-12**: AI返回格式异常时先基于Schema校验，不通过自动重试1次，仍失败则完整返回原始内容
+- [x] **AIAI-13**: 用户主动中断生成时保留已生成的有效内容，允许继续编辑或重新生成
 
 ### Template — 模板与渲染
 
@@ -138,15 +138,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AIAI-02 | Phase 6 | Pending |
 | AIAI-03 | Phase 3 | Complete |
 | AIAI-04 | Phase 3 | Pending |
-| AIAI-05 | Phase 3 | Pending |
-| AIAI-06 | Phase 3 | Pending |
+| AIAI-05 | Phase 3 | Complete |
+| AIAI-06 | Phase 3 | Complete |
 | AIAI-07 | Phase 3 | Complete |
 | AIAI-08 | Phase 3 | Pending |
-| AIAI-09 | Phase 3 | Pending |
-| AIAI-10 | Phase 3 | Pending |
-| AIAI-11 | Phase 3 | Pending |
-| AIAI-12 | Phase 3 | Pending |
-| AIAI-13 | Phase 3 | Pending |
+| AIAI-09 | Phase 3 | Complete |
+| AIAI-10 | Phase 3 | Complete |
+| AIAI-11 | Phase 3 | Complete |
+| AIAI-12 | Phase 3 | Complete |
+| AIAI-13 | Phase 3 | Complete |
 | TMPL-01 | Phase 5 | Pending |
 | TMPL-02 | Phase 5 | Pending |
 | TMPL-03 | Phase 5 | Pending |

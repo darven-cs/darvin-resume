@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 03-02-PLAN.md: AI selection floating toolbar"
-last_updated: "2026-04-05T12:29:57.659Z"
+stopped_at: Completed 03-06-PLAN.md
+last_updated: "2026-04-05T12:37:06.638Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 11
-  completed_plans: 9
-  percent: 82
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 ## Current Position
 
 Phase: 2 of 7 (核心编辑器)
-Plan: 2 of 4 in current phase
+Plan: 4 of 4 in current phase
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -54,6 +54,8 @@ Progress: [▓░░░░░░░░░] 14%
 
 *Updated after each plan completion*
 | Phase 03 P03-02 | 265 | 3 tasks | 5 files |
+| Phase 03 P05 | 5 | 6 tasks | 7 files |
+| Phase 03 P06 | 618 | 6 tasks | 8 files |
 
 ## Phase 2 Plan Summary
 
@@ -75,6 +77,12 @@ Recent decisions affecting current work:
 - [Phase ?]: BasicInfo 作为 basicInfo 模块存储在 json_data 中，确保序列化一致性
 - [Phase 03]: AI 选区工具栏使用 position fixed + Teleport to body 避免 z-index 问题
 - [Phase 03]: 工具栏显示在选区起始位置上方，超出边界自动翻转
+- [Phase 03-05]: sendMessageSync for parsing (non-streaming, need complete JSON before preview)
+- [Phase 03-05]: Resume model JobTarget field (JSON stored as text, no migration needed)
+- [Phase 03-05]: Schema validation with graceful degradation (show parsed data even on partial validation)
+- [Phase 03]: Toast 自动消失策略：非严重错误 3s 自动消失，AUTH_FAILED 需手动关闭
+- [Phase 03]: 格式校验重试：ChatWithRetry 最多重试 1 次，失败返回原始内容而非报错
+- [Phase 03]: 操作取消：后端 sync.Map 追踪活跃操作，前端 abort() 保留已生成内容
 
 ### Phase 2 Decisions (from 02-CONTEXT.md)
 
@@ -97,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T12:29:57.646Z
-Stopped at: Completed 03-02-PLAN.md: AI selection floating toolbar
+Last session: 2026-04-05T12:37:06.630Z
+Stopped at: Completed 03-06-PLAN.md
 Resume file: None
