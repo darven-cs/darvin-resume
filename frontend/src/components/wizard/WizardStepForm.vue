@@ -195,7 +195,7 @@ const moduleFieldConfigs: Record<string, FieldConfig[]> = {
     { key: 'summary', label: '一句话简介', type: 'textarea', placeholder: '3年经验的 Web 全栈开发者，专注 Vue/React 生态' },
   ],
   projects: [
-    { key: 'name', label: '项目名称', placeholder: 'Open-Resume' },
+    { key: 'name', label: '项目名称', placeholder: 'Darvin-Resume' },
     { key: 'role', label: '角色', placeholder: '前端负责人' },
     { key: 'startDate', label: '开始时间', placeholder: '2025-01' },
     { key: 'endDate', label: '结束时间', placeholder: '2025-06 或 至今' },

@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"open-resume/internal/settings"
+	"Darvin-Resume/internal/settings"
 )
 
 // Message represents a chat message in the Messages API format.
@@ -24,14 +24,14 @@ type Message struct {
 
 // AIMessage represents an assistant message from the API.
 type AIMessage struct {
-	ID      string   `json:"id"`
-	Type    string   `json:"type"`
-	Role    string   `json:"role"`
-	Content []ContentBlock `json:"content"`
-	Model   string   `json:"model"`
-	StopReason string `json:"stop_reason"`
-	StopSequence string `json:"stop_sequence"`
-	Usage   Usage    `json:"usage"`
+	ID           string         `json:"id"`
+	Type         string         `json:"type"`
+	Role         string         `json:"role"`
+	Content      []ContentBlock `json:"content"`
+	Model        string         `json:"model"`
+	StopReason   string         `json:"stop_reason"`
+	StopSequence string         `json:"stop_sequence"`
+	Usage        Usage          `json:"usage"`
 }
 
 // ContentBlock represents a content block in the response.
@@ -48,10 +48,10 @@ type Usage struct {
 
 // streamingEvent represents a single SSE event from Claude's streaming response.
 type streamingEvent struct {
-	Type string `json:"type"`
-	Index int `json:"index"`
+	Type         string        `json:"type"`
+	Index        int           `json:"index"`
 	ContentBlock *ContentBlock `json:"content_block"`
-	Delta *TextDelta `json:"delta"`
+	Delta        *TextDelta    `json:"delta"`
 }
 
 // TextDelta represents a text delta in a streaming response.
@@ -62,23 +62,23 @@ type TextDelta struct {
 
 // messagesRequest is the request body for the Claude Messages API.
 type messagesRequest struct {
-	Model       string    `json:"model"`
-	MaxTokens   int       `json:"max_tokens"`
-	Stream      bool      `json:"stream"`
-	Messages    []Message `json:"messages"`
-	System      string    `json:"system,omitempty"`
+	Model     string    `json:"model"`
+	MaxTokens int       `json:"max_tokens"`
+	Stream    bool      `json:"stream"`
+	Messages  []Message `json:"messages"`
+	System    string    `json:"system,omitempty"`
 }
 
 // messagesResponse is the non-streaming response from the Claude Messages API.
 type messagesResponse struct {
-	ID          string   `json:"id"`
-	Type        string   `json:"type"`
-	Role        string   `json:"role"`
-	Content     []ContentBlock `json:"content"`
-	Model       string   `json:"model"`
-	StopReason  string   `json:"stop_reason"`
-	StopSequence string  `json:"stop_sequence"`
-	Usage       Usage    `json:"usage"`
+	ID           string         `json:"id"`
+	Type         string         `json:"type"`
+	Role         string         `json:"role"`
+	Content      []ContentBlock `json:"content"`
+	Model        string         `json:"model"`
+	StopReason   string         `json:"stop_reason"`
+	StopSequence string         `json:"stop_sequence"`
+	Usage        Usage          `json:"usage"`
 }
 
 // client is the HTTP client for Claude API calls.

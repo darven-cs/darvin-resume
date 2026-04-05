@@ -1,6 +1,6 @@
 <div align="center">
 
-# Open-Resume
+# Darvin-Resume
 
 **Markdown-Native, Privacy-First, AI-Powered Resume Builder**
 
@@ -18,9 +18,9 @@
 
 > **Editor preview matches PDF export exactly. What you see is what you get.**
 
-Open-Resume is a **local-first** resume builder designed for CS graduates and junior developers (0-3 years experience). All data is stored locally in SQLite. Bring your own AI API key — the platform never intercepts your requests.
+Darvin-Resume is a **local-first** resume builder designed for CS graduates and junior developers (0-3 years experience). All data is stored locally in SQLite. Bring your own AI API key — the platform never intercepts your requests.
 
-## Why Open-Resume?
+## Why Darvin-Resume?
 
 | Pain Point | Solution |
 |---|---|

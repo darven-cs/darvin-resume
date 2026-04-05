@@ -2,7 +2,7 @@
   <div class="app-layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h2>Open-Resume</h2>
+        <h2>Darvin-Resume</h2>
       </div>
       <nav class="sidebar-nav">
         <RouterLink to="/">简历列表</RouterLink>

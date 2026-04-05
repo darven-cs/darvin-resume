@@ -1,4 +1,4 @@
-module open-resume
+module Darvin-Resume
 
 go 1.25.0
 

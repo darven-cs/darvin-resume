@@ -1,4 +1,4 @@
-# Requirements: Open-Resume
+# Requirements: Darvin-Resume
 
 **Defined:** 2026-04-05
 **Core Value:** 编辑器预览与PDF导出100%排版一致，所见即所得，零排版焦虑

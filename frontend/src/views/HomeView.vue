@@ -3,7 +3,7 @@
     <!-- 顶部栏 -->
     <header class="top-bar">
       <div class="top-bar-left">
-        <h1 class="app-title">Open-Resume</h1>
+        <h1 class="app-title">Darvin-Resume</h1>
       </div>
       <div class="top-bar-right">
         <!-- 搜索框 -->

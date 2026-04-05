@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"open-resume/internal/converter"
-	"open-resume/internal/database"
-	"open-resume/internal/model"
+	"Darvin-Resume/internal/converter"
+	"Darvin-Resume/internal/database"
+	"Darvin-Resume/internal/model"
 
 	"github.com/google/uuid"
 )
@@ -303,10 +303,10 @@ func (s *resumeService) Delete(ctx context.Context, id string) error {
 
 // UpdateJSON updates resume data.
 // Supports two formats:
-// 1. Object format (from auto-save): {"markdownContent": "...", "jobTarget": "..."}
-//    → merges into existing json_data, updates markdown_content
-// 2. Array format (from wizard): [{"type": "...", ...}]
-//    → parses as modules, regenerates markdown (backward compatible)
+//  1. Object format (from auto-save): {"markdownContent": "...", "jobTarget": "..."}
+//     → merges into existing json_data, updates markdown_content
+//  2. Array format (from wizard): [{"type": "...", ...}]
+//     → parses as modules, regenerates markdown (backward compatible)
 func (s *resumeService) UpdateJSON(ctx context.Context, id string, jsonData string) error {
 	// Verify resume exists and not deleted
 	checkQuery := `SELECT id FROM resumes WHERE id = ? AND is_deleted = FALSE`
@@ -440,12 +440,12 @@ func (s *resumeService) DuplicateResume(ctx context.Context, id string) (*model.
 
 	// 创建副本，使用新的 UUID 和 "(副本)" 后缀标题
 	duplicate := &model.Resume{
-		Title:     original.Title + "(副本)",
-		BasicInfo: original.BasicInfo,
-		Modules:   original.Modules,
+		Title:      original.Title + "(副本)",
+		BasicInfo:  original.BasicInfo,
+		Modules:    original.Modules,
 		TemplateID: original.TemplateID,
-		CustomCSS: original.CustomCSS,
-		JobTarget: original.JobTarget,
+		CustomCSS:  original.CustomCSS,
+		JobTarget:  original.JobTarget,
 	}
 
 	if err := s.Create(ctx, duplicate); err != nil {

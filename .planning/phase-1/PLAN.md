@@ -43,7 +43,7 @@
 #### T1: 初始化 Wails 项目
 - 在项目根目录下使用 `wails init` 初始化（需先备份现有文件）
 - 使用模板: `vue-ts`（Vue 3 + TypeScript）
-- 项目名: `open-resume`
+- 项目名: `Darvin-Resume`
 - 由于项目目录已存在（有 .planning/、CLAUDE.md 等），需要：
   1. 在临时目录创建 Wails 项目
   2. 将生成的文件合并到当前目录
@@ -52,8 +52,8 @@
 #### T2: 配置 wails.json
 ```json5
 {
-  "name": "open-resume",
-  "outputfilename": "Open-Resume",
+  "name": "Darvin-Resume",
+  "outputfilename": "Darvin-Resume",
   "frontend:dir": "frontend",
   "frontend:install": "npm install",
   "frontend:build": "npm run build",
@@ -62,8 +62,8 @@
   "wailsjsdir": "frontend/src/wailsjs",
   "assetdir": "frontend/dist",
   "info": {
-    "companyName": "Open-Resume",
-    "productName": "Open-Resume",
+    "companyName": "Darvin-Resume",
+    "productName": "Darvin-Resume",
     "productVersion": "0.1.0",
     "comments": "Markdown原生、隐私优先的本地化简历工具"
   }
@@ -123,7 +123,7 @@ frontend/
   <div class="app-layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h2>Open-Resume</h2>
+        <h2>Darvin-Resume</h2>
       </div>
       <nav class="sidebar-nav">
         <RouterLink to="/">简历列表</RouterLink>
@@ -189,7 +189,7 @@ export function renderMarkdown(content: string): string {
 ```go
 // 功能：
 // - 初始化 SQLite 连接（使用 modernc.org/sqlite）
-// - 数据库文件路径：用户数据目录/open-resume/data.db
+// - 数据库文件路径：用户数据目录/Darvin-Resume/data.db
 // - 启用 WAL 模式、外键约束
 // - 连接池配置
 // - 优雅关闭
@@ -424,7 +424,7 @@ Wails Bind 配置：
 ```go
 // main.go
 err := wails.Run(&options.App{
-    Title:     "Open-Resume",
+    Title:     "Darvin-Resume",
     Width:     1280,
     Height:    800,
     MinWidth:  1200,
@@ -489,7 +489,7 @@ err := wails.Run(&options.App{
 与 Go 后端模型对应的 TypeScript 类型定义，确保前后端类型一致。
 
 #### T4: 前端视图页面
-- **HomeView.vue**: 空白首页，展示"Open-Resume"标题，含"新建简历"按钮占位
+- **HomeView.vue**: 空白首页，展示"Darvin-Resume"标题，含"新建简历"按钮占位
 - **EditorView.vue**: 空白编辑器页面占位（Phase 2 完善）
 - 路由已在 01-01 T5 配置，此处仅创建视图组件
 
@@ -524,7 +524,7 @@ err := wails.Run(&options.App{
 - [ ] 前端控制台可调用 Bridge 方法并获得返回值
 - [ ] JSON→Markdown 转换输出格式正确（由 converter 测试保证，非手动对比）
 - [ ] 前端路由 `/` 和 `/editor/:id` 均可正常访问
-- [ ] 应用窗口标题显示 "Open-Resume"
+- [ ] 应用窗口标题显示 "Darvin-Resume"
 
 ---
 

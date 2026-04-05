@@ -132,5 +132,5 @@ func getUserDataDir() (string, error) {
 		}
 	}
 
-	return filepath.Join(dataHome, "open-resume"), nil
+	return filepath.Join(dataHome, "Darvin-Resume"), nil
 }

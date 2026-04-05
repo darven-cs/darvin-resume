@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"open-resume/internal/model"
+	"Darvin-Resume/internal/model"
 )
 
 func TestConvertBasicInfo(t *testing.T) {
@@ -48,12 +48,12 @@ func TestConvertBasicInfo(t *testing.T) {
 func TestConvertEducation(t *testing.T) {
 	itemsJSON, _ := json.Marshal([]model.EducationItem{
 		{
-			School:    "清华大学",
-			Degree:    "本科",
-			Major:     "计算机科学与技术",
-			StartDate: "2018-09",
-			EndDate:   "2022-06",
-			GPA:       "3.8/4.0",
+			School:     "清华大学",
+			Degree:     "本科",
+			Major:      "计算机科学与技术",
+			StartDate:  "2018-09",
+			EndDate:    "2022-06",
+			GPA:        "3.8/4.0",
 			Highlights: []string{"GPA排名前10%", "获得国家奖学金"},
 		},
 	})
@@ -301,7 +301,7 @@ func TestConvertAwards(t *testing.T) {
 			Description: "全校仅10人获得",
 		},
 		{
-			Name: "优秀学生干部",
+			Name:  "优秀学生干部",
 			Level: "校级",
 			Date:  "2022-05",
 		},
@@ -340,13 +340,13 @@ func TestConvertAwards(t *testing.T) {
 func TestConvertCertificates(t *testing.T) {
 	itemsJSON, _ := json.Marshal([]model.CertificateItem{
 		{
-			Name:    "英语四级",
-			Issuer:  "教育部",
-			Date:    "2020-09",
-			Score:   "580分",
+			Name:   "英语四级",
+			Issuer: "教育部",
+			Date:   "2020-09",
+			Score:  "580分",
 		},
 		{
-			Name:  "云计算工程师",
+			Name:   "云计算工程师",
 			Issuer: "阿里云",
 			Date:   "2023-03",
 		},
@@ -503,12 +503,12 @@ func TestFullResume(t *testing.T) {
 	// Create a complete resume with all module types
 	educationJSON, _ := json.Marshal([]model.EducationItem{
 		{
-			School:    "清华大学",
-			Degree:    "本科",
-			Major:     "计算机科学",
-			StartDate: "2018-09",
-			EndDate:   "2022-06",
-			GPA:       "3.9/4.0",
+			School:     "清华大学",
+			Degree:     "本科",
+			Major:      "计算机科学",
+			StartDate:  "2018-09",
+			EndDate:    "2022-06",
+			GPA:        "3.9/4.0",
 			Highlights: []string{"GPA 3.9", "国家奖学金"},
 		},
 	})

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"open-resume/internal/database"
+	"Darvin-Resume/internal/database"
 )
 
 // ErrChatNotFound is returned when no chat history exists for a resume.

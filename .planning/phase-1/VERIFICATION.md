@@ -36,7 +36,7 @@
 
 ROADMAP.md Success Criteria 明确要求"显示基础页面框架（侧边栏+主内容区）"。但 PLAN.md 中:
 - Plan 01-01 T5: 仅配置基础 Vue Router（`/` → HomeView 空白首页）
-- Plan 01-03 T4: App.vue 仅有 `<router-view />`，HomeView.vue 展示"Open-Resume标题和基本布局"
+- Plan 01-03 T4: App.vue 仅有 `<router-view />`，HomeView.vue 展示"Darvin-Resume标题和基本布局"
 - 没有任何任务实现侧边栏+主内容区的布局结构
 
 **改进建议**: 在 Plan 01-03 T4 中增加侧边栏布局实现，或在 App.vue 中实现基础的 sidebar + main content 双栏布局框架。如果认为侧边栏布局属于 Phase 2（核心编辑器阶段），则应与 ROADMAP.md 协调修改 Success Criterion 1 的措辞，使其与计划一致。
@@ -196,7 +196,7 @@ Plan 01-02 T5 提到"在 app.startup() 中调用 database.Init()"，但未考虑
 | JSON→Markdown 转换输出格式正确（手动对比验证） | 仅手动验证 | **FLAG** — 应有自动化测试用例 |
 | 创建简历后重启应用，数据完整保留 | 集成测试描述清晰 | 合理（T5 描述了测试流程） |
 | 前端路由正常跳转（/ 和 /editor/:id） | 可手动验证 | 合理 |
-| 应用窗口标题显示 "Open-Resume" | 可手动验证 | 合理 |
+| 应用窗口标题显示 "Darvin-Resume" | 可手动验证 | 合理 |
 
 ### 问题
 

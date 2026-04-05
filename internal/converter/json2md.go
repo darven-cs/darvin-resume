@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"open-resume/internal/model"
+	"Darvin-Resume/internal/model"
 )
 
 // ConvertResumeToMarkdown converts a resume model to markdown format

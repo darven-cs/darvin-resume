@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"open-resume/internal/database"
-	"open-resume/internal/model"
+	"Darvin-Resume/internal/database"
+	"Darvin-Resume/internal/model"
 )
 
 // TestMain sets up the test environment
@@ -285,11 +285,11 @@ func TestIntegration_TimestampUpdates(t *testing.T) {
 	// Update the resume
 	newModules := []model.Module{
 		{
-			Type:     "basicInfo",
-			Title:    "基本信息",
-			Order:    0,
-			Visible:  true,
-			Items:    json.RawMessage(`{"name":"Test User"}`),
+			Type:    "basicInfo",
+			Title:   "基本信息",
+			Order:   0,
+			Visible: true,
+			Items:   json.RawMessage(`{"name":"Test User"}`),
 		},
 	}
 	newModulesJSON, _ := json.Marshal(newModules)

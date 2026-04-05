@@ -27,10 +27,10 @@ SQLite 数据库正确初始化，简历结构化 JSON Schema 定义完整，CRU
 
 ### 数据库连接管理 (internal/database/db.go)
 - 使用 modernc.org/sqlite 纯 Go SQLite 驱动
-- 数据库文件路径：用户数据目录/open-resume/data.db
-  - Linux: ~/.local/share/open-resume/
-  - macOS: ~/Library/Application Support/open-resume/
-  - Windows: %APPDATA%/open-resume/
+- 数据库文件路径：用户数据目录/Darvin-Resume/data.db
+  - Linux: ~/.local/share/Darvin-Resume/
+  - macOS: ~/Library/Application Support/Darvin-Resume/
+  - Windows: %APPDATA%/Darvin-Resume/
 - 启用 WAL 模式、外键约束
 - 连接池配置（MaxOpenConns=1, MaxIdleConns=1）
 - 优雅关闭

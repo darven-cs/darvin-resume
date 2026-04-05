@@ -1,8 +1,8 @@
-# Open-Resume
+# Darvin-Resume
 
 ## What This Is
 
-Open-Resume 是一款基于 Markdown 原生、隐私优先、AI 深度协同、开发者友好的本地化简历制作与管理工具。基于 Wails v2 (Go + WebView) 构建，面向计算机专业应届生及毕业3年内的初级开发者，解决排版错乱、多版本管理难、内容润色效率低、简历隐私泄露四大核心痛点。所有数据100%本地存储于 SQLite，用户自备 AI API Key，平台不截留任何请求数据。
+Darvin-Resume 是一款基于 Markdown 原生、隐私优先、AI 深度协同、开发者友好的本地化简历制作与管理工具。基于 Wails v2 (Go + WebView) 构建，面向计算机专业应届生及毕业3年内的初级开发者，解决排版错乱、多版本管理难、内容润色效率低、简历隐私泄露四大核心痛点。所有数据100%本地存储于 SQLite，用户自备 AI API Key，平台不截留任何请求数据。
 
 ## Core Value
 

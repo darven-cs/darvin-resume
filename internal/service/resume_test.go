@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"open-resume/internal/database"
-	"open-resume/internal/model"
+	"Darvin-Resume/internal/database"
+	"Darvin-Resume/internal/model"
 
 	_ "modernc.org/sqlite"
 )
@@ -122,7 +122,7 @@ func TestGetResume(t *testing.T) {
 				Title:   "教育经历",
 				Order:   1,
 				Visible: true,
-				Items: json.RawMessage(`[{"school":"清华大学","major":"计算机科学","degree":"本科","startDate":"2018-09","endDate":"2022-06"}]`),
+				Items:   json.RawMessage(`[{"school":"清华大学","major":"计算机科学","degree":"本科","startDate":"2018-09","endDate":"2022-06"}]`),
 			},
 		},
 	}

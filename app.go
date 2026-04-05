@@ -4,18 +4,18 @@ import (
 	"context"
 	"log"
 
-	"open-resume/internal/ai"
-	"open-resume/internal/database"
-	"open-resume/internal/model"
-	"open-resume/internal/service"
+	"Darvin-Resume/internal/ai"
+	"Darvin-Resume/internal/database"
+	"Darvin-Resume/internal/model"
+	"Darvin-Resume/internal/service"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
 type App struct {
-	ctx    context.Context
-	svc    service.ResumeService
+	ctx context.Context
+	svc service.ResumeService
 }
 
 // NewApp creates a new App application struct
@@ -119,10 +119,10 @@ func (a *App) GetAIConfig() (map[string]interface{}, error) {
 		return nil, err
 	}
 	return map[string]interface{}{
-		"apiKey":        cfg.APIKey,
-		"baseURL":       cfg.BaseURL,
-		"defaultModel":  cfg.DefaultModel,
-		"maxTokens":     cfg.MaxTokens,
+		"apiKey":         cfg.APIKey,
+		"baseURL":        cfg.BaseURL,
+		"defaultModel":   cfg.DefaultModel,
+		"maxTokens":      cfg.MaxTokens,
 		"timeoutSeconds": cfg.TimeoutSecs,
 	}, nil
 }
@@ -134,7 +134,7 @@ func (a *App) SaveAIConfig(config map[string]interface{}) error {
 		BaseURL:      getString(config, "baseURL", ai.DefaultBaseURL),
 		DefaultModel: getString(config, "defaultModel", ai.DefaultModel),
 		MaxTokens:    getInt(config, "maxTokens", ai.DefaultMaxTokens),
-		TimeoutSecs: getInt(config, "timeoutSeconds", ai.DefaultTimeoutSecs),
+		TimeoutSecs:  getInt(config, "timeoutSeconds", ai.DefaultTimeoutSecs),
 	}
 	if err := cfg.Validate(); err != nil {
 		return err

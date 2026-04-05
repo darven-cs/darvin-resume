@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"open-resume/internal/database"
+	"Darvin-Resume/internal/database"
 )
 
 // ErrSettingNotFound is returned when a setting key does not exist.
