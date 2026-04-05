@@ -39,7 +39,7 @@
 - [x] **AIAI-05**: 职位目标上下文管理 — 简历编辑页顶部可编辑目标岗位，AI调用默认传入
 - [x] **AIAI-06**: 全文上下文参考开关 — 局部润色/翻译默认关闭，全文重写/结构化生成默认开启
 - [x] **AIAI-07**: 流式传输 — 所有AI生成内容支持流式传输（SSE协议），打字机效果实时渲染
-- [ ] **AIAI-08**: AI对话侧边栏 — 编辑器右侧唤起，支持多轮对话，可引用选中文本，输出可一键插入编辑区
+- [x] **AIAI-08**: AI对话侧边栏 — 编辑器右侧唤起，支持多轮对话，可引用选中文本，输出可一键插入编辑区
 - [x] **AIAI-09**: 一键解析 — 用户粘贴纯文本/Markdown旧简历后AI自动解析生成结构化数据+Markdown内容
 - [x] **AIAI-10**: 网络/API调用失败时弹窗提示错误原因，完整保留原始输入，提供一键重试
 - [x] **AIAI-11**: Token超限时自动检测并分批生成，同时弹窗提示用户精简内容
@@ -141,7 +141,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AIAI-05 | Phase 3 | Complete |
 | AIAI-06 | Phase 3 | Complete |
 | AIAI-07 | Phase 3 | Complete |
-| AIAI-08 | Phase 3 | Pending |
+| AIAI-08 | Phase 3 | Complete |
 | AIAI-09 | Phase 3 | Complete |
 | AIAI-10 | Phase 3 | Complete |
 | AIAI-11 | Phase 3 | Complete |
