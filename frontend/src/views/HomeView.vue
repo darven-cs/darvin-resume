@@ -2,11 +2,32 @@
   <div class="home-view">
     <h1>Open-Resume</h1>
     <p class="subtitle">Markdown原生、隐私优先的本地化简历工具</p>
-    <button class="create-btn">新建简历</button>
+    <button class="create-btn" @click="createResume">新建简历</button>
+    <p v-if="message" class="message">{{ message }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { CreateResume } from '../wailsjs/wailsjs/go/main/App'
+
+const router = useRouter()
+const message = ref('')
+
+async function createResume() {
+  try {
+    const resume = await CreateResume('我的简历')
+    message.value = `创建成功！ID: ${resume.id}`
+    // 跳转到编辑器
+    setTimeout(() => {
+      router.push(`/editor/${resume.id}`)
+    }, 500)
+  } catch (err) {
+    message.value = `创建失败: ${err}`
+    console.error(err)
+  }
+}
 </script>
 
 <style scoped>
@@ -46,5 +67,16 @@ h1 {
 
 .create-btn:hover {
   background-color: #2ea043;
+}
+
+.message {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.message:empty {
+  display: none;
 }
 </style>

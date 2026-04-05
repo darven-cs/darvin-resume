@@ -316,3 +316,11 @@ func (a *App) AISendChatMessage(operationId string, prompt string, jobTarget str
 
 	return fullContent, nil
 }
+
+// AICancelOperation cancels a running AI streaming operation.
+// It removes the operation from the active set, allowing the streaming loop to exit.
+// Implements AIAI-13: user-initiated abort with content preservation.
+func (a *App) AICancelOperation(operationId string) error {
+	ai.CancelOperation(operationId)
+	return nil
+}
