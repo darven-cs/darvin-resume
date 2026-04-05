@@ -75,6 +75,9 @@
       </div>
     </main>
 
+    <!-- 回收站折叠区 -->
+    <RecycleBinSection @restore="handleRecycleAction" @permanent-delete="handleRecycleAction" />
+
     <!-- 创建模式选择弹窗 -->
     <CreateModeModal
       :visible="showCreateModal"
@@ -87,10 +90,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { CreateResume } from '../wailsjs/wailsjs/go/main/App'
+import { CreateResume, UpdateResume } from '../wailsjs/wailsjs/go/main/App'
 import { useResumeList } from '../composables/useResumeList'
 import ResumeCard from '../components/ResumeCard.vue'
 import CreateModeModal from '../components/CreateModeModal.vue'
+import RecycleBinSection from '../components/RecycleBinSection.vue'
 
 const router = useRouter()
 const {
@@ -148,13 +152,49 @@ async function handleDelete(id: string) {
   }
 }
 
+// 回收站操作后刷新列表
+function handleRecycleAction() {
+  fetchResumes()
+}
+
+// 空白简历模板 per D-02 / RESM-05
+const BLANK_TEMPLATE = `# 你的姓名
+
+📞 电话 | ✉️ 邮箱 | 🌐 GitHub
+
+---
+
+## 专业技能
+
+-
+
+## 项目经历
+
+### 项目名称
+**角色** | 起始日期 - 结束日期
+
+- 描述
+
+## 自我评价
+
+-`
+
 // 处理创建模式选择
 async function handleCreateMode(mode: 'wizard' | 'blank') {
   try {
-    const resume = await CreateResume('我的简历')
     if (mode === 'wizard') {
+      // AI 引导模式：创建简历后带 wizard 参数跳转
+      const resume = await CreateResume('我的简历')
       router.push(`/editor/${resume.id}?wizard=true`)
     } else {
+      // 空白页模式 per D-02 / RESM-05
+      // 创建新简历后，填入空白模板并跳转
+      const resume = await CreateResume('未命名简历')
+      // 使用 UpdateResume 填入空白模板内容
+      await UpdateResume(resume.id, JSON.stringify({
+        markdownContent: BLANK_TEMPLATE,
+        jobTarget: ''
+      }))
       router.push(`/editor/${resume.id}`)
     }
   } catch (err) {

@@ -2,16 +2,59 @@
   <div class="editor-view">
     <!-- Editor Toolbar -->
     <div class="editor-toolbar">
+      <!-- 返回按钮 per D-29 -->
+      <button class="toolbar-btn" @click="handleBack" title="返回 (有未保存内容时将提示)">
+        <span class="btn-icon">&#8592;</span>
+        <span class="btn-label">返回</span>
+      </button>
+      <div class="toolbar-divider" />
+
+      <!-- 简历标题编辑 per D-30 -->
+      <div class="title-edit-wrapper">
+        <input
+          v-if="isEditingTitle"
+          ref="titleInputRef"
+          v-model="editingTitle"
+          class="title-input"
+          @keydown.enter="confirmTitleEdit"
+          @keydown.escape="cancelTitleEdit"
+          @blur="confirmTitleEdit"
+        />
+        <button
+          v-else
+          class="title-display"
+          @click="startTitleEdit"
+          :title="'点击修改标题: ' + resumeTitle"
+        >
+          <span class="title-text">{{ resumeTitle }}</span>
+          <svg class="title-edit-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="toolbar-divider" />
+
+      <!-- 导入按钮 -->
       <button class="toolbar-btn" @click="showParserModal = true" title="导入旧简历">
         <span class="btn-icon">📥</span>
         <span class="btn-label">导入</span>
       </button>
-      <div class="toolbar-divider" />
+
       <JobTargetChip
         v-model="jobTarget"
         @change="handleJobTargetChange"
       />
       <div class="toolbar-spacer" />
+
+      <!-- 保存状态指示器 per D-25 -->
+      <SaveStatusIndicator
+        :status="saveStatus"
+        :error-message="errorMessage"
+        @retry="handleRetrySave"
+      />
+
       <button
         class="toolbar-btn"
         @click="showAIConfigModal = true"
@@ -134,7 +177,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import MonacoEditor from '../components/MonacoEditor.vue'
 import SplitPane from '../components/SplitPane.vue'
 import A4Page from '../components/A4Page.vue'
@@ -143,10 +186,13 @@ import ResumeParserModal from '../components/ResumeParserModal.vue'
 import AIChatSidebar from '../components/AIChatSidebar.vue'
 import AIConfigModal from '../components/AIConfigModal.vue'
 import ResumeWizardSidebar from '../components/ResumeWizardSidebar.vue'
-import { GetResume, UpdateResume } from '../wailsjs/wailsjs/go/main/App'
+import SaveStatusIndicator from '../components/SaveStatusIndicator.vue'
+import { useAutoSave } from '../composables/useAutoSave'
+import { GetResume, RenameResume } from '../wailsjs/wailsjs/go/main/App'
 import type { Resume } from '../types/resume'
 
 const route = useRoute()
+const router = useRouter()
 const monacoRef = ref<InstanceType<typeof MonacoEditor> | null>(null)
 
 // 当前简历 ID
@@ -156,6 +202,12 @@ const resumeId = computed(() => route.params.id as string)
 const content = ref('')
 const debouncedContent = ref('')
 const jobTarget = ref('')
+
+// 简历标题 per D-30
+const resumeTitle = ref('未命名简历')
+const isEditingTitle = ref(false)
+const editingTitle = ref('')
+const titleInputRef = ref<HTMLInputElement | null>(null)
 
 // Modal 状态
 const showParserModal = ref(false)
@@ -173,8 +225,11 @@ const windowWidth = ref(window.innerWidth)
 const isSinglePane = computed(() => windowWidth.value < 1200)
 const activeView = ref<'editor' | 'preview'>('editor')
 
-// 防抖保存 timer
-let saveTimer: ReturnType<typeof setTimeout> | null = null
+// 自动保存 composable per D-25~D-28
+const { saveStatus, errorMessage, markDirty, triggerSave, startAutoSave, stopAutoSave } = useAutoSave({
+  resumeId,
+  getData: () => ({ markdownContent: content.value, jobTarget: jobTarget.value })
+})
 
 // 加载简历数据
 onMounted(async () => {
@@ -185,10 +240,14 @@ onMounted(async () => {
       content.value = resume.markdownContent || ''
       debouncedContent.value = resume.markdownContent || ''
       jobTarget.value = (resume as any).jobTarget || ''
+      resumeTitle.value = resume.title || '未命名简历'
     } catch (err) {
       console.error('Failed to load resume:', err)
     }
   }
+
+  // 启动自动保存定时器 per D-26
+  startAutoSave()
 
   // 监听窗口宽度变化
   window.addEventListener('resize', handleResize)
@@ -199,49 +258,73 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
-  if (saveTimer) clearTimeout(saveTimer)
+  stopAutoSave()
 })
 
 function handleResize() {
   windowWidth.value = window.innerWidth
 }
 
-// 内容变化处理 per D-10 (150ms debounce)
+// 内容变化处理 per D-10 (150ms debounce for preview)
+// 预览防抖和自动保存是两个独立机制，不互相干扰 per D-10 注释
 function handleContentChange(newContent: string) {
   content.value = newContent
-  debouncedSave()
-}
-
-// 150ms 防抖 timer per D-10
-function debouncedSave() {
-  if (saveTimer) clearTimeout(saveTimer)
-  saveTimer = setTimeout(() => {
-    debouncedContent.value = content.value
-    saveResume()
-  }, 150)
-}
-
-// 保存简历到后端
-async function saveResume() {
-  const id = resumeId.value
-  if (!id) return
-
-  try {
-    // 构建更新数据（包含 markdownContent 和 jobTarget）
-    const resumeData: Record<string, unknown> = {
-      markdownContent: content.value,
-      jobTarget: jobTarget.value,
-    }
-    await UpdateResume(id, JSON.stringify(resumeData))
-  } catch (err) {
-    console.error('Failed to save resume:', err)
-  }
+  // 标记内容已修改，触发自动保存
+  markDirty()
 }
 
 // 职位目标变更时保存
 async function handleJobTargetChange(value: string) {
   jobTarget.value = value
-  debouncedSave()
+  markDirty()
+}
+
+// 重试保存
+function handleRetrySave() {
+  triggerSave()
+}
+
+// 返回按钮处理 per D-29
+function handleBack() {
+  // 有未保存内容时弹确认框
+  if (saveStatus.value === 'unsaved' || saveStatus.value === 'error') {
+    if (confirm('有未保存的内容，确定要离开吗？')) {
+      triggerSave().then(() => router.push('/'))
+      return
+    }
+  }
+  router.push('/')
+}
+
+// 标题编辑 per D-30
+function startTitleEdit() {
+  editingTitle.value = resumeTitle.value
+  isEditingTitle.value = true
+  // DOM 更新后聚焦 input
+  setTimeout(() => {
+    titleInputRef.value?.focus()
+    titleInputRef.value?.select()
+  }, 0)
+}
+
+async function confirmTitleEdit() {
+  if (!isEditingTitle.value) return
+  isEditingTitle.value = false
+
+  const newTitle = editingTitle.value.trim()
+  if (!newTitle || newTitle === resumeTitle.value) return
+
+  try {
+    await RenameResume(resumeId.value, newTitle)
+    resumeTitle.value = newTitle
+  } catch (err) {
+    console.error('重命名失败:', err)
+  }
+}
+
+function cancelTitleEdit() {
+  isEditingTitle.value = false
+  editingTitle.value = ''
 }
 
 // 导入旧简历处理
@@ -255,8 +338,8 @@ async function handleImport(markdown: string, importedJobTarget: string) {
     jobTarget.value = importedJobTarget
   }
 
-  // 保存到后端
-  await saveResume()
+  // 触发保存 per D-26 (AI操作完成时)
+  await triggerSave()
 
   // 关闭 modal
   showParserModal.value = false
@@ -292,10 +375,26 @@ async function loadResume() {
     content.value = resume.markdownContent || ''
     debouncedContent.value = resume.markdownContent || ''
     jobTarget.value = (resume as any).jobTarget || ''
+    resumeTitle.value = resume.title || '未命名简历'
   } catch (err) {
     console.error('Failed to load resume:', err)
   }
 }
+
+// 路由离开守卫 per D-31
+onBeforeRouteLeave((to, from, next) => {
+  if (saveStatus.value === 'unsaved') {
+    const confirmed = confirm('有未保存的内容，确定要离开吗？')
+    if (confirmed) {
+      triggerSave().then(() => next())
+      return
+    } else {
+      next(false)
+    }
+  } else {
+    next()
+  }
+})
 
 // 150ms 防抖更新预览 per D-10
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -389,6 +488,63 @@ function setupScrollSync() {
 
 .toolbar-spacer {
   flex: 1;
+}
+
+/* 简历标题编辑 per D-30 */
+.title-edit-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.title-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+  max-width: 200px;
+}
+
+.title-display:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #3c3c3c;
+}
+
+.title-text {
+  font-size: 12px;
+  color: #e6edf3;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.title-edit-icon {
+  color: #8b949e;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.title-display:hover .title-edit-icon {
+  opacity: 1;
+}
+
+.title-input {
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #e6edf3;
+  background: #1e1e1e;
+  border: 1px solid #58a6ff;
+  border-radius: 4px;
+  outline: none;
+  width: 180px;
 }
 
 /* 双栏模式 */
