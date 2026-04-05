@@ -51,10 +51,10 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 02-01: Monaco Editor集成、Markdown语法高亮、VS Code兼容键位配置
-- [ ] 02-02: 双栏布局组件、拖拽调整栏宽、统一渲染引擎(Markdown-it)与CSS样式表
-- [ ] 02-03: 实时预览同步(延迟<200ms)、A4分页线显示
-- [ ] 02-04: 行级交互 — 折叠/展开、拖拽排序、快捷菜单
+- [x] 02-01: Monaco Editor集成、Markdown语法高亮、VS Code兼容键位配置
+- [x] 02-02: 双栏布局组件、拖拽调整栏宽、统一渲染引擎(Markdown-it)与CSS样式表
+- [x] 02-03: 实时预览同步(延迟<200ms)、A4分页线显示
+- [x] 02-04: 行级交互 — 折叠/展开、拖拽排序、快捷菜单
 
 ### Phase 3: AI核心能力
 **Goal**: 用户可以在编辑过程中随时调用AI能力润色、翻译、改写内容，并通过AI对话获取简历建议
@@ -66,11 +66,11 @@ Plans:
   3. 用户可以从编辑器右侧唤起AI对话侧边栏，进行多轮对话，引用选中文本，一键插入AI输出
   4. 用户粘贴旧简历文本后，AI可以自动解析生成结构化数据和Markdown内容
   5. 网络失败、Token超限、格式异常、用户中断等异常场景均有兜底处理，不丢失已输入内容
-**Plans**: TBD
+**Plans**: 6 planned,详见 `.planning/phases/03-ai-core/`
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01: Claude Messages API适配、自定义BaseURL、流式传输(SSE)
+- [x] 03-01: Claude Messages API适配、自定义BaseURL、流式传输(SSE)
 - [ ] 03-02: 选区快捷AI操作(润色/翻译/缩写/重写)、浮动工具栏
 - [ ] 03-03: Diff对比视图、AI修改接受/拒绝交互
 - [ ] 03-04: AI对话侧边栏、多轮对话、引用文本、一键插入
@@ -86,7 +86,7 @@ Plans:
   2. 用户可以通过空白页模式直接进入双栏编辑界面，随时调用AI能力
   3. 软件启动后进入简历列表页，用户可以排序、搜索、重命名、复制、删除简历，删除的简历进入回收站30天内可恢复
   4. 编辑过程中内容每30秒自动保存，AI操作完成和页面切换时自动触发保存，无数据丢失
-**Plans**: TBD
+**Plans**: 6 planned,详见 `.planning/phases/03-ai-core/`
 **UI hint**: yes
 
 Plans:
@@ -104,7 +104,7 @@ Plans:
   3. 用户可以将当前样式保存为个人模板，可以输入自定义CSS（仅限白名单属性），可以一键重置默认样式
   4. 用户可以导出PDF（默认系统打印/可选Chromedp），导出严格遵循A4尺寸和分页规则，与预览100%一致
   5. 用户可以创建版本快照（手动/自动），查看版本历史，对比两版本差异，一键回滚
-**Plans**: TBD
+**Plans**: 6 planned,详见 `.planning/phases/03-ai-core/`
 **UI hint**: yes
 
 Plans:
@@ -121,7 +121,7 @@ Plans:
   1. 用户输入的API Key经过AES-256-GCM加密后存储，应用重启后可以正确解密使用
   2. 用户可以一键导出全量数据为加密压缩备份包，可以设置自动备份周期
   3. 用户可以选择备份包一键导入恢复，恢复前自动为当前数据创建备份，恢复后所有数据完整
-**Plans**: TBD
+**Plans**: 6 planned,详见 `.planning/phases/03-ai-core/`
 
 Plans:
 - [ ] 06-01: API Key加密存储 — AES-256-GCM、设备唯一标识密钥生成
@@ -138,7 +138,7 @@ Plans:
   3. 所有AI操作支持快捷键（Ctrl/Cmd+R/T/D），用户可自定义快捷键，配置本地持久化
   4. 无简历时首页展示模板Demo预览和醒目新建按钮，所有异步操作有加载提示，所有操作有即时反馈
   5. 全场景异常状态（网络异常/API失败/渲染异常/数据加载失败）均有错误提示和可执行恢复方案
-**Plans**: TBD
+**Plans**: 6 planned,详见 `.planning/phases/03-ai-core/`
 **UI hint**: yes
 
 Plans:
@@ -155,8 +155,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. 项目骨架与数据层 | 3/3 | ✅ Complete | 2026-04-05 |
-| 2. 核心编辑器 | 0/4 | Not started | - |
-| 3. AI核心能力 | 0/6 | Not started | - |
+| 2. 核心编辑器 | 4/4 | ✅ Complete | 2026-04-05 |
+| 3. AI核心能力 | 1/6 | 🔄 In Progress | - |
 | 4. 简历创建与管理 | 0/3 | Not started | - |
 | 5. 模板与导出 | 0/4 | Not started | - |
 | 6. 数据安全与备份 | 0/3 | Not started | - |
