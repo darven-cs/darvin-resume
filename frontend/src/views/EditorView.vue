@@ -1,5 +1,18 @@
 <template>
   <div class="editor-view">
+    <!-- Editor Toolbar -->
+    <div class="editor-toolbar">
+      <button class="toolbar-btn" @click="showParserModal = true" title="导入旧简历">
+        <span class="btn-icon">📥</span>
+        <span class="btn-label">导入</span>
+      </button>
+      <div class="toolbar-divider" />
+      <JobTargetChip
+        v-model="jobTarget"
+        @change="handleJobTargetChange"
+      />
+    </div>
+
     <!-- 双栏模式 (窗口宽度 >= 1200px) per D-09 -->
     <template v-if="!isSinglePane">
       <SplitPane :default-ratio="40" :min-width="300">
@@ -53,6 +66,7 @@
             <MonacoEditor
               ref="monacoRef"
               v-model="content"
+              :job-target="jobTarget"
               @change="handleContentChange"
             />
           </div>
@@ -62,6 +76,14 @@
         </div>
       </div>
     </template>
+
+    <!-- Resume Parser Modal -->
+    <ResumeParserModal
+      :visible="showParserModal"
+      :resume-id="resumeId"
+      @close="showParserModal = false"
+      @import="handleImport"
+    />
   </div>
 </template>
 
@@ -71,30 +93,42 @@ import { useRoute } from 'vue-router'
 import MonacoEditor from '../components/MonacoEditor.vue'
 import SplitPane from '../components/SplitPane.vue'
 import A4Page from '../components/A4Page.vue'
-import { GetResume } from '../wailsjs/wailsjs/go/main/App'
+import JobTargetChip from '../components/JobTargetChip.vue'
+import ResumeParserModal from '../components/ResumeParserModal.vue'
+import { GetResume, UpdateResume } from '../wailsjs/wailsjs/go/main/App'
+import type { Resume } from '../types/resume'
 
 const route = useRoute()
 const monacoRef = ref<InstanceType<typeof MonacoEditor> | null>(null)
+
+// 当前简历 ID
+const resumeId = computed(() => route.params.id as string)
 
 // 编辑器内容
 const content = ref('')
 const debouncedContent = ref('')
 const jobTarget = ref('')
 
+// Modal 状态
+const showParserModal = ref(false)
+
 // 响应式状态 per D-09
 const windowWidth = ref(window.innerWidth)
 const isSinglePane = computed(() => windowWidth.value < 1200)
 const activeView = ref<'editor' | 'preview'>('editor')
 
+// 防抖保存 timer
+let saveTimer: ReturnType<typeof setTimeout> | null = null
+
 // 加载简历数据
 onMounted(async () => {
-  const resumeId = route.params.id as string
-  if (resumeId) {
+  const id = resumeId.value
+  if (id) {
     try {
-      const resume = await GetResume(resumeId) as any
+      const resume = await GetResume(id)
       content.value = resume.markdownContent || ''
       debouncedContent.value = resume.markdownContent || ''
-      jobTarget.value = resume.jobTarget || ''
+      jobTarget.value = (resume as any).jobTarget || ''
     } catch (err) {
       console.error('Failed to load resume:', err)
     }
@@ -104,12 +138,12 @@ onMounted(async () => {
   window.addEventListener('resize', handleResize)
 
   // 编辑器与预览滚动同步 per D-11
-  // 在 onMounted 中设置（需要等待 Monaco 实例就绪）
   setTimeout(setupScrollSync, 500)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  if (saveTimer) clearTimeout(saveTimer)
 })
 
 function handleResize() {
@@ -119,9 +153,63 @@ function handleResize() {
 // 内容变化处理 per D-10 (150ms debounce)
 function handleContentChange(newContent: string) {
   content.value = newContent
+  debouncedSave()
 }
 
 // 150ms 防抖 timer per D-10
+function debouncedSave() {
+  if (saveTimer) clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    debouncedContent.value = content.value
+    saveResume()
+  }, 150)
+}
+
+// 保存简历到后端
+async function saveResume() {
+  const id = resumeId.value
+  if (!id) return
+
+  try {
+    // 构建更新数据（包含 markdownContent 和 jobTarget）
+    const resumeData: Record<string, unknown> = {
+      markdownContent: content.value,
+      jobTarget: jobTarget.value,
+    }
+    await UpdateResume(id, JSON.stringify(resumeData))
+  } catch (err) {
+    console.error('Failed to save resume:', err)
+  }
+}
+
+// 职位目标变更时保存
+async function handleJobTargetChange(value: string) {
+  jobTarget.value = value
+  debouncedSave()
+}
+
+// 导入旧简历处理
+async function handleImport(markdown: string, importedJobTarget: string) {
+  // 填充编辑器内容
+  content.value = markdown
+  debouncedContent.value = markdown
+
+  // 如果导入了职位目标，更新 chip
+  if (importedJobTarget) {
+    jobTarget.value = importedJobTarget
+  }
+
+  // 保存到后端
+  await saveResume()
+
+  // 关闭 modal
+  showParserModal.value = false
+
+  // 聚焦编辑器
+  monacoRef.value?.focus()
+}
+
+// 150ms 防抖更新预览 per D-10
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 watch(content, (newVal) => {
   if (debounceTimer) clearTimeout(debounceTimer)
@@ -155,6 +243,54 @@ function setupScrollSync() {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Toolbar */
+.editor-toolbar {
+  height: 40px;
+  min-height: 40px;
+  padding: 0 12px;
+  background: #2d2d2d;
+  border-bottom: 1px solid #3c3c3c;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid #3c3c3c;
+  border-radius: 4px;
+  color: #cccccc;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.toolbar-btn:hover {
+  background: #3c3c3c;
+  border-color: #4c4c4c;
+}
+
+.btn-icon {
+  font-size: 13px;
+}
+
+.btn-label {
+  font-size: 12px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: #3c3c3c;
+  margin: 0 4px;
 }
 
 /* 双栏模式 */
@@ -189,9 +325,10 @@ function setupScrollSync() {
 
 /* 单栏模式 per D-09 */
 .single-pane-mode {
-  height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .view-tabs {

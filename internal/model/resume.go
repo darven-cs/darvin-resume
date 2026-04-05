@@ -14,6 +14,7 @@ type Resume struct {
 	TemplateID      string       `json:"templateId"`
 	CustomCSS       string       `json:"customCss"`
 	MarkdownContent string       `json:"markdownContent"`
+	JobTarget       string       `json:"jobTarget"`
 	CreatedAt       time.Time    `json:"createdAt"`
 	UpdatedAt       time.Time    `json:"updatedAt"`
 }
