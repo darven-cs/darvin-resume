@@ -166,7 +166,6 @@ xxx公司 | 前端开发工程师 | 2024-至今
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { v4 as uuidv4 } from 'uuid'
 import { sendMessageSync } from '../services/ai'
 import { jsonToMarkdown } from '../utils/resume'
 import type { ParsedResume } from '../types/resume'
@@ -285,7 +284,7 @@ async function handleParse() {
   parsedData.value = null
   parsedMarkdown.value = ''
 
-  const operationId = `parse-${uuidv4()}`
+  const operationId = `parse-${crypto.randomUUID()}`
   const userPrompt = `请解析以下简历内容：
 
 ${pasteContent.value.trim()}`
