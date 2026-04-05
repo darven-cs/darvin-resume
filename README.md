@@ -49,6 +49,13 @@ Open-Resume is a **local-first** resume builder designed for CS graduates and ju
 - BYOK: bring your own API key, platform never intercepts requests
 - Cross-platform: Windows, macOS, Linux
 
+**Resume Management**
+- AI-guided creation wizard: step-by-step module selection, field filling, real-time AI polish
+- Blank page mode: start from scratch with full AI support
+- Resume list: card grid, search, sort, rename, duplicate, delete
+- Recycle bin: recover or permanently delete within 30 days
+- Auto-save: 30-second interval, AI completion trigger, page navigation trigger, Ctrl/Cmd+S manual save
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -115,10 +122,10 @@ The binary will be in `build/bin/`.
 
 | Phase | Description | Status |
 |---|---|---|
-| 1. Project Skeleton & Data Layer | Wails init, SQLite, JSON schema, routing | Done |
-| 2. Core Editor | Monaco, split-pane, real-time preview, A4 boundary | Done |
-| 3. AI Core | Claude API, streaming, floating toolbar, diff, chat, parsing | Done |
-| 4. Resume Management | List, search, AI-guided creation, trash, auto-save | Planned |
+| 1. Project Skeleton & Data Layer | Wails init, SQLite, JSON schema, routing | ✅ Done |
+| 2. Core Editor | Monaco, split-pane, real-time preview, A4 boundary | ✅ Done |
+| 3. AI Core | Claude API, streaming, floating toolbar, diff, chat, parsing | ✅ Done |
+| 4. Resume Management | List, search, AI wizard, blank page, recycle bin, auto-save | ✅ Done |
 | 5. Templates & Export | Built-in templates, style tuning, PDF export, versioning | Planned |
 | 6. Data Security | Encrypted API keys, backup & restore | Planned |
 | 7. UI Polish | Dark mode, responsive, shortcuts, error handling | Planned |
