@@ -1,0 +1,51 @@
+# ===== OS =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ===== IDE / Editor =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== Go / Wails =====
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+build/
+dist/
+
+# ===== Node / Frontend =====
+node_modules/
+frontend/node_modules/
+*.tsbuildinfo
+
+# ===== Wails 构建产物 =====
+build/bin/
+frontend/dist/
+frontend/build/
+
+# ===== 环境与密钥 =====
+.env
+.env.*
+!.env.example
+
+# ===== 日志 =====
+*.log
+logs/
+
+# ===== SQLite 数据库 (本地测试) =====
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== 临时文件 =====
+tmp/
+temp/
