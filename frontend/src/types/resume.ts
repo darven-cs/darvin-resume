@@ -7,6 +7,7 @@ export interface Resume {
   modules: Module[]
   templateId: string
   customCss: string
+  markdownContent: string
   createdAt: string
   updatedAt: string
 }
