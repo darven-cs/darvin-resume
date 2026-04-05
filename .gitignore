@@ -51,8 +51,6 @@ tmp/
 temp/
 
 # ===== AI/工具配置 =====
-.planning/
-.claude/
 .playwright-mcp/
 
 # ===== 开发临时文件 =====
