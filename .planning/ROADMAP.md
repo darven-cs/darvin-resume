@@ -31,12 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. SQLite数据库正确初始化，简历结构化JSON Schema完整定义并可读写
   3. 新建一条简历记录后关闭应用重新打开，数据完整保留
   4. JSON到Markdown的正向同步可以正确执行，修改JSON字段后生成的Markdown内容准确
-**Plans**: TBD
+**Plans**: 3 planned,详见 `.planning/phase-1/PLAN.md`
 
 Plans:
-- [ ] 01-01: Wails v2项目初始化、Go后端与Vue 3前端项目骨架、基础构建配置
-- [ ] 01-02: SQLite存储层实现、简历结构化JSON Schema定义、基础CRUD操作
-- [ ] 01-03: Bridge层绑定、JSON-Markdown正向同步、基础前端页面框架与路由
+- [ ] 01-01: Wails v2项目初始化、Go后端与Vue 3前端项目骨架、基础构建配置、侧边栏布局、Markdown-it引擎初始化
+- [ ] 01-02: SQLite存储层实现、简历结构化JSON Schema定义、基础CRUD操作、单元测试
+- [ ] 01-03: Bridge层绑定、JSON-Markdown正向同步、前端页面框架与路由、集成测试
 
 ### Phase 2: 核心编辑器
 **Goal**: 用户可以在双栏界面中流畅编写Markdown并实时看到与导出一致的预览效果
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. 项目骨架与数据层 | 0/3 | Not started | - |
+| 1. 项目骨架与数据层 | 1/3 | In progress | - |
 | 2. 核心编辑器 | 0/4 | Not started | - |
 | 3. AI核心能力 | 0/6 | Not started | - |
 | 4. 简历创建与管理 | 0/3 | Not started | - |
