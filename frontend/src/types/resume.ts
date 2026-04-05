@@ -97,6 +97,7 @@ export interface ResumeListItem {
   id: string
   title: string
   updatedAt: string
+  deletedAt?: string  // 回收站列表需要
 }
 
 /**
