@@ -18,14 +18,26 @@
       :current-operation="currentOperation"
       @operate="handleAIOperation"
     />
+    <!-- AI Diff 对比视图 per EDIT-11 -->
+    <AIDiffView
+      :visible="aiDiff.visible"
+      :original-text="aiDiff.originalText"
+      :modified-text="aiDiff.modifiedText"
+      :operation-type="aiDiff.operationType"
+      :streaming="aiDiff.streaming"
+      :position="toolbarPosition"
+      @accept="handleDiffAccept"
+      @reject="handleDiffReject"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import * as monacoEditor from 'monaco-editor'
 import ContextMenu from './ContextMenu.vue'
 import AIFloatingToolbar from './AIFloatingToolbar.vue'
+import AIDiffView from './AIDiffView.vue'
 import type { MenuItem } from './ContextMenu.vue'
 import { useAISelection } from '../composables/useAISelection'
 import type { AIOperationType } from '../types/ai'
@@ -92,6 +104,28 @@ const {
   updateSelection,
   performAIOperation,
 } = useAISelection(() => editor, props.jobTarget)
+
+// ============================================================
+// AI Diff 对比视图状态 per EDIT-11
+// ============================================================
+
+interface AIDiffState {
+  visible: boolean
+  originalText: string
+  modifiedText: string
+  operationType: AIOperationType
+  range: { startLineNumber: number; startColumn: number; endLineNumber: number; endColumn: number } | null
+  streaming: boolean
+}
+
+const aiDiff = reactive<AIDiffState>({
+  visible: false,
+  originalText: '',
+  modifiedText: '',
+  operationType: 'polish',
+  range: null,
+  streaming: false,
+})
 
 // ============================================================
 // 行首图标装饰 (Gutter Icons) per EDIT-08
@@ -527,23 +561,82 @@ defineExpose({
 })
 
 // ============================================================
-// AI 操作处理器 per EDIT-07
+// AI 操作处理器 per EDIT-07 + Diff 对比 per EDIT-11
 // ============================================================
 
 async function handleAIOperation(operation: string) {
   if (!editor || !selectionRange.value) return
 
-  const result = await performAIOperation(operation as AIOperationType)
-  if (result && selectionRange.value) {
-    // 替换选区内容
-    editor.executeEdits('ai-operation', [{
-      range: selectionRange.value,
-      text: result,
-      forceMoveMarkers: true,
-    }])
-  }
-  // 操作完成后隐藏工具栏
+  // 保存原始选区文本和范围用于 diff 对比
+  const originalText = selectedText.value
+  const savedRange = { ...selectionRange.value }
+
+  // 显示 diff 视图，进入 streaming 状态
+  aiDiff.visible = true
+  aiDiff.originalText = originalText
+  aiDiff.modifiedText = ''
+  aiDiff.operationType = operation as AIOperationType
+  aiDiff.range = savedRange
+  aiDiff.streaming = true
+
+  // 隐藏工具栏（diff 视图替代显示）
   toolbarVisible.value = false
+
+  // 执行 AI 操作
+  const result = await performAIOperation(operation as AIOperationType)
+
+  // 更新 diff 内容
+  if (result) {
+    aiDiff.modifiedText = result
+  }
+  aiDiff.streaming = false
+
+  // 如果操作失败（空结果），关闭 diff 视图
+  if (!result) {
+    aiDiff.visible = false
+  }
+}
+
+/**
+ * 接受 AI 修改：使用 executeEdits 替换选区内容，合并到单个 undo 单元
+ */
+function handleDiffAccept() {
+  if (!editor || !monaco || !aiDiff.range || !aiDiff.modifiedText) return
+
+  const range = new monaco.Range(
+    aiDiff.range.startLineNumber,
+    aiDiff.range.startColumn,
+    aiDiff.range.endLineNumber,
+    aiDiff.range.endColumn,
+  )
+
+  // 使用 executeEdits 替换，支持 Ctrl+Z 一次性撤销
+  editor.executeEdits('ai-accept', [{
+    range,
+    text: aiDiff.modifiedText,
+    forceMoveMarkers: true,
+  }])
+
+  // 关闭 diff 视图
+  closeDiffView()
+}
+
+/**
+ * 拒绝 AI 修改：关闭 diff 视图，原文保持不变
+ */
+function handleDiffReject() {
+  closeDiffView()
+}
+
+/**
+ * 关闭 diff 视图并重置状态
+ */
+function closeDiffView() {
+  aiDiff.visible = false
+  aiDiff.originalText = ''
+  aiDiff.modifiedText = ''
+  aiDiff.range = null
+  aiDiff.streaming = false
 }
 
 // 监听外部 modelValue 变化，同步到编辑器
