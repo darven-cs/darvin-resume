@@ -115,13 +115,75 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be populated by roadmapper) | - | - |
+| EDIT-01 | Phase 2 | Pending |
+| EDIT-02 | Phase 2 | Pending |
+| EDIT-03 | Phase 2 | Pending |
+| EDIT-04 | Phase 1 | Pending |
+| EDIT-05 | Phase 2 | Pending |
+| EDIT-06 | Phase 2 | Pending |
+| EDIT-07 | Phase 3 | Pending |
+| EDIT-08 | Phase 2 | Pending |
+| EDIT-09 | Phase 2 | Pending |
+| EDIT-10 | Phase 2 | Pending |
+| EDIT-11 | Phase 3 | Pending |
+| RESM-01 | Phase 4 | Pending |
+| RESM-02 | Phase 4 | Pending |
+| RESM-03 | Phase 4 | Pending |
+| RESM-04 | Phase 4 | Pending |
+| RESM-05 | Phase 4 | Pending |
+| RESM-06 | Phase 4 | Pending |
+| RESM-07 | Phase 4 | Pending |
+| RESM-08 | Phase 4 | Pending |
+| AIAI-01 | Phase 3 | Pending |
+| AIAI-02 | Phase 6 | Pending |
+| AIAI-03 | Phase 3 | Pending |
+| AIAI-04 | Phase 3 | Pending |
+| AIAI-05 | Phase 3 | Pending |
+| AIAI-06 | Phase 3 | Pending |
+| AIAI-07 | Phase 3 | Pending |
+| AIAI-08 | Phase 3 | Pending |
+| AIAI-09 | Phase 3 | Pending |
+| AIAI-10 | Phase 3 | Pending |
+| AIAI-11 | Phase 3 | Pending |
+| AIAI-12 | Phase 3 | Pending |
+| AIAI-13 | Phase 3 | Pending |
+| TMPL-01 | Phase 5 | Pending |
+| TMPL-02 | Phase 5 | Pending |
+| TMPL-03 | Phase 5 | Pending |
+| TMPL-04 | Phase 5 | Pending |
+| TMPL-05 | Phase 5 | Pending |
+| TMPL-06 | Phase 5 | Pending |
+| TMPL-07 | Phase 1 | Pending |
+| TMPL-08 | Phase 1 | Pending |
+| EXPT-01 | Phase 5 | Pending |
+| EXPT-02 | Phase 5 | Pending |
+| EXPT-03 | Phase 5 | Pending |
+| EXPT-04 | Phase 5 | Pending |
+| EXPT-05 | Phase 5 | Pending |
+| EXPT-06 | Phase 5 | Pending |
+| EXPT-07 | Phase 5 | Pending |
+| EXPT-08 | Phase 5 | Pending |
+| EXPT-09 | Phase 5 | Pending |
+| EXPT-10 | Phase 6 | Pending |
+| EXPT-11 | Phase 6 | Pending |
+| EXPT-12 | Phase 6 | Pending |
+| UIUX-01 | Phase 7 | Pending |
+| UIUX-02 | Phase 7 | Pending |
+| UIUX-03 | Phase 7 | Pending |
+| UIUX-04 | Phase 7 | Pending |
+| UIUX-05 | Phase 7 | Pending |
+| UIUX-06 | Phase 7 | Pending |
+| UIUX-07 | Phase 7 | Pending |
+| UIUX-08 | Phase 7 | Pending |
+| UIUX-09 | Phase 7 | Pending |
+| UIUX-10 | Phase 7 | Pending |
+| UIUX-11 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 57 total
-- Mapped to phases: 0
-- Unmapped: 57 ⚠️
+- v1 requirements: 63 total
+- Mapped to phases: 63
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-05*
-*Last updated: 2026-04-05 after initial definition*
+*Last updated: 2026-04-05 after roadmap creation*
