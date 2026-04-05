@@ -11,6 +11,16 @@
         v-model="jobTarget"
         @change="handleJobTargetChange"
       />
+      <div class="toolbar-spacer" />
+      <button
+        class="toolbar-btn"
+        :class="{ active: chatSidebarVisible }"
+        @click="chatSidebarVisible = !chatSidebarVisible"
+        title="AI 对话 (Ctrl+Shift+A)"
+      >
+        <span class="btn-icon">💬</span>
+        <span class="btn-label">AI 助手</span>
+      </button>
     </div>
 
     <!-- 双栏模式 (窗口宽度 >= 1200px) per D-09 -->
@@ -84,6 +94,17 @@
       @close="showParserModal = false"
       @import="handleImport"
     />
+
+    <!-- AI Chat Sidebar -->
+    <AIChatSidebar
+      ref="chatSidebarRef"
+      :visible="chatSidebarVisible"
+      :resume-id="resumeId"
+      :job-target="jobTarget"
+      :editor-content="content"
+      @close="chatSidebarVisible = false"
+      @insert-text="handleInsertText"
+    />
   </div>
 </template>
 
@@ -95,6 +116,7 @@ import SplitPane from '../components/SplitPane.vue'
 import A4Page from '../components/A4Page.vue'
 import JobTargetChip from '../components/JobTargetChip.vue'
 import ResumeParserModal from '../components/ResumeParserModal.vue'
+import AIChatSidebar from '../components/AIChatSidebar.vue'
 import { GetResume, UpdateResume } from '../wailsjs/wailsjs/go/main/App'
 import type { Resume } from '../types/resume'
 
@@ -111,6 +133,10 @@ const jobTarget = ref('')
 
 // Modal 状态
 const showParserModal = ref(false)
+
+// AI Chat Sidebar 状态
+const chatSidebarVisible = ref(false)
+const chatSidebarRef = ref<InstanceType<typeof AIChatSidebar> | null>(null)
 
 // 响应式状态 per D-09
 const windowWidth = ref(window.innerWidth)
@@ -209,6 +235,11 @@ async function handleImport(markdown: string, importedJobTarget: string) {
   monacoRef.value?.focus()
 }
 
+// AI Sidebar text insertion
+function handleInsertText(text: string) {
+  monacoRef.value?.insertAtCursor(text)
+}
+
 // 150ms 防抖更新预览 per D-10
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 watch(content, (newVal) => {
@@ -278,6 +309,12 @@ function setupScrollSync() {
   border-color: #4c4c4c;
 }
 
+.toolbar-btn.active {
+  background: #0078d4;
+  border-color: #0078d4;
+  color: #ffffff;
+}
+
 .btn-icon {
   font-size: 13px;
 }
@@ -291,6 +328,10 @@ function setupScrollSync() {
   height: 20px;
   background: #3c3c3c;
   margin: 0 4px;
+}
+
+.toolbar-spacer {
+  flex: 1;
 }
 
 /* 双栏模式 */

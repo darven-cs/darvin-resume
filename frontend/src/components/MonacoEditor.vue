@@ -507,6 +507,23 @@ defineExpose({
   getMonaco: () => monaco,
   focus: () => editor?.focus(),
   layout: () => editor?.layout(),
+  /**
+   * Gets the currently selected text in the editor.
+   */
+  getSelection: () => editor?.getModel()?.getValueInRange(editor.getSelection()!),
+  /**
+   * Inserts text at the current cursor position.
+   */
+  insertAtCursor: (text: string) => {
+    if (!editor) return
+    const position = editor.getPosition()
+    if (!position) return
+    editor.executeEdits('insert', [{
+      range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
+      text: text,
+    }])
+    editor.focus()
+  },
 })
 
 // ============================================================
