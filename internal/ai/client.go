@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"open-resume/internal/settings"
@@ -375,6 +376,73 @@ func BuildMessages(systemPromptTemplate, userContent, jobTarget string, includeF
 	return messages
 }
 
+// ChatMessage represents a stored chat message with role and content.
+type ChatMessage struct {
+	ID         string `json:"id"`
+	ResumeID   string `json:"resumeId"`
+	Role       string `json:"role"`
+	Content    string `json:"content"`
+	QuotedText string `json:"quotedText,omitempty"`
+	CreatedAt  int64  `json:"createdAt"`
+}
+
+// BuildChatMessages constructs the messages array including conversation history.
+// It builds a system prompt with context, prepends history messages (up to 10),
+// and appends the current user prompt (with optional quoted text).
+func BuildChatMessages(systemPromptTemplate, userContent, jobTarget string, historyMessages []ChatMessage, resumeContent string) []Message {
+	messages := make([]Message, 0, 2+len(historyMessages))
+
+	// Build context info for system prompt
+	var contextInfo string
+	if jobTarget != "" {
+		contextInfo += fmt.Sprintf("\n目标岗位：%s", jobTarget)
+	}
+	if resumeContent != "" {
+		contextInfo += fmt.Sprintf("\n当前简历内容：\n%s", resumeContent)
+	}
+
+	// Build system prompt
+	systemPrompt := systemPromptTemplate
+	if contextInfo != "" {
+		systemPrompt += "\n\n当前简历编辑上下文：" + contextInfo
+	}
+	systemPrompt += "\n\n请以简历优化助手的身份回答。"
+
+	messages = append(messages, Message{
+		Role:    "user",
+		Content: systemPrompt,
+	})
+
+	// Add history messages (up to 10 most recent)
+	maxHistory := 10
+	if len(historyMessages) > maxHistory {
+		historyMessages = historyMessages[len(historyMessages)-maxHistory:]
+	}
+	for _, msg := range historyMessages {
+		role := "user"
+		if msg.Role == "assistant" {
+			role = "assistant"
+		}
+		messages = append(messages, Message{
+			Role:    role,
+			Content: msg.Content,
+		})
+	}
+
+	// Add current user message with optional quoted text
+	currentContent := userContent
+	if resumeContent != "" {
+		// Prepend resume content for context in current message
+		currentContent = fmt.Sprintf("【简历内容】\n%s\n\n【你的问题】\n%s", resumeContent, userContent)
+	}
+	messages = append(messages, Message{
+		Role:    "user",
+		Content: currentContent,
+	})
+
+	return messages
+}
+
 // setHeaders sets the required headers for Claude API requests.
 func (c *client) setHeaders(req *http.Request, bodyLen int) {
 	req.Header.Set("x-api-key", c.config.APIKey)
@@ -472,3 +540,89 @@ func SaveConfig(ctx context.Context, cfg AIConfig) error {
 // SystemPrompt is the default system prompt for resume optimization.
 const SystemPrompt = `你是一位专业的简历优化助手。请根据用户需求优化简历内容。
 要求：只返回优化后的文本内容，不要添加解释。`
+
+// ChatWithRetry sends a chat request with automatic retry on format errors.
+// It validates the response format and retries at most maxRetries times.
+// If all attempts fail, returns the last response with a FORMAT_ERROR.
+// This implements AIAI-12: format validation with auto-retry.
+func (c *client) ChatWithRetry(ctx context.Context, model string, messages []Message, maxTokens int, systemPrompt string, maxRetries int) (string, error) {
+	if maxRetries < 1 {
+		maxRetries = 1
+	}
+
+	var lastResponse string
+
+	for attempt := 0; attempt <= maxRetries; attempt++ {
+		resp, err := c.Chat(ctx, model, messages, maxTokens, systemPrompt)
+		if err != nil {
+			// Real error (not format) - return immediately
+			return resp, err
+		}
+
+		lastResponse = resp
+
+		// Validate response format
+		if isValidResponse(resp) {
+			return resp, nil
+		}
+
+		// Format invalid - retry unless we've exhausted retries
+		if attempt < maxRetries {
+			continue
+		}
+	}
+
+	// All attempts exhausted - return raw response with format error
+	// This implements the "fallback to raw output" requirement from AIAI-12
+	return lastResponse, &APIError{
+		Code:    AIErrParseResp,
+		Message: "AI 返回格式异常，已保留原始输出，可手动编辑",
+	}
+}
+
+// isValidResponse checks if the AI response looks like valid resume content.
+func isValidResponse(content string) bool {
+	if content == "" {
+		return false
+	}
+	trimmed := strings.TrimSpace(content)
+	if len(trimmed) < 10 {
+		return false
+	}
+	// Check it's not a pure error message or junk
+	lower := strings.ToLower(trimmed)
+	if strings.HasPrefix(lower, "error:") ||
+		strings.HasPrefix(lower, "sorry,") ||
+		strings.HasPrefix(lower, "i can't") ||
+		strings.HasPrefix(lower, "i cannot") {
+		return false
+	}
+	return true
+}
+
+// activeOperations tracks which streaming operations are still active.
+var activeOperations = &sync.Map{}
+
+// RegisterOperation marks an operation as active for cancellation tracking.
+func RegisterOperation(operationId string) {
+	activeOperations.Store(operationId, true)
+}
+
+// UnregisterOperation removes an operation from the active set.
+func UnregisterOperation(operationId string) {
+	activeOperations.Delete(operationId)
+}
+
+// IsOperationActive checks if an operation is still registered as active.
+func IsOperationActive(operationId string) bool {
+	_, ok := activeOperations.Load(operationId)
+	return ok
+}
+
+// CancelOperation removes an operation from the active set.
+// The streaming loop should check IsOperationActive periodically.
+// This implements AIAI-13: user-initiated abort with content preservation.
+func CancelOperation(operationId string) bool {
+	_, existed := activeOperations.LoadAndDelete(operationId)
+	return existed
+}

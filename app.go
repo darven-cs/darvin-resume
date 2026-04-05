@@ -245,3 +245,74 @@ func getInt(m map[string]interface{}, key string, defaults ...int) int {
 	}
 	return 0
 }
+
+// ============================================================
+// Chat History Bridge Methods
+// ============================================================
+
+// GetChatHistory retrieves all chat messages for a given resume.
+func (a *App) GetChatHistory(resumeId string) ([]ai.ChatMessage, error) {
+	return ai.GetChatHistoryOrEmpty(context.Background(), resumeId)
+}
+
+// SaveChatMessage persists a chat message to the database.
+func (a *App) SaveChatMessage(msg ai.ChatMessage) error {
+	return ai.SaveChatMessage(context.Background(), msg)
+}
+
+// ClearChatHistory removes all chat messages for a given resume.
+func (a *App) ClearChatHistory(resumeId string) error {
+	return ai.ClearChatHistory(context.Background(), resumeId)
+}
+
+// AISendChatMessage sends a chat message with conversation history context.
+// It streams the response via Wails EventsOn("ai:stream:{operationId}").
+// historyMessages contains up to 10 recent messages for context.
+func (a *App) AISendChatMessage(operationId string, prompt string, jobTarget string, historyMessages []ai.ChatMessage, resumeContent string) (string, error) {
+	// Load config
+	cfg, err := ai.LoadConfig(context.Background())
+	if err != nil {
+		a.emitStreamError(operationId, err)
+		return "", err
+	}
+
+	if cfg.APIKey == "" {
+		err := &ai.APIError{Code: ai.AIErrAuth, Message: "API key not configured"}
+		a.emitStreamError(operationId, err)
+		return "", err
+	}
+
+	client := ai.NewClient(cfg)
+	messages := ai.BuildChatMessages(ai.SystemPrompt, prompt, jobTarget, historyMessages, resumeContent)
+
+	// Start streaming
+	body, err := client.ChatStream(context.Background(), cfg.DefaultModel, messages, cfg.MaxTokens, "")
+	if err != nil {
+		a.emitStreamError(operationId, err)
+		return "", err
+	}
+	defer body.Close()
+
+	// Stream chunks to frontend
+	fullContent := ""
+	err = ai.StreamEvents(body, func(chunk string) error {
+		fullContent += chunk
+		runtime.EventsEmit(a.ctx, "ai:stream:"+operationId, map[string]interface{}{
+			"type":    "content",
+			"content": chunk,
+		})
+		return nil
+	})
+
+	if err != nil {
+		a.emitStreamError(operationId, err)
+		return fullContent, err
+	}
+
+	// Emit done event
+	runtime.EventsEmit(a.ctx, "ai:stream:"+operationId, map[string]interface{}{
+		"type": "done",
+	})
+
+	return fullContent, nil
+}
