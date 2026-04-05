@@ -17,6 +17,7 @@ import {
   AISendChatMessage,
 } from '../wailsjs/wailsjs/go/main/App'
 import type { AIConfig, ChatMessage } from '../types/ai'
+import { ai } from '../wailsjs/wailsjs/go/models'
 
 /**
  * Retrieves the current AI configuration from the backend.
@@ -97,28 +98,31 @@ export async function sendMessageSync(
  */
 export async function getChatHistory(resumeId: string): Promise<ChatMessage[]> {
   const messages = await GetChatHistory(resumeId)
-  return (messages || []).map((msg: any) => ({
-    id: msg.id || '',
-    resumeId: msg.resumeId || resumeId,
-    role: (msg.role === 'user' || msg.role === 'assistant') ? msg.role : 'user',
-    content: msg.content || '',
-    timestamp: msg.createdAt || Date.now(),
-    quotedText: msg.quotedText || undefined,
-  }))
+  return (messages || []).map((msg) => {
+    const m = msg instanceof ai.ChatMessage ? msg : new ai.ChatMessage(msg)
+    return {
+      id: m.id || '',
+      resumeId: m.resumeId || resumeId,
+      role: (m.role === 'user' || m.role === 'assistant') ? m.role : 'user',
+      content: m.content || '',
+      timestamp: m.createdAt || Date.now(),
+      quotedText: m.quotedText || undefined,
+    }
+  })
 }
 
 /**
  * Saves a chat message to the backend for persistence.
  */
 export async function saveChatMessage(message: ChatMessage): Promise<void> {
-  await SaveChatMessage({
+  await SaveChatMessage(new ai.ChatMessage({
     id: message.id,
     resumeId: message.resumeId,
     role: message.role,
     content: message.content,
     quotedText: message.quotedText || '',
     createdAt: message.timestamp,
-  } as any)
+  }))
 }
 
 /**
@@ -146,13 +150,13 @@ export async function sendChatMessage(
   historyMessages: ChatMessage[] = [],
   resumeContent: string = ''
 ): Promise<string> {
-  const history = historyMessages.map((msg) => ({
+  const history = historyMessages.map((msg) => new ai.ChatMessage({
     id: msg.id,
     resumeId: msg.resumeId,
     role: msg.role,
     content: msg.content,
     quotedText: msg.quotedText || '',
     createdAt: msg.timestamp,
-  } as any))
+  }))
   return AISendChatMessage(operationId, prompt, jobTarget, history, resumeContent)
 }
