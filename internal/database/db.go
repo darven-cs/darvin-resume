@@ -3,41 +3,137 @@ package database
 import (
 	"database/sql"
 	"log"
+	"os"
+	"path/filepath"
+	"runtime"
+	"sync"
 
 	_ "modernc.org/sqlite"
+
+	"github.com/pressly/goose/v3"
 )
 
 // DB is the global database connection
 var DB *sql.DB
 
-// Init initializes the database connection
+// Mutex for thread-safe access
+var mu sync.Mutex
+
+// Init initializes the database connection and runs migrations
 func Init() error {
-	var err error
-	DB, err = sql.Open("sqlite", "data.db")
+	mu.Lock()
+	defer mu.Unlock()
+
+	// Get user data directory
+	userDataDir, err := getUserDataDir()
 	if err != nil {
 		return err
 	}
 
-	// Enable WAL mode
-	_, err = DB.Exec("PRAGMA journal_mode=WAL")
+	// Ensure directory exists
+	if err := os.MkdirAll(userDataDir, 0755); err != nil {
+		return err
+	}
+
+	// Database file path
+	dbPath := filepath.Join(userDataDir, "data.db")
+
+	// Open database connection
+	DB, err = sql.Open("sqlite", dbPath)
 	if err != nil {
+		return err
+	}
+
+	// Configure connection pool
+	DB.SetMaxOpenConns(1) // SQLite only supports one writer at a time
+	DB.SetMaxIdleConns(1)
+	DB.SetConnMaxLifetime(0) // Lifetime 0 means connections are reused forever
+
+	// Enable WAL mode for better concurrency
+	if _, err := DB.Exec("PRAGMA journal_mode=WAL"); err != nil {
 		return err
 	}
 
 	// Enable foreign keys
-	_, err = DB.Exec("PRAGMA foreign_keys=ON")
-	if err != nil {
+	if _, err := DB.Exec("PRAGMA foreign_keys=ON"); err != nil {
 		return err
 	}
 
-	log.Println("Database initialized")
+	// Enable synchronous=NORMAL for better performance without losing durability
+	if _, err := DB.Exec("PRAGMA synchronous=NORMAL"); err != nil {
+		return err
+	}
+
+	// Enable cache_size = -64000 (64MB)
+	if _, err := DB.Exec("PRAGMA cache_size=-64000"); err != nil {
+		return err
+	}
+
+	// Run migrations
+	if err := runMigrations(dbPath); err != nil {
+		return err
+	}
+
+	log.Println("Database initialized at:", dbPath)
+	return nil
+}
+
+// runMigrations runs database migrations using goose
+func runMigrations(dbPath string) error {
+	// Get the directory containing migration files
+	_, currentFile, _, _ := runtime.Caller(0)
+	migrationsDir := filepath.Join(filepath.Dir(currentFile), "migrations")
+
+	// Set table name for goose migrations table
+	goose.SetTableName("schema_migrations")
+	goose.SetVerbose(true)
+
+	// Run migrations
+	if err := goose.Up(DB, migrationsDir); err != nil {
+		return err
+	}
+
+	log.Println("Database migrations completed")
 	return nil
 }
 
 // Close closes the database connection
 func Close() error {
+	mu.Lock()
+	defer mu.Unlock()
+
 	if DB != nil {
-		return DB.Close()
+		err := DB.Close()
+		DB = nil
+		return err
 	}
 	return nil
+}
+
+// getUserDataDir returns the platform-specific user data directory
+func getUserDataDir() (string, error) {
+	// Try to use the standard user data directory
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	// Use XDG_DATA_HOME on Linux, ~/Library/Application Support on macOS,
+	// or %APPDATA% on Windows
+	dataHome := os.Getenv("XDG_DATA_HOME")
+	if dataHome == "" {
+		switch runtime.GOOS {
+		case "darwin":
+			dataHome = filepath.Join(homeDir, "Library", "Application Support")
+		case "windows":
+			dataHome = os.Getenv("APPDATA")
+			if dataHome == "" {
+				dataHome = filepath.Join(homeDir, "AppData", "Roaming")
+			}
+		default: // linux and others
+			dataHome = filepath.Join(homeDir, ".local", "share")
+		}
+	}
+
+	return filepath.Join(dataHome, "open-resume"), nil
 }

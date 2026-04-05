@@ -7,14 +7,15 @@ import (
 
 // Resume represents a resume document
 type Resume struct {
-	ID         string       `json:"id"`
-	Title      string       `json:"title"`
-	BasicInfo  BasicInfo    `json:"basicInfo"`
-	Modules    []Module     `json:"modules"`
-	TemplateID string       `json:"templateId"`
-	CustomCSS  string       `json:"customCss"`
-	CreatedAt  time.Time    `json:"createdAt"`
-	UpdatedAt  time.Time    `json:"updatedAt"`
+	ID              string       `json:"id"`
+	Title           string       `json:"title"`
+	BasicInfo       BasicInfo    `json:"basicInfo"`
+	Modules         []Module     `json:"modules"`
+	TemplateID      string       `json:"templateId"`
+	CustomCSS       string       `json:"customCss"`
+	MarkdownContent string       `json:"markdownContent"`
+	CreatedAt       time.Time    `json:"createdAt"`
+	UpdatedAt       time.Time    `json:"updatedAt"`
 }
 
 // BasicInfo contains personal information
