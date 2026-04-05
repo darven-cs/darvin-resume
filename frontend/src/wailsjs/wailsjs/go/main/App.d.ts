@@ -17,6 +17,8 @@ export function CreateResume(arg1:string):Promise<model.Resume>;
 
 export function DeleteResume(arg1:string):Promise<void>;
 
+export function DuplicateResume(arg1:string):Promise<model.Resume>;
+
 export function GetAIConfig():Promise<Record<string, any>>;
 
 export function GetChatHistory(arg1:string):Promise<Array<ai.ChatMessage>>;
@@ -25,7 +27,15 @@ export function GetResume(arg1:string):Promise<model.Resume>;
 
 export function Greet(arg1:string):Promise<string>;
 
+export function ListDeletedResumes():Promise<Array<model.ResumeListItem>>;
+
 export function ListResumes():Promise<Array<model.ResumeListItem>>;
+
+export function PermanentDeleteResume(arg1:string):Promise<void>;
+
+export function RenameResume(arg1:string,arg2:string):Promise<void>;
+
+export function RestoreResume(arg1:string):Promise<void>;
 
 export function SaveAIConfig(arg1:Record<string, any>):Promise<void>;
 

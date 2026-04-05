@@ -30,6 +30,10 @@ export function DeleteResume(arg1) {
   return window['go']['main']['App']['DeleteResume'](arg1);
 }
 
+export function DuplicateResume(arg1) {
+  return window['go']['main']['App']['DuplicateResume'](arg1);
+}
+
 export function GetAIConfig() {
   return window['go']['main']['App']['GetAIConfig']();
 }
@@ -46,8 +50,24 @@ export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
+export function ListDeletedResumes() {
+  return window['go']['main']['App']['ListDeletedResumes']();
+}
+
 export function ListResumes() {
   return window['go']['main']['App']['ListResumes']();
+}
+
+export function PermanentDeleteResume(arg1) {
+  return window['go']['main']['App']['PermanentDeleteResume'](arg1);
+}
+
+export function RenameResume(arg1, arg2) {
+  return window['go']['main']['App']['RenameResume'](arg1, arg2);
+}
+
+export function RestoreResume(arg1) {
+  return window['go']['main']['App']['RestoreResume'](arg1);
 }
 
 export function SaveAIConfig(arg1) {
