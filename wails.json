@@ -1,0 +1,17 @@
+{
+  "name": "open-resume",
+  "outputfilename": "Open-Resume",
+  "frontend:dir": "frontend",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "wailsjsdir": "frontend/src/wailsjs",
+  "assetdir": "frontend/dist",
+  "info": {
+    "companyName": "Open-Resume",
+    "productName": "Open-Resume",
+    "productVersion": "0.1.0",
+    "comments": "Markdown原生、隐私优先的本地化简历工具"
+  }
+}
