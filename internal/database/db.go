@@ -84,11 +84,8 @@ func runMigrations(dbPath string) error {
 	_, currentFile, _, _ := runtime.Caller(0)
 	migrationsDir := filepath.Join(filepath.Dir(currentFile), "migrations")
 
-	// Set table name for goose migrations table
-	goose.SetTableName("schema_migrations")
-	goose.SetVerbose(true)
-
-	// Run migrations
+	// Run migrations with options
+	goose.SetDialect("sqlite")
 	if err := goose.Up(DB, migrationsDir); err != nil {
 		return err
 	}
