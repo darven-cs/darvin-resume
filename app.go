@@ -4,9 +4,12 @@ import (
 	"context"
 	"log"
 
+	"open-resume/internal/ai"
 	"open-resume/internal/database"
 	"open-resume/internal/model"
 	"open-resume/internal/service"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
@@ -80,4 +83,165 @@ func (a *App) DeleteResume(id string) error {
 // UpdateResumeModule updates a specific module within a resume
 func (a *App) UpdateResumeModule(id string, moduleType string, moduleData string) error {
 	return a.svc.UpdateJSON(context.Background(), id, moduleData)
+}
+
+// AI Configuration Bridge Methods
+
+// GetAIConfig returns the current AI configuration as a map.
+func (a *App) GetAIConfig() (map[string]interface{}, error) {
+	cfg, err := ai.LoadConfig(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"apiKey":        cfg.APIKey,
+		"baseURL":       cfg.BaseURL,
+		"defaultModel":  cfg.DefaultModel,
+		"maxTokens":     cfg.MaxTokens,
+		"timeoutSeconds": cfg.TimeoutSecs,
+	}, nil
+}
+
+// SaveAIConfig saves AI configuration to persistent storage.
+func (a *App) SaveAIConfig(config map[string]interface{}) error {
+	cfg := ai.AIConfig{
+		APIKey:       getString(config, "apiKey"),
+		BaseURL:      getString(config, "baseURL", ai.DefaultBaseURL),
+		DefaultModel: getString(config, "defaultModel", ai.DefaultModel),
+		MaxTokens:    getInt(config, "maxTokens", ai.DefaultMaxTokens),
+		TimeoutSecs: getInt(config, "timeoutSeconds", ai.DefaultTimeoutSecs),
+	}
+	if err := cfg.Validate(); err != nil {
+		return err
+	}
+	return ai.SaveConfig(context.Background(), cfg)
+}
+
+// ValidateAPIKey validates the given API key by sending a test request.
+func (a *App) ValidateAPIKey(apiKey string, baseURL string) (bool, error) {
+	testCfg := ai.AIConfig{
+		APIKey:  apiKey,
+		BaseURL: baseURL,
+	}
+	client := ai.NewClient(testCfg)
+	return client.ValidateAPIKey(context.Background(), apiKey, baseURL)
+}
+
+// AISendMessage sends a streaming chat message to the AI service.
+// operationId is used by the frontend to track and cancel the operation.
+// Streamed chunks are emitted via Wails EventsEmit("ai:stream:{operationId}", chunk).
+func (a *App) AISendMessage(operationId string, prompt string, jobTarget string, includeFullContext bool) (string, error) {
+	// Load config
+	cfg, err := ai.LoadConfig(context.Background())
+	if err != nil {
+		a.emitStreamError(operationId, err)
+		return "", err
+	}
+
+	if cfg.APIKey == "" {
+		err := &ai.APIError{Code: ai.AIErrAuth, Message: "API key not configured"}
+		a.emitStreamError(operationId, err)
+		return "", err
+	}
+
+	client := ai.NewClient(cfg)
+	messages := ai.BuildMessages(ai.SystemPrompt, prompt, jobTarget, includeFullContext, "")
+
+	// Start streaming
+	body, err := client.ChatStream(context.Background(), cfg.DefaultModel, messages, cfg.MaxTokens, "")
+	if err != nil {
+		a.emitStreamError(operationId, err)
+		return "", err
+	}
+	defer body.Close()
+
+	// Stream chunks to frontend
+	fullContent := ""
+	err = ai.StreamEvents(body, func(chunk string) error {
+		fullContent += chunk
+		runtime.EventsEmit(a.ctx, "ai:stream:"+operationId, map[string]interface{}{
+			"type":    "content",
+			"content": chunk,
+		})
+		return nil
+	})
+
+	if err != nil {
+		a.emitStreamError(operationId, err)
+		return fullContent, err
+	}
+
+	// Emit done event
+	runtime.EventsEmit(a.ctx, "ai:stream:"+operationId, map[string]interface{}{
+		"type": "done",
+	})
+
+	return fullContent, nil
+}
+
+// AISendMessageSync sends a non-streaming chat message and returns the full response.
+// Use this as a fallback when streaming is not supported.
+func (a *App) AISendMessageSync(operationId string, prompt string, jobTarget string, includeFullContext bool) (string, error) {
+	cfg, err := ai.LoadConfig(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	if cfg.APIKey == "" {
+		return "", &ai.APIError{Code: ai.AIErrAuth, Message: "API key not configured"}
+	}
+
+	client := ai.NewClient(cfg)
+	messages := ai.BuildMessages(ai.SystemPrompt, prompt, jobTarget, includeFullContext, "")
+
+	content, err := client.Chat(context.Background(), cfg.DefaultModel, messages, cfg.MaxTokens, "")
+	if err != nil {
+		return "", err
+	}
+
+	// Emit done event
+	runtime.EventsEmit(a.ctx, "ai:stream:"+operationId, map[string]interface{}{
+		"type": "done",
+	})
+
+	return content, nil
+}
+
+// emitStreamError emits an error event to the frontend.
+func (a *App) emitStreamError(operationId string, err error) {
+	var msg string
+	if apiErr, ok := err.(*ai.APIError); ok {
+		msg = apiErr.Message
+	} else {
+		msg = err.Error()
+	}
+	runtime.EventsEmit(a.ctx, "ai:stream:"+operationId, map[string]interface{}{
+		"type":  "error",
+		"error": msg,
+	})
+}
+
+// getString safely extracts a string from a map with optional default.
+func getString(m map[string]interface{}, key string, defaults ...string) string {
+	if v, ok := m[key].(string); ok {
+		return v
+	}
+	if len(defaults) > 0 {
+		return defaults[0]
+	}
+	return ""
+}
+
+// getInt safely extracts an int from a map with optional default.
+func getInt(m map[string]interface{}, key string, defaults ...int) int {
+	if v, ok := m[key].(float64); ok {
+		return int(v)
+	}
+	if v, ok := m[key].(int); ok {
+		return v
+	}
+	if len(defaults) > 0 {
+		return defaults[0]
+	}
+	return 0
 }
