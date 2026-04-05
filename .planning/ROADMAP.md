@@ -47,7 +47,7 @@ Plans:
   2. 预览区实时渲染Markdown内容，输入到渲染延迟<200ms
   3. 双栏布局支持拖拽调整宽度比例，预览区固定显示A4分页线标注页面边界
   4. 用户可以折叠/展开Markdown内容块，可以拖拽排序内容块，可以点击行首图标弹出快捷菜单
-**Plans**: TBD
+**Plans**: 4 planned,详见 `.planning/phases/02-core-editor/`
 **UI hint**: yes
 
 Plans:
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. 项目骨架与数据层 | 1/3 | In progress | - |
+| 1. 项目骨架与数据层 | 3/3 | ✅ Complete | 2026-04-05 |
 | 2. 核心编辑器 | 0/4 | Not started | - |
 | 3. AI核心能力 | 0/6 | Not started | - |
 | 4. 简历创建与管理 | 0/3 | Not started | - |
