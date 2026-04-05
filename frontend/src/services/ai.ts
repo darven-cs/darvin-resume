@@ -5,8 +5,18 @@
  * All AI operations go through the backend to keep API keys secure.
  */
 
-import { GetAIConfig, SaveAIConfig, ValidateAPIKey, AISendMessage, AISendMessageSync } from '../wailsjs/wailsjs/go/main/App'
-import type { AIConfig } from '../types/ai'
+import {
+  GetAIConfig,
+  SaveAIConfig,
+  ValidateAPIKey,
+  AISendMessage,
+  AISendMessageSync,
+  GetChatHistory,
+  SaveChatMessage,
+  ClearChatHistory,
+  AISendChatMessage,
+} from '../wailsjs/wailsjs/go/main/App'
+import type { AIConfig, ChatMessage } from '../types/ai'
 
 /**
  * Retrieves the current AI configuration from the backend.
@@ -75,4 +85,74 @@ export async function sendMessageSync(
   includeFullContext: boolean = false
 ): Promise<string> {
   return AISendMessageSync(operationId, prompt, jobTarget, includeFullContext)
+}
+
+// ============================================================
+// Chat History Service
+// ============================================================
+
+/**
+ * Retrieves chat history for a given resume from the backend.
+ * Returns an empty array if no history exists.
+ */
+export async function getChatHistory(resumeId: string): Promise<ChatMessage[]> {
+  const messages = await GetChatHistory(resumeId)
+  return (messages || []).map((msg: any) => ({
+    id: msg.id || '',
+    resumeId: msg.resumeId || resumeId,
+    role: (msg.role === 'user' || msg.role === 'assistant') ? msg.role : 'user',
+    content: msg.content || '',
+    timestamp: msg.createdAt || Date.now(),
+    quotedText: msg.quotedText || undefined,
+  }))
+}
+
+/**
+ * Saves a chat message to the backend for persistence.
+ */
+export async function saveChatMessage(message: ChatMessage): Promise<void> {
+  await SaveChatMessage({
+    id: message.id,
+    resumeId: message.resumeId,
+    role: message.role,
+    content: message.content,
+    quotedText: message.quotedText || '',
+    createdAt: message.timestamp,
+  } as any)
+}
+
+/**
+ * Clears all chat history for a given resume.
+ */
+export async function clearChatHistory(resumeId: string): Promise<void> {
+  await ClearChatHistory(resumeId)
+}
+
+/**
+ * Sends a chat message with conversation history context.
+ * Streaming chunks are delivered via Wails EventsOn('ai:stream:{operationId}').
+ *
+ * @param operationId - Unique ID for this operation
+ * @param prompt - User message content
+ * @param jobTarget - Target job position for context
+ * @param historyMessages - Recent conversation history (up to 10 messages)
+ * @param resumeContent - Current resume markdown content for context
+ * @returns Full AI response content
+ */
+export async function sendChatMessage(
+  operationId: string,
+  prompt: string,
+  jobTarget: string = '',
+  historyMessages: ChatMessage[] = [],
+  resumeContent: string = ''
+): Promise<string> {
+  const history = historyMessages.map((msg) => ({
+    id: msg.id,
+    resumeId: msg.resumeId,
+    role: msg.role,
+    content: msg.content,
+    quotedText: msg.quotedText || '',
+    createdAt: msg.timestamp,
+  } as any))
+  return AISendChatMessage(operationId, prompt, jobTarget, history, resumeContent)
 }
