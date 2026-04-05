@@ -14,6 +14,14 @@
       <div class="toolbar-spacer" />
       <button
         class="toolbar-btn"
+        @click="showAIConfigModal = true"
+        title="AI 设置"
+      >
+        <span class="btn-icon">⚙</span>
+        <span class="btn-label">设置</span>
+      </button>
+      <button
+        class="toolbar-btn"
         :class="{ active: chatSidebarVisible }"
         @click="chatSidebarVisible = !chatSidebarVisible"
         title="AI 对话 (Ctrl+Shift+A)"
@@ -105,6 +113,12 @@
       @close="chatSidebarVisible = false"
       @insert-text="handleInsertText"
     />
+
+    <!-- AI Config Modal -->
+    <AIConfigModal
+      :visible="showAIConfigModal"
+      @close="showAIConfigModal = false"
+    />
   </div>
 </template>
 
@@ -117,6 +131,7 @@ import A4Page from '../components/A4Page.vue'
 import JobTargetChip from '../components/JobTargetChip.vue'
 import ResumeParserModal from '../components/ResumeParserModal.vue'
 import AIChatSidebar from '../components/AIChatSidebar.vue'
+import AIConfigModal from '../components/AIConfigModal.vue'
 import { GetResume, UpdateResume } from '../wailsjs/wailsjs/go/main/App'
 import type { Resume } from '../types/resume'
 
@@ -133,6 +148,7 @@ const jobTarget = ref('')
 
 // Modal 状态
 const showParserModal = ref(false)
+const showAIConfigModal = ref(false)
 
 // AI Chat Sidebar 状态
 const chatSidebarVisible = ref(false)

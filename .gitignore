@@ -49,3 +49,13 @@ logs/
 # ===== 临时文件 =====
 tmp/
 temp/
+
+# ===== AI/工具配置 =====
+.planning/
+.claude/
+.playwright-mcp/
+
+# ===== 开发临时文件 =====
+dev.tex
+frontend/package.json.md5
+open-resume

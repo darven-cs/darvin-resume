@@ -407,7 +407,7 @@ function initEditor() {
     const target = e.target
 
     // 点击行首图标区域
-    if (target.type === monaco.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+    if (target.type === monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
       const lineNumber = target.position?.lineNumber
       if (!lineNumber) return
 

@@ -285,7 +285,11 @@ async function handleParse() {
   parsedMarkdown.value = ''
 
   const operationId = `parse-${crypto.randomUUID()}`
-  const userPrompt = `请解析以下简历内容：
+  const userPrompt = `${PARSER_SYSTEM_PROMPT}
+
+---
+
+请解析以下简历内容：
 
 ${pasteContent.value.trim()}`
 
