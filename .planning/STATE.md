@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 03-01-PLAN.md: Claude API adapter + SSE streaming"
-last_updated: "2026-04-05T12:22:33.151Z"
+stopped_at: "Completed 03-02-PLAN.md: AI selection floating toolbar"
+last_updated: "2026-04-05T12:29:57.659Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 11
-  completed_plans: 8
-  percent: 73
+  completed_plans: 9
+  percent: 82
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 ## Current Position
 
 Phase: 2 of 7 (核心编辑器)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -53,6 +53,7 @@ Progress: [▓░░░░░░░░░] 14%
 - Trend: Establishing baseline
 
 *Updated after each plan completion*
+| Phase 03 P03-02 | 265 | 3 tasks | 5 files |
 
 ## Phase 2 Plan Summary
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 
 - [Phase ?]: 使用 goose v3 程序化迁移而非 CLI，便于桌面应用自动初始化
 - [Phase ?]: BasicInfo 作为 basicInfo 模块存储在 json_data 中，确保序列化一致性
+- [Phase 03]: AI 选区工具栏使用 position fixed + Teleport to body 避免 z-index 问题
+- [Phase 03]: 工具栏显示在选区起始位置上方，超出边界自动翻转
 
 ### Phase 2 Decisions (from 02-CONTEXT.md)
 
@@ -94,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T12:22:33.143Z
-Stopped at: Completed 03-01-PLAN.md: Claude API adapter + SSE streaming
+Last session: 2026-04-05T12:29:57.646Z
+Stopped at: Completed 03-02-PLAN.md: AI selection floating toolbar
 Resume file: None

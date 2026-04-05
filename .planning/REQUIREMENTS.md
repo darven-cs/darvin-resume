@@ -13,7 +13,7 @@
 - [ ] **EDIT-04**: 编辑器预览与PDF导出采用完全一致的渲染引擎与CSS样式表，确保100%渲染一致
 - [ ] **EDIT-05**: 预览区固定显示A4标准纸张分页线，明确标注页面边界
 - [ ] **EDIT-06**: 编辑区内容输入后预览区实时同步渲染，延迟<200ms
-- [ ] **EDIT-07**: 选区快捷操作 — 用户框选文本后自动弹出浮动工具栏，包含AI润色/翻译/缩写/重写
+- [x] **EDIT-07**: 选区快捷操作 — 用户框选文本后自动弹出浮动工具栏，包含AI润色/翻译/缩写/重写
 - [ ] **EDIT-08**: 行级交互 — Markdown标题/列表行首显示折叠/展开图标，支持点击折叠内容块
 - [ ] **EDIT-09**: 行级交互 — 支持长按行首图标拖拽排序，快速调整内容块顺序
 - [ ] **EDIT-10**: 行级交互 — 点击行首图标弹出快捷菜单（上移/下移/AI重写/删除）
@@ -32,13 +32,13 @@
 
 ### AI — AI智能体
 
-- [ ] **AIAI-01**: Claude Messages API核心适配，支持用户自定义BaseURL兼容API中转站
+- [x] **AIAI-01**: Claude Messages API核心适配，支持用户自定义BaseURL兼容API中转站
 - [ ] **AIAI-02**: API Key采用AES-256-GCM算法加密存储，密钥基于设备唯一标识生成
-- [ ] **AIAI-03**: 支持用户配置默认模型、单次调用最大Token数、请求超时时间
+- [x] **AIAI-03**: 支持用户配置默认模型、单次调用最大Token数、请求超时时间
 - [ ] **AIAI-04**: 所有AI生成/修改操作以简历结构化JSON Schema为唯一标准，AI输出必须严格符合Schema
 - [ ] **AIAI-05**: 职位目标上下文管理 — 简历编辑页顶部可编辑目标岗位，AI调用默认传入
 - [ ] **AIAI-06**: 全文上下文参考开关 — 局部润色/翻译默认关闭，全文重写/结构化生成默认开启
-- [ ] **AIAI-07**: 流式传输 — 所有AI生成内容支持流式传输（SSE协议），打字机效果实时渲染
+- [x] **AIAI-07**: 流式传输 — 所有AI生成内容支持流式传输（SSE协议），打字机效果实时渲染
 - [ ] **AIAI-08**: AI对话侧边栏 — 编辑器右侧唤起，支持多轮对话，可引用选中文本，输出可一键插入编辑区
 - [ ] **AIAI-09**: 一键解析 — 用户粘贴纯文本/Markdown旧简历后AI自动解析生成结构化数据+Markdown内容
 - [ ] **AIAI-10**: 网络/API调用失败时弹窗提示错误原因，完整保留原始输入，提供一键重试
@@ -121,7 +121,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EDIT-04 | Phase 1 | Pending |
 | EDIT-05 | Phase 2 | Pending |
 | EDIT-06 | Phase 2 | Pending |
-| EDIT-07 | Phase 3 | Pending |
+| EDIT-07 | Phase 3 | Complete |
 | EDIT-08 | Phase 2 | Pending |
 | EDIT-09 | Phase 2 | Pending |
 | EDIT-10 | Phase 2 | Pending |
@@ -134,13 +134,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RESM-06 | Phase 4 | Pending |
 | RESM-07 | Phase 4 | Pending |
 | RESM-08 | Phase 4 | Pending |
-| AIAI-01 | Phase 3 | Pending |
+| AIAI-01 | Phase 3 | Complete |
 | AIAI-02 | Phase 6 | Pending |
-| AIAI-03 | Phase 3 | Pending |
+| AIAI-03 | Phase 3 | Complete |
 | AIAI-04 | Phase 3 | Pending |
 | AIAI-05 | Phase 3 | Pending |
 | AIAI-06 | Phase 3 | Pending |
-| AIAI-07 | Phase 3 | Pending |
+| AIAI-07 | Phase 3 | Complete |
 | AIAI-08 | Phase 3 | Pending |
 | AIAI-09 | Phase 3 | Pending |
 | AIAI-10 | Phase 3 | Pending |
