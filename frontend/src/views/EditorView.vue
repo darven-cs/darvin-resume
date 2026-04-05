@@ -119,6 +119,16 @@
       :visible="showAIConfigModal"
       @close="showAIConfigModal = false"
     />
+
+    <!-- Resume Wizard Sidebar -->
+    <ResumeWizardSidebar
+      :visible="wizardVisible"
+      :resume-id="resumeId"
+      :job-target="jobTarget"
+      @close="wizardVisible = false"
+      @complete="handleWizardComplete"
+      @save-draft="handleWizardSaveDraft"
+    />
   </div>
 </template>
 
@@ -132,6 +142,7 @@ import JobTargetChip from '../components/JobTargetChip.vue'
 import ResumeParserModal from '../components/ResumeParserModal.vue'
 import AIChatSidebar from '../components/AIChatSidebar.vue'
 import AIConfigModal from '../components/AIConfigModal.vue'
+import ResumeWizardSidebar from '../components/ResumeWizardSidebar.vue'
 import { GetResume, UpdateResume } from '../wailsjs/wailsjs/go/main/App'
 import type { Resume } from '../types/resume'
 
@@ -153,6 +164,9 @@ const showAIConfigModal = ref(false)
 // AI Chat Sidebar 状态
 const chatSidebarVisible = ref(false)
 const chatSidebarRef = ref<InstanceType<typeof AIChatSidebar> | null>(null)
+
+// Resume Wizard 状态 — 检测路由 query ?wizard=true 自动打开向导
+const wizardVisible = ref(route.query.wizard === 'true')
 
 // 响应式状态 per D-09
 const windowWidth = ref(window.innerWidth)
@@ -254,6 +268,33 @@ async function handleImport(markdown: string, importedJobTarget: string) {
 // AI Sidebar text insertion
 function handleInsertText(text: string) {
   monacoRef.value?.insertAtCursor(text)
+}
+
+// 向导完成后重新加载简历内容（后端已自动生成 Markdown）
+async function handleWizardComplete() {
+  wizardVisible.value = false
+  await loadResume()
+  monacoRef.value?.focus()
+}
+
+// 向导保存草稿后重新加载简历内容
+async function handleWizardSaveDraft() {
+  wizardVisible.value = false
+  await loadResume()
+}
+
+// 加载简历数据（提取为可复用函数）
+async function loadResume() {
+  const id = resumeId.value
+  if (!id) return
+  try {
+    const resume = await GetResume(id)
+    content.value = resume.markdownContent || ''
+    debouncedContent.value = resume.markdownContent || ''
+    jobTarget.value = (resume as any).jobTarget || ''
+  } catch (err) {
+    console.error('Failed to load resume:', err)
+  }
 }
 
 // 150ms 防抖更新预览 per D-10
