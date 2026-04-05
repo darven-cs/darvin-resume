@@ -225,6 +225,14 @@ const windowWidth = ref(window.innerWidth)
 const isSinglePane = computed(() => windowWidth.value < 1200)
 const activeView = ref<'editor' | 'preview'>('editor')
 
+// 键盘快捷键处理 — Ctrl+S / Cmd+S 保存
+function handleKeydown(e: KeyboardEvent) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault()
+    triggerSave()
+  }
+}
+
 // 自动保存 composable per D-25~D-28
 const { saveStatus, errorMessage, markDirty, triggerSave, startAutoSave, stopAutoSave } = useAutoSave({
   resumeId,
@@ -249,6 +257,9 @@ onMounted(async () => {
   // 启动自动保存定时器 per D-26
   startAutoSave()
 
+  // 注册 Ctrl+S / Cmd+S 保存快捷键
+  window.addEventListener('keydown', handleKeydown)
+
   // 监听窗口宽度变化
   window.addEventListener('resize', handleResize)
 
@@ -258,6 +269,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  window.removeEventListener('keydown', handleKeydown)
   stopAutoSave()
 })
 

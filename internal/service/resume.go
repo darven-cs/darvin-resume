@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 
 	"open-resume/internal/converter"
@@ -300,9 +301,14 @@ func (s *resumeService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-// UpdateJSON updates only the JSON data and triggers Markdown regeneration
+// UpdateJSON updates resume data.
+// Supports two formats:
+// 1. Object format (from auto-save): {"markdownContent": "...", "jobTarget": "..."}
+//    → merges into existing json_data, updates markdown_content
+// 2. Array format (from wizard): [{"type": "...", ...}]
+//    → parses as modules, regenerates markdown (backward compatible)
 func (s *resumeService) UpdateJSON(ctx context.Context, id string, jsonData string) error {
-	// Verify resume exists and is not deleted
+	// Verify resume exists and not deleted
 	checkQuery := `SELECT id FROM resumes WHERE id = ? AND is_deleted = FALSE`
 	var existingID string
 	err := database.DB.QueryRowContext(ctx, checkQuery, id).Scan(&existingID)
@@ -313,7 +319,38 @@ func (s *resumeService) UpdateJSON(ctx context.Context, id string, jsonData stri
 		return err
 	}
 
-	// Parse the JSON to create a resume model for markdown conversion
+	trimmed := strings.TrimSpace(jsonData)
+	if strings.HasPrefix(trimmed, "{") && strings.Contains(trimmed, `"markdownContent"`) {
+		// Format 1: Object with markdownContent (from auto-save triggerSave)
+		// Extract markdownContent directly, no DB read needed
+		var input struct {
+			MarkdownContent string `json:"markdownContent"`
+		}
+		if err := json.Unmarshal([]byte(jsonData), &input); err != nil {
+			return err
+		}
+
+		// Update only markdown_content field
+		updateQuery := `
+			UPDATE resumes
+			SET markdown_content = ?, updated_at = ?
+			WHERE id = ? AND is_deleted = FALSE
+		`
+		result, err := database.DB.ExecContext(ctx, updateQuery, input.MarkdownContent, time.Now(), id)
+		if err != nil {
+			return err
+		}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if rowsAffected == 0 {
+			return ErrResumeNotFound
+		}
+		return nil
+	}
+
+	// Format 2: Modules array (backward compatible, from wizard/generation)
 	var modules []model.Module
 	if err := json.Unmarshal([]byte(jsonData), &modules); err != nil {
 		return err
@@ -343,7 +380,7 @@ func (s *resumeService) UpdateJSON(ctx context.Context, id string, jsonData stri
 		return err
 	}
 
-	// Update only json_data and markdown_content
+	// Update json_data and markdown_content
 	updateQuery := `
 		UPDATE resumes
 		SET json_data = ?, markdown_content = ?, updated_at = ?
@@ -353,7 +390,6 @@ func (s *resumeService) UpdateJSON(ctx context.Context, id string, jsonData stri
 	if err != nil {
 		return err
 	}
-
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return err
@@ -361,7 +397,6 @@ func (s *resumeService) UpdateJSON(ctx context.Context, id string, jsonData stri
 	if rowsAffected == 0 {
 		return ErrResumeNotFound
 	}
-
 	return nil
 }
 

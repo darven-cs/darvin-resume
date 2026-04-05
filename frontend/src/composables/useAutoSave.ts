@@ -50,7 +50,7 @@ export function useAutoSave(options: {
 
     try {
       const data = options.getData()
-      await UpdateResume(id, JSON.stringify(data))
+      await UpdateResume(id, JSON.stringify(data));
       saveStatus.value = 'saved'
       isDirty = false
       errorMessage.value = ''
