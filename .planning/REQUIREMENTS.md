@@ -25,10 +25,10 @@
 - [ ] **RESM-02**: AI引导式创建 — 按自定义模块顺序分步填写，每步提供填写框架与示例
 - [ ] **RESM-03**: AI引导式创建 — 用户每步填写后AI实时润色并生成结构化数据，全部完成后生成完整Markdown简历
 - [ ] **RESM-04**: AI引导式创建 — 支持单步骤重生成、单步骤跳过、中途退出保存已填写内容
-- [ ] **RESM-05**: 空白页创建 — 直接进入双栏编辑界面，生成空白Markdown模板，可随时调用AI能力
+- [x] **RESM-05**: 空白页创建 — 直接进入双栏编辑界面，生成空白Markdown模板，可随时调用AI能力
 - [ ] **RESM-06**: 简历列表管理 — 软件启动后默认进入简历列表页，支持按修改时间排序、搜索、重命名、复制、删除
-- [ ] **RESM-07**: 回收站功能 — 删除的简历进入回收站保留30天，支持恢复与永久删除
-- [ ] **RESM-08**: 自动保存 — 编辑区内容每30秒自动保存，AI操作完成/页面切换时自动触发保存
+- [x] **RESM-07**: 回收站功能 — 删除的简历进入回收站保留30天，支持恢复与永久删除
+- [x] **RESM-08**: 自动保存 — 编辑区内容每30秒自动保存，AI操作完成/页面切换时自动触发保存
 
 ### AI — AI智能体
 
@@ -130,10 +130,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RESM-02 | Phase 4 | Pending |
 | RESM-03 | Phase 4 | Pending |
 | RESM-04 | Phase 4 | Pending |
-| RESM-05 | Phase 4 | Pending |
+| RESM-05 | Phase 4 | Complete |
 | RESM-06 | Phase 4 | Pending |
-| RESM-07 | Phase 4 | Pending |
-| RESM-08 | Phase 4 | Pending |
+| RESM-07 | Phase 4 | Complete |
+| RESM-08 | Phase 4 | Complete |
 | AIAI-01 | Phase 3 | Complete |
 | AIAI-02 | Phase 6 | Pending |
 | AIAI-03 | Phase 3 | Complete |
