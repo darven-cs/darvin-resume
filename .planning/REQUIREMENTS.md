@@ -59,10 +59,10 @@
 
 ### Export — 数据管理与导出
 
-- [ ] **EXPT-01**: PDF导出 — 默认采用Wails原生系统打印接口，无需内置Chromium
-- [ ] **EXPT-02**: PDF导出保留Chromedp无头浏览器渲染作为高级可选模式
-- [ ] **EXPT-03**: PDF导出严格遵循A4标准纸张尺寸，自动处理break-inside: avoid规则
-- [ ] **EXPT-04**: 支持用户自定义导出页码范围、是否隐藏分页线、导出DPI参数
+- [x] **EXPT-01**: PDF导出 — 默认采用Wails原生系统打印接口，无需内置Chromium
+- [x] **EXPT-02**: PDF导出保留Chromedp无头浏览器渲染作为高级可选模式
+- [x] **EXPT-03**: PDF导出严格遵循A4标准纸张尺寸，自动处理break-inside: avoid规则
+- [x] **EXPT-04**: 支持用户自定义导出页码范围、是否隐藏分页线、导出DPI参数
 - [ ] **EXPT-05**: 版本快照 — 支持用户手动创建版本快照，可自定义版本标签和备注
 - [ ] **EXPT-06**: 版本快照 — 每次成功导出PDF后自动创建版本快照
 - [ ] **EXPT-07**: 版本管理 — 查看全量历史版本列表，支持两版本Diff对比
@@ -155,10 +155,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TMPL-06 | Phase 5 | Complete |
 | TMPL-07 | Phase 1 | Pending |
 | TMPL-08 | Phase 1 | Pending |
-| EXPT-01 | Phase 5 | Pending |
-| EXPT-02 | Phase 5 | Pending |
-| EXPT-03 | Phase 5 | Pending |
-| EXPT-04 | Phase 5 | Pending |
+| EXPT-01 | Phase 5 | Complete |
+| EXPT-02 | Phase 5 | Complete |
+| EXPT-03 | Phase 5 | Complete |
+| EXPT-04 | Phase 5 | Complete |
 | EXPT-05 | Phase 5 | Pending |
 | EXPT-06 | Phase 5 | Pending |
 | EXPT-07 | Phase 5 | Pending |
