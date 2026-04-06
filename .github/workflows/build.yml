@@ -75,12 +75,16 @@ jobs:
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
+      - name: Install NSIS
+        run: |
+          choco install nsis -y
+          echo "C:\Program Files (x86)\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+
       - name: Build Windows NSIS installer
         run: |
-          cd frontend && npm install && cd ..
+          cd frontend; npm install; cd ..
           wails build --platform windows/amd64 --nsis
-          echo "=== Windows build output ==="
-          ls -la build/bin/
+          Get-ChildItem build/bin/
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
