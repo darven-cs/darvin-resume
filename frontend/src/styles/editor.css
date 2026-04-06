@@ -12,12 +12,57 @@
   --mm-to-px: 3.78;
 }
 
-/* 预览区 Markdown 渲染样式 */
+/* =========================================
+   模板样式变量（TMPL-04 可视化调整用）
+   通过 StyleEditor 滑块/选择器修改这些变量值
+   ========================================= */
+:root {
+  /* 主色调 */
+  --resume-primary-color: #1a1a1a;
+  --resume-heading-color: #1a1a1a;
+  --resume-link-color: #0066cc;
+  --resume-bg-color: #ffffff;
+
+  /* 字号（默认 10.5pt） */
+  --resume-font-size: 10.5pt;
+
+  /* 行高（默认 1.6） */
+  --resume-line-height: 1.6;
+
+  /* 页面边距（默认 20mm） */
+  --resume-padding: 20mm;
+
+  /* 字体 */
+  --resume-font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* 模板样式应用到 .page-content */
 .page-content {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  font-size: 10.5pt;
-  line-height: 1.6;
-  color: #1a1a1a;
+  color: var(--resume-primary-color);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  font-family: var(--resume-font-family);
+}
+
+.page-content h1,
+.page-content h2,
+.page-content h3,
+.page-content h4 {
+  color: var(--resume-heading-color);
+}
+
+.page-content a {
+  color: var(--resume-link-color);
+}
+
+/* 背景色（用于有背景色的模板） */
+.a4-page {
+  background-color: var(--resume-bg-color);
+  padding: var(--resume-padding);
+}
+
+/* 预览区 Markdown 渲染样式（基础样式，已通过上方变量覆盖） */
+.page-content {
   word-wrap: break-word;
   position: relative;
   z-index: 2;
