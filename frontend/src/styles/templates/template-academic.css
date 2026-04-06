@@ -1,0 +1,150 @@
+/* =========================================
+   template-academic.css - 学术科研风
+   适用场景：学术/科研类职位，申请高校、科研院所、博士博后
+   风格特点：宽松行距，居中标题，教育背景突出，论文格式规范
+   ========================================= */
+
+.template-academic .page-content {
+  font-family: 'Times New Roman', Georgia, 'Songti SC', 'SimSun', serif;
+  font-size: 10.5pt;
+  line-height: 1.8;
+  color: #1a1a1a;
+  word-wrap: break-word;
+}
+
+/* 标题：居中，细下划线 */
+.template-academic .page-content h1 {
+  font-size: 18pt;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 10pt 0;
+  padding-bottom: 4pt;
+  border-bottom: 0.75pt solid #1a1a1a;
+  line-height: 1.3;
+  letter-spacing: 1pt;
+}
+
+/* 二级标题：左对齐，无下划线 */
+.template-academic .page-content h2 {
+  font-size: 13pt;
+  font-weight: 600;
+  margin: 14pt 0 8pt 0;
+  padding-bottom: 0;
+  border-bottom: none;
+  line-height: 1.4;
+  /* 教育背景突出：左侧色条 */
+  border-left: 3pt solid #2563eb;
+  padding-left: 8pt;
+}
+
+/* 三级标题：斜体 */
+.template-academic .page-content h3 {
+  font-size: 11pt;
+  font-weight: 600;
+  font-style: italic;
+  margin: 10pt 0 5pt 0;
+  line-height: 1.5;
+}
+
+/* 段落 */
+.template-academic .page-content p {
+  margin: 0 0 8pt 0;
+}
+
+/* 列表 */
+.template-academic .page-content ul,
+.template-academic .page-content ol {
+  margin: 0 0 8pt 0;
+  padding-left: 20pt;
+}
+
+.template-academic .page-content li {
+  margin-bottom: 4pt;
+  line-height: 1.6;
+}
+
+/* 论文/Publications 格式：紧凑行距，斜体期刊名 */
+.template-academic .page-content .publication-item {
+  margin-bottom: 6pt;
+  line-height: 1.5;
+}
+
+.template-academic .page-content .journal-name {
+  font-style: italic;
+  color: #333;
+}
+
+/* 表格 */
+.template-academic .page-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 8pt 0;
+  font-size: 10pt;
+}
+
+.template-academic .page-content th,
+.template-academic .page-content td {
+  border: 0.5pt solid #ccc;
+  padding: 4pt 6pt;
+  text-align: left;
+}
+
+.template-academic .page-content th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+/* 粗体斜体 */
+.template-academic .page-content strong {
+  font-weight: 700;
+}
+
+.template-academic .page-content em {
+  font-style: italic;
+}
+
+/* 代码（学术场景少用，样式淡化） */
+.template-academic .page-content code {
+  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  font-size: 9pt;
+  background: #f8f8f8;
+  padding: 1pt 3pt;
+  border-radius: 2px;
+}
+
+.template-academic .page-content pre {
+  background: #f8f8f8;
+  padding: 6pt;
+  border-radius: 3px;
+  overflow-x: auto;
+  margin: 0 0 6pt 0;
+}
+
+/* 引用块 */
+.template-academic .page-content blockquote {
+  border-left: 2pt solid #999;
+  margin: 8pt 0;
+  padding: 4pt 10pt;
+  color: #555;
+  font-style: italic;
+}
+
+/* 链接 */
+.template-academic .page-content a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+/* 教育背景区块：浅蓝背景 */
+.template-academic .page-content .education-section {
+  background: rgba(37, 99, 235, 0.04);
+  padding: 4pt 6pt;
+  border-radius: 2pt;
+  margin: 4pt 0;
+}
+
+/* 分页控制 */
+.template-academic .page-content .page-break-avoid {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
