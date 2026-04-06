@@ -34,6 +34,10 @@ type ResumeService interface {
 	PermanentDeleteResume(ctx context.Context, id string) error
 	// ListDeletedResumes 查询已软删除的简历列表
 	ListDeletedResumes(ctx context.Context) ([]*model.ResumeListItem, error)
+	// UpdateTemplateID 更新简历模板 ID
+	UpdateTemplateID(ctx context.Context, id string, templateId string) error
+	// UpdateCustomCSS 更新简历自定义 CSS
+	UpdateCustomCSS(ctx context.Context, id string, customCss string) error
 }
 
 // ErrResumeNotFound is returned when a resume is not found
@@ -517,4 +521,44 @@ func (s *resumeService) ListDeletedResumes(ctx context.Context) ([]*model.Resume
 	}
 
 	return items, nil
+}
+
+// UpdateTemplateID 更新简历模板 ID
+func (s *resumeService) UpdateTemplateID(ctx context.Context, id string, templateId string) error {
+	validIds := map[string]bool{"minimal": true, "dual-col": true, "academic": true, "campus": true}
+	if !validIds[templateId] {
+		return errors.New("invalid template id")
+	}
+	query := `UPDATE resumes SET template_id = ?, updated_at = ? WHERE id = ? AND is_deleted = FALSE`
+	now := time.Now()
+	result, err := database.DB.ExecContext(ctx, query, templateId, now, id)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrResumeNotFound
+	}
+	return nil
+}
+
+// UpdateCustomCSS 更新简历自定义 CSS
+func (s *resumeService) UpdateCustomCSS(ctx context.Context, id string, customCss string) error {
+	query := `UPDATE resumes SET custom_css = ?, updated_at = ? WHERE id = ? AND is_deleted = FALSE`
+	now := time.Now()
+	result, err := database.DB.ExecContext(ctx, query, customCss, now, id)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrResumeNotFound
+	}
+	return nil
 }

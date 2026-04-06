@@ -349,3 +349,13 @@ func (a *App) AICancelOperation(operationId string) error {
 	ai.CancelOperation(operationId)
 	return nil
 }
+
+// UpdateResumeTemplate 更新简历模板 ID
+func (a *App) UpdateResumeTemplate(id string, templateId string) error {
+	return a.svc.UpdateTemplateID(context.Background(), id, templateId)
+}
+
+// UpdateResumeCustomCSS 更新简历自定义 CSS
+func (a *App) UpdateResumeCustomCSS(id string, customCss string) error {
+	return a.svc.UpdateCustomCSS(context.Background(), id, customCss)
+}
