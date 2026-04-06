@@ -104,7 +104,7 @@ Plans:
   3. 用户可以将当前样式保存为个人模板，可以输入自定义CSS（仅限白名单属性），可以一键重置默认样式
   4. 用户可以导出PDF（默认系统打印/可选Chromedp），导出严格遵循A4尺寸和分页规则，与预览100%一致
   5. 用户可以创建版本快照（手动/自动），查看版本历史，对比两版本差异，一键回滚
-**Plans**: 6 planned,详见 `.planning/phases/03-ai-core/`
+**Plans**: 4 planned,详见 `.planning/phases/05-templates-export/`
 **UI hint**: yes
 
 Plans:
@@ -121,7 +121,7 @@ Plans:
   1. 用户输入的API Key经过AES-256-GCM加密后存储，应用重启后可以正确解密使用
   2. 用户可以一键导出全量数据为加密压缩备份包，可以设置自动备份周期
   3. 用户可以选择备份包一键导入恢复，恢复前自动为当前数据创建备份，恢复后所有数据完整
-**Plans**: 6 planned,详见 `.planning/phases/03-ai-core/`
+**Plans**: 3 planned,详见 `.planning/phases/06-security-backup/`
 
 Plans:
 - [ ] 06-01: API Key加密存储 — AES-256-GCM、设备唯一标识密钥生成
@@ -138,7 +138,7 @@ Plans:
   3. 所有AI操作支持快捷键（Ctrl/Cmd+R/T/D），用户可自定义快捷键，配置本地持久化
   4. 无简历时首页展示模板Demo预览和醒目新建按钮，所有异步操作有加载提示，所有操作有即时反馈
   5. 全场景异常状态（网络异常/API失败/渲染异常/数据加载失败）均有错误提示和可执行恢复方案
-**Plans**: 6 planned,详见 `.planning/phases/03-ai-core/`
+**Plans**: 4 planned,详见 `.planning/phases/07-ui-polish/`
 **UI hint**: yes
 
 Plans:
