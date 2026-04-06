@@ -242,11 +242,13 @@ jobs:
           echo "=== Generated packages ==="
           ls -lh dist/
           echo ""
+          DEB_FILE=$(ls dist/*.deb)
+          RPM_FILE=$(ls dist/*.rpm)
           echo "=== .deb metadata ==="
-          dpkg-deb -info dist/*.deb
+          dpkg-deb -info "$DEB_FILE"
           echo ""
           echo "=== .rpm metadata ==="
-          rpm -qpi dist/*.rpm
+          rpm -qpi "$RPM_FILE"
 
       - name: Upload Linux packages
         uses: actions/upload-artifact@v4
