@@ -26,12 +26,28 @@ export function CreateResume(arg1) {
   return window['go']['main']['App']['CreateResume'](arg1);
 }
 
+export function CreateSnapshot(arg1, arg2, arg3, arg4) {
+  return window['go']['main']['App']['CreateSnapshot'](arg1, arg2, arg3, arg4);
+}
+
 export function DeleteResume(arg1) {
   return window['go']['main']['App']['DeleteResume'](arg1);
 }
 
+export function DeleteSnapshot(arg1) {
+  return window['go']['main']['App']['DeleteSnapshot'](arg1);
+}
+
+export function DiffSnapshots(arg1, arg2) {
+  return window['go']['main']['App']['DiffSnapshots'](arg1, arg2);
+}
+
 export function DuplicateResume(arg1) {
   return window['go']['main']['App']['DuplicateResume'](arg1);
+}
+
+export function ExportPDFFromHTML(arg1, arg2) {
+  return window['go']['main']['App']['ExportPDFFromHTML'](arg1, arg2);
 }
 
 export function GetAIConfig() {
@@ -46,6 +62,14 @@ export function GetResume(arg1) {
   return window['go']['main']['App']['GetResume'](arg1);
 }
 
+export function GetSnapshot(arg1) {
+  return window['go']['main']['App']['GetSnapshot'](arg1);
+}
+
+export function GetSnapshotMarkdown(arg1) {
+  return window['go']['main']['App']['GetSnapshotMarkdown'](arg1);
+}
+
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
@@ -56,6 +80,10 @@ export function ListDeletedResumes() {
 
 export function ListResumes() {
   return window['go']['main']['App']['ListResumes']();
+}
+
+export function ListSnapshots(arg1) {
+  return window['go']['main']['App']['ListSnapshots'](arg1);
 }
 
 export function PermanentDeleteResume(arg1) {
@@ -70,12 +98,20 @@ export function RestoreResume(arg1) {
   return window['go']['main']['App']['RestoreResume'](arg1);
 }
 
+export function RollbackToSnapshot(arg1, arg2) {
+  return window['go']['main']['App']['RollbackToSnapshot'](arg1, arg2);
+}
+
 export function SaveAIConfig(arg1) {
   return window['go']['main']['App']['SaveAIConfig'](arg1);
 }
 
 export function SaveChatMessage(arg1) {
   return window['go']['main']['App']['SaveChatMessage'](arg1);
+}
+
+export function ShowSaveDialog(arg1) {
+  return window['go']['main']['App']['ShowSaveDialog'](arg1);
 }
 
 export function UpdateResume(arg1, arg2) {
