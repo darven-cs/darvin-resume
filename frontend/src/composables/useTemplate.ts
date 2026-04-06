@@ -1,4 +1,12 @@
 import { ref, computed, type Ref } from 'vue'
+import { GetResume } from '../wailsjs/wailsjs/go/main/App'
+
+/** Wails bridge shim — 尚未生成的 bridge 方法通过 window.go 调用 */
+type AppBridge = {
+  UpdateResumeTemplate(id: string, templateId: string): Promise<void>
+  UpdateResumeCustomCSS(id: string, customCss: string): Promise<void>
+}
+const bridge = (window as any).go?.main?.App as AppBridge | undefined
 
 /**
  * 模板定义
@@ -64,9 +72,9 @@ export function useTemplate(resumeId: Ref<string>) {
   async function loadTemplate() {
     isLoading.value = true
     try {
-      const resume = await window.go.main.App.GetResume(resumeId.value)
-      currentTemplateId.value = (resume as any).templateId || 'minimal'
-      customCss.value = (resume as any).customCss || ''
+      const resume = await GetResume(resumeId.value)
+      currentTemplateId.value = resume.templateId || 'minimal'
+      customCss.value = resume.customCss || ''
     } catch (err) {
       console.error('[useTemplate] Failed to load template:', err)
     } finally {
@@ -81,7 +89,7 @@ export function useTemplate(resumeId: Ref<string>) {
     if (templateId === currentTemplateId.value) return
     currentTemplateId.value = templateId
     try {
-      await window.go.main.App.UpdateResumeTemplate(resumeId.value, templateId)
+      await bridge?.UpdateResumeTemplate(resumeId.value, templateId)
     } catch (err) {
       console.error('[useTemplate] Failed to update template:', err)
     }
@@ -93,7 +101,7 @@ export function useTemplate(resumeId: Ref<string>) {
   async function saveAsTemplate(css: string) {
     customCss.value = css
     try {
-      await window.go.main.App.UpdateResumeCustomCSS(resumeId.value, css)
+      await bridge?.UpdateResumeCustomCSS(resumeId.value, css)
     } catch (err) {
       console.error('[useTemplate] Failed to save custom CSS:', err)
     }
