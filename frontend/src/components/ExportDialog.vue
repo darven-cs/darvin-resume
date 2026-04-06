@@ -140,6 +140,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { ExportPDFFromHTML, ShowSaveDialog } from '../wailsjs/wailsjs/go/main/App'
 
 interface Props {
   visible: boolean
@@ -275,7 +276,7 @@ ${clone.outerHTML}
   errorMessage.value = ''
 
   try {
-    await window.go.main.App.ExportPDFFromHTML(htmlContent, outputPath.value)
+    await ExportPDFFromHTML(htmlContent, outputPath.value)
     emit('exported')
     emit('close')
   } catch (err) {
@@ -292,7 +293,7 @@ ${clone.outerHTML}
 async function selectOutputPath() {
   try {
     // 使用 Wails 系统文件保存对话框
-    const result = await window.go.main.App.ShowSaveDialog({
+    const result = await ShowSaveDialog({
       title: '保存 PDF 文件',
       defaultPath: 'resume.pdf',
       filters: [{ name: 'PDF 文件', extensions: ['pdf'] }],
