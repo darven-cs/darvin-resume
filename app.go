@@ -273,6 +273,62 @@ func getInt(m map[string]interface{}, key string, defaults ...int) int {
 }
 
 // ============================================================
+// Snapshot Bridge Methods (EXPT-05 ~ EXPT-09)
+// ============================================================
+
+// CreateSnapshot 创建版本快照
+func (a *App) CreateSnapshot(resumeId string, label string, note string, triggerType string) (*model.Snapshot, error) {
+	svc := service.NewSnapshotService()
+	req := &model.CreateSnapshotRequest{
+		ResumeID:    resumeId,
+		Label:       label,
+		Note:        note,
+		TriggerType: triggerType,
+	}
+	return svc.CreateSnapshot(context.Background(), req)
+}
+
+// ListSnapshots 获取简历的所有快照列表
+func (a *App) ListSnapshots(resumeId string) ([]*model.SnapshotListItem, error) {
+	svc := service.NewSnapshotService()
+	return svc.ListSnapshots(context.Background(), resumeId)
+}
+
+// GetSnapshot 获取单个快照的完整数据
+func (a *App) GetSnapshot(snapshotId string) (*model.Snapshot, error) {
+	svc := service.NewSnapshotService()
+	return svc.GetSnapshot(context.Background(), snapshotId)
+}
+
+// DiffSnapshots 对比两个快照
+func (a *App) DiffSnapshots(id1 string, id2 string) (*model.DiffResult, error) {
+	svc := service.NewSnapshotService()
+	return svc.DiffSnapshots(context.Background(), id1, id2)
+}
+
+// RollbackToSnapshot 回滚到指定快照
+func (a *App) RollbackToSnapshot(resumeId string, snapshotId string) (*model.Snapshot, error) {
+	svc := service.NewSnapshotService()
+	return svc.RollbackToSnapshot(context.Background(), resumeId, snapshotId)
+}
+
+// DeleteSnapshot 删除快照
+func (a *App) DeleteSnapshot(snapshotId string) error {
+	svc := service.NewSnapshotService()
+	return svc.DeleteSnapshot(context.Background(), snapshotId)
+}
+
+// GetSnapshotMarkdown 获取快照的 Markdown 内容（用于编辑器加载）
+func (a *App) GetSnapshotMarkdown(snapshotId string) (string, string, string, string, error) {
+	svc := service.NewSnapshotService()
+	snap, err := svc.GetSnapshot(context.Background(), snapshotId)
+	if err != nil {
+		return "", "", "", "", err
+	}
+	return snap.MarkdownContent, snap.TemplateID, snap.CustomCSS, snap.JSONData, nil
+}
+
+// ============================================================
 // Chat History Bridge Methods
 // ============================================================
 
