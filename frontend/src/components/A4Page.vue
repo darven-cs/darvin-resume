@@ -125,10 +125,10 @@ defineExpose({
   width: 210mm;
   min-height: 297mm;
   margin: 0 auto 20px;
-  padding: 20mm;
   background: white;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
+  /* Bug修复：移除硬编码 padding，改用 editor.css 全局 CSS 变量 --resume-padding */
 }
 
 /* A4 页面边界线 */

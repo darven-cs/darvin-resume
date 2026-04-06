@@ -34,6 +34,13 @@
           </svg>
           新建简历
         </button>
+        <!-- 设置按钮 -->
+        <button class="settings-btn" @click="showSettings = true" title="设置">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
       </div>
     </header>
 
@@ -84,6 +91,12 @@
       @close="showCreateModal = false"
       @select-mode="handleCreateMode"
     />
+
+    <!-- 设置弹窗 -->
+    <AIConfigModal
+      :visible="showSettings"
+      @close="showSettings = false"
+    />
   </div>
 </template>
 
@@ -95,6 +108,7 @@ import { useResumeList } from '../composables/useResumeList'
 import ResumeCard from '../components/ResumeCard.vue'
 import CreateModeModal from '../components/CreateModeModal.vue'
 import RecycleBinSection from '../components/RecycleBinSection.vue'
+import AIConfigModal from '../components/AIConfigModal.vue'
 
 const router = useRouter()
 const {
@@ -109,6 +123,7 @@ const {
 } = useResumeList()
 
 const showCreateModal = ref(false)
+const showSettings = ref(false)
 
 // 页面加载时获取简历列表
 onMounted(() => {
@@ -313,6 +328,26 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
 
 .create-btn:hover {
   background: #2ea043;
+}
+
+/* 设置按钮 */
+.settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #3c3c3c;
+  border-radius: 6px;
+  background: #2d2d2d;
+  color: #8b949e;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.settings-btn:hover {
+  border-color: #58a6ff;
+  color: #e6edf3;
 }
 
 /* 卡片网格区域 */

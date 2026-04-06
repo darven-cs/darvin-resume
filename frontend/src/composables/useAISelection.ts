@@ -141,8 +141,9 @@ export function useAISelection(
     isLoading.value = true
     currentOperation.value = operation
 
-    // Set up streaming listener
-    const { content, isStreaming, abort } = useAIStream(currentOperationId)
+    // Set up streaming listener with a ref so it always listens to current operation ID
+    const operationIdRef = { value: currentOperationId }
+    const { content, isStreaming, abort } = useAIStream(operationIdRef)
 
     // Track streamed content for replacement
     let streamedResult = ''

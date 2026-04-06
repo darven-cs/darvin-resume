@@ -445,6 +445,93 @@ async function handleExport() {
 }
 </script>
 
+<style>
+/* 系统打印 (@media print) 必须放在全局（非scoped）块内
+ * 否则 Vue scoped CSS 会给选择器附加 data 属性，破坏 body 选择器 */
+@media print {
+  /* 强制白底：解决 Wails WebView 深色主题背景渗透到 PDF */
+  html, body {
+    background: white !important;
+    color: #1a1a1a !important;
+  }
+
+  /* 隐藏所有非打印容器元素 */
+  body > *:not(.print-container) {
+    display: none !important;
+  }
+
+  /* 打印容器样式 */
+  .print-container {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* A4 页面 */
+  .a4-page {
+    width: 210mm !important;
+    height: auto !important;
+    min-height: 297mm !important;
+    padding: var(--resume-padding, 20mm) !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .a4-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* 禁止内容块内部分页 */
+  .page-content > * {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .page-content h1, .page-content h2, .page-content h3 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  .page-content table, .page-content thead, .page-content tbody,
+  .page-content tr, .page-content th, .page-content td {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .page-content li {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* 强制颜色输出 */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body {
+    font-size: 10.5pt !important;
+  }
+
+  /* 隐藏分页参考线 */
+  .hide-page-breaks .a4-page::before,
+  .hide-page-breaks .a4-page::after {
+    display: none !important;
+  }
+}
+</style>
+
 <style scoped>
 .modal-overlay {
   position: fixed;

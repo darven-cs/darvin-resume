@@ -160,6 +160,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { sanitizeCustomCSS, buildCSSVars, DEFAULT_CSS_VARS } from '../utils/sanitizeCSS'
+import { UpdateResumeCustomCSS } from '../wailsjs/wailsjs/go/main/App'
 
 const props = defineProps<{
   /** 控制面板显示/隐藏 */
@@ -343,9 +344,13 @@ function saveToBackend() {
   // 简单防抖：500ms 内合并
   if (saveTimerHandle) clearTimeout(saveTimerHandle)
   saveTimer = Date.now()
-  saveTimerHandle = setTimeout(() => {
-    // 触发父组件保存（通过 v-model 事件）
-    emit('update:modelValue', props.modelValue)
+  saveTimerHandle = setTimeout(async () => {
+    const fullCSS = buildFullCSS()
+    try {
+      await UpdateResumeCustomCSS(props.resumeId, fullCSS)
+    } catch (err) {
+      console.error('[StyleEditor] 保存样式失败:', err)
+    }
   }, 500)
 }
 
@@ -406,7 +411,14 @@ function confirmReset() {
 
   // 保存到后端
   const defaultCSS = buildCSSVars(buildCurrentCSSVars())
-  emit('update:modelValue', props.modelValue)
+  saveTimer = Date.now()
+  saveTimerHandle = setTimeout(async () => {
+    try {
+      await UpdateResumeCustomCSS(props.resumeId, defaultCSS)
+    } catch (err) {
+      console.error('[StyleEditor] 保存默认样式失败:', err)
+    }
+  }, 500)
 }
 
 // ============================================================

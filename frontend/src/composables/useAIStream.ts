@@ -102,10 +102,13 @@ function convertBackendError(errorStr: string): AIError {
  * Listens to ai:stream:{operationId} events and accumulates content chunks.
  * Integrates error handling (AIAI-10 to AIAI-13).
  *
- * @param operationId - Unique identifier for the streaming operation
+ * @param operationIdRef - Ref containing the unique identifier for the streaming operation.
+ *                           Pass a ref so this composable always listens to the current ID,
+ *                           fixing the bug where a new operation ID was generated per message
+ *                           but the listener was registered with the initial ID.
  * @returns Streaming state and control functions
  */
-export function useAIStream(operationId: string) {
+export function useAIStream(operationIdRef: { value: string }) {
   const content = ref('')
   const isStreaming = ref(false)
   const error = ref<string | null>(null)
@@ -114,7 +117,10 @@ export function useAIStream(operationId: string) {
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
   const DEBOUNCE_MS = 16 // ~60fps for smooth typewriter effect
 
-  const eventName = `ai:stream:${operationId}`
+  // Dynamically compute event name from the ref, so we always listen to the current ID
+  function getEventName() {
+    return `ai:stream:${operationIdRef.value}`
+  }
 
   const handleEvent = (data: AIStreamChunk) => {
     switch (data.type) {
@@ -135,7 +141,7 @@ export function useAIStream(operationId: string) {
         aiError.value = convertBackendError(errorStr)
         isStreaming.value = false
         // Log to console for debugging (AIAI-10)
-        console.error('[AI Stream Error]', aiError.value, { operationId })
+        console.error('[AI Stream Error]', aiError.value, { operationId: operationIdRef.value })
         break
       }
       case 'done':
@@ -149,29 +155,22 @@ export function useAIStream(operationId: string) {
     }
   }
 
-  // Start listening to events
+  // Start listening to events with the current operation ID
+  const eventName = getEventName()
   EventsOn(eventName, handleEvent)
   isStreaming.value = true
 
   /**
    * Abort the streaming operation.
    * Implements AIAI-13: user-initiated abort with content preservation.
-   *
-   * 1. Notifies backend to cancel the operation
-   * 2. Stops listening to events
-   * 3. Preserves already-generated content (content.value stays intact)
-   * 4. Logs the abort event
    */
   const abort = async () => {
     try {
-      // Notify backend to cancel the operation
-      await AICancelOperation(operationId)
+      await AICancelOperation(operationIdRef.value)
     } catch (err) {
-      // Backend cancellation failed - non-fatal, continue with frontend cleanup
       console.warn('[AI] Backend cancel failed:', err)
     }
 
-    // Stop listening to events
     EventsOff(eventName)
     isStreaming.value = false
 
@@ -180,7 +179,6 @@ export function useAIStream(operationId: string) {
       debounceTimer = null
     }
 
-    // Set abort error
     error.value = 'cancelled'
     aiError.value = {
       code: 'ABORTED',
@@ -189,7 +187,6 @@ export function useAIStream(operationId: string) {
       retryable: false,
     }
 
-    // Log abort with content preservation info
     console.log('[AI] Aborted, preserved content length:', content.value.length)
   }
 

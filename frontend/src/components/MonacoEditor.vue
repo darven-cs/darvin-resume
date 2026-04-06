@@ -565,9 +565,13 @@ defineExpose({
 // ============================================================
 
 async function handleAIOperation(operation: string) {
+  // Bug fix: 点击浮动工具栏时，Monaco 编辑器会先触发 mousedown
+  // 导致 selectionRange.value 被清空（useAISelection 的 updateSelection 执行）。
+  // 解决方案：在函数入口处立即将选区状态复制到局部变量（闭包捕获），
+  // 避免依赖可能被清空的响应式状态。
   if (!editor || !selectionRange.value) return
 
-  // 保存原始选区文本和范围用于 diff 对比
+  // 保存原始选区文本和范围用于 diff 对比（闭包捕获，非响应式）
   const originalText = selectedText.value
   const savedRange = { ...selectionRange.value }
 

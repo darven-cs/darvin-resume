@@ -41,8 +41,9 @@ const scrollContainer = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const rafId = ref<number | null>(null)
 
-// Use the AI stream composable
-const { content: streamedContent, isStreaming: streamActive, error: streamError, abort, reset } = useAIStream(operationId.value)
+// Use the AI stream composable with a ref (not a plain string)
+// This fixes Bug 4: useAIStream now accepts a ref so it always listens to the current operationId
+const { content: streamedContent, isStreaming: streamActive, error: streamError, abort, reset } = useAIStream(operationId)
 
 // Welcome message
 const welcomeMessage: ChatMessage = {
