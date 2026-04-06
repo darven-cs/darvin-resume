@@ -43,6 +43,10 @@ export function SaveChatMessage(arg1:ai.ChatMessage):Promise<void>;
 
 export function UpdateResume(arg1:string,arg2:string):Promise<void>;
 
+export function UpdateResumeCustomCSS(arg1:string,arg2:string):Promise<void>;
+
 export function UpdateResumeModule(arg1:string,arg2:string,arg3:string):Promise<void>;
+
+export function UpdateResumeTemplate(arg1:string,arg2:string):Promise<void>;
 
 export function ValidateAPIKey(arg1:string,arg2:string):Promise<boolean>;

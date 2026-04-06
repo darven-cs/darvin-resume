@@ -82,8 +82,16 @@ export function UpdateResume(arg1, arg2) {
   return window['go']['main']['App']['UpdateResume'](arg1, arg2);
 }
 
+export function UpdateResumeCustomCSS(arg1, arg2) {
+  return window['go']['main']['App']['UpdateResumeCustomCSS'](arg1, arg2);
+}
+
 export function UpdateResumeModule(arg1, arg2, arg3) {
   return window['go']['main']['App']['UpdateResumeModule'](arg1, arg2, arg3);
+}
+
+export function UpdateResumeTemplate(arg1, arg2) {
+  return window['go']['main']['App']['UpdateResumeTemplate'](arg1, arg2);
 }
 
 export function ValidateAPIKey(arg1, arg2) {
