@@ -42,6 +42,23 @@
         <span class="btn-label">导入</span>
       </button>
 
+      <!-- PDF 导出按钮 -->
+      <button class="toolbar-btn" @click="showExportDialog = true" title="导出 PDF">
+        <span class="btn-icon">PDF</span>
+        <span class="btn-label">导出</span>
+      </button>
+
+      <!-- 版本快照按钮 -->
+      <button
+        class="toolbar-btn"
+        :class="{ active: snapshotSidebarVisible }"
+        @click="snapshotSidebarVisible = !snapshotSidebarVisible"
+        title="版本快照"
+      >
+        <span class="btn-icon">&#128247;</span>
+        <span class="btn-label">快照</span>
+      </button>
+
       <JobTargetChip
         v-model="jobTarget"
         @change="handleJobTargetChange"
@@ -188,6 +205,22 @@
       @close="showAIConfigModal = false"
     />
 
+    <!-- Export Dialog -->
+    <ExportDialog
+      :visible="showExportDialog"
+      :resume-id="resumeId"
+      @close="showExportDialog = false"
+      @exported="handleExportCompleted"
+    />
+
+    <!-- Snapshot Sidebar -->
+    <SnapshotSidebar
+      :visible="snapshotSidebarVisible"
+      :resume-id="resumeId"
+      @close="snapshotSidebarVisible = false"
+      @rollback="handleRollback"
+    />
+
     <!-- Resume Wizard Sidebar -->
     <ResumeWizardSidebar
       :visible="wizardVisible"
@@ -210,11 +243,14 @@ import JobTargetChip from '../components/JobTargetChip.vue'
 import ResumeParserModal from '../components/ResumeParserModal.vue'
 import AIChatSidebar from '../components/AIChatSidebar.vue'
 import AIConfigModal from '../components/AIConfigModal.vue'
+import ExportDialog from '../components/ExportDialog.vue'
+import SnapshotSidebar from '../components/SnapshotSidebar.vue'
 import ResumeWizardSidebar from '../components/ResumeWizardSidebar.vue'
 import SaveStatusIndicator from '../components/SaveStatusIndicator.vue'
 import StyleEditor from '../components/StyleEditor.vue'
 import { useAutoSave } from '../composables/useAutoSave'
 import { useTemplate } from '../composables/useTemplate'
+import { useSnapshot } from '../composables/useSnapshot'
 import { GetResume, RenameResume } from '../wailsjs/wailsjs/go/main/App'
 import type { Resume } from '../types/resume'
 
@@ -246,6 +282,17 @@ const chatSidebarRef = ref<InstanceType<typeof AIChatSidebar> | null>(null)
 
 // Resume Wizard 状态 — 检测路由 query ?wizard=true 自动打开向导
 const wizardVisible = ref(route.query.wizard === 'true')
+
+// Export Dialog 状态
+const showExportDialog = ref(false)
+
+// Snapshot Sidebar 状态
+const snapshotSidebarVisible = ref(false)
+const {
+  loadSnapshots,
+  autoCreateSnapshot,
+  rollback,
+} = useSnapshot()
 
 // 响应式状态 per D-09
 const windowWidth = ref(window.innerWidth)
@@ -299,6 +346,9 @@ onMounted(async () => {
 
   // 监听窗口宽度变化
   window.addEventListener('resize', handleResize)
+
+  // 加载快照列表
+  await loadSnapshots(resumeId.value)
 
   // 编辑器与预览滚动同步 per D-11
   setTimeout(setupScrollSync, 500)
@@ -400,6 +450,20 @@ async function handleImport(markdown: string, importedJobTarget: string) {
 // AI Sidebar text insertion
 function handleInsertText(text: string) {
   monacoRef.value?.insertAtCursor(text)
+}
+
+// 导出完成后自动创建快照
+async function handleExportCompleted() {
+  const dateStr = new Date().toLocaleDateString('zh-CN')
+  await autoCreateSnapshot(resumeId.value, `PDF 导出快照 ${dateStr}`, '')
+  console.log('PDF 导出成功，已自动创建版本快照')
+}
+
+// 回滚后重新加载简历内容
+async function handleRollback(snapshotId: string) {
+  // 重新加载简历数据
+  await loadResume()
+  snapshotSidebarVisible.value = false
 }
 
 // 向导完成后重新加载简历内容（后端已自动生成 Markdown）
