@@ -184,6 +184,7 @@ jobs:
 
       - name: Create nfpm configuration
         run: |
+          mkdir -p dist
           cat > nfpm.yml << 'YAML'
           name: darvin-resume
           version: ${VERSION}
@@ -197,15 +198,17 @@ jobs:
           homepage: https://github.com/darven-cs/darvin-resume
           license: MIT
 
+          contents:
+            - src: ./build/bin/Darvin-Resume
+              dst: /usr/bin/darvin-resume
+              type: executable
+
           scripts:
             postinstall: |
-              # Create application menu entry
               install -Dm644 darvin-resume.desktop \
                 /usr/share/applications/darvin-resume.desktop
               install -Dm644 com.darven.darvin-resume.appdata.xml \
                 /usr/share/metainfo/com.darven.darvin-resume.appdata.xml
-              install -Dm644 packaging/linux/darvin-resume.desktop \
-                /usr/share/applications/darvin-resume.desktop 2>/dev/null || true
             preremove: |
               rm -f /usr/share/applications/darvin-resume.desktop
               rm -f /usr/share/metainfo/com.darven.darvin-resume.appdata.xml
@@ -227,17 +230,15 @@ jobs:
         run: |
           nfpm pkg \
             --packager deb \
-            --input ./build/bin \
-            --output ./dist \
-            -f nfpm.yml
+            --config nfpm.yml \
+            --target ./dist/
 
       - name: Build .rpm package
         run: |
           nfpm pkg \
             --packager rpm \
-            --input ./build/bin \
-            --output ./dist \
-            -f nfpm.yml
+            --config nfpm.yml \
+            --target ./dist/
 
       - name: Verify packages
         run: |
