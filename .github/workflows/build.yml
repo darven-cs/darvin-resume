@@ -245,7 +245,7 @@ jobs:
           DEB_FILE=$(ls dist/*.deb)
           RPM_FILE=$(ls dist/*.rpm)
           echo "=== .deb metadata ==="
-          dpkg-deb -info "$DEB_FILE"
+          dpkg-deb --info "$DEB_FILE"
           echo ""
           echo "=== .rpm metadata ==="
           rpm -qpi "$RPM_FILE"
