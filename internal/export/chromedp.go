@@ -39,8 +39,26 @@ func ExportPDFFromHTML(ctx context.Context, htmlContent string, outputPath strin
 		return err
 	}
 
-	// 写入临时 HTML 文件（避免 data: URL 编码问题）
-	tmpFile, err := os.CreateTemp("", "darvin-resume-export-*.html")
+	// 写入临时 HTML 文件到输出目录（Chromium 沙箱通常无法访问 /tmp）
+	// 使用 outputPath 同目录或当前工作目录，确保 Chromium 有权限读取
+	tmpDir := ""
+	if idx := lastIndexByte(outputPath, '/'); idx >= 0 {
+		tmpDir = outputPath[:idx]
+	}
+	// 如果 outputPath 没有目录（只有文件名），使用当前工作目录
+	if tmpDir == "" {
+		wd, err := os.Getwd()
+		if err == nil {
+			tmpDir = wd
+		}
+	}
+	// 确保输出目录存在（Chromedp 需要能读取父目录）
+	if tmpDir != "" {
+		if err := os.MkdirAll(tmpDir, 0755); err != nil {
+			return fmt.Errorf("create output directory failed: %w", err)
+		}
+	}
+	tmpFile, err := os.CreateTemp(tmpDir, "darvin-resume-export-*.html")
 	if err != nil {
 		return fmt.Errorf("create temp file failed: %w", err)
 	}
@@ -52,7 +70,7 @@ func ExportPDFFromHTML(ctx context.Context, htmlContent string, outputPath strin
 		return fmt.Errorf("write temp HTML failed: %w", err)
 	}
 
-	// 使用 file URL 加载（无编码问题）
+	// file:// URL（Unix 需要三斜杠表示绝对路径）
 	fileURL := "file://" + tmpPath
 
 	// 创建无头浏览器分配器
@@ -106,18 +124,7 @@ func ExportPDFFromHTML(ctx context.Context, htmlContent string, outputPath strin
 		return fmt.Errorf("chromedp run failed: %w", err)
 	}
 
-	// 确保输出目录存在
-	dir := ""
-	if idx := lastIndexByte(outputPath, '/'); idx >= 0 {
-		dir = outputPath[:idx]
-	}
-	if dir != "" {
-		if err := os.MkdirAll(dir, 0755); err != nil {
-			return fmt.Errorf("create output directory failed: %w", err)
-		}
-	}
-
-	// 写入文件
+	// 写入 PDF 文件（输出目录已在前面确保存在）
 	if err := os.WriteFile(outputPath, pdfBuf, 0644); err != nil {
 		return fmt.Errorf("write file failed: %w", err)
 	}
