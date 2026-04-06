@@ -203,3 +203,122 @@
   overflow: visible !important;
   text-overflow: clip !important;
 }
+
+/* =========================================
+   PDF 导出打印样式（EXPT-01, EXPT-03）
+   预览与 PDF 100% 一致的核心规则
+   ========================================= */
+
+@media print {
+  /* 隐藏所有 UI 元素，仅保留 A4 页面 */
+  body > *:not(.print-container),
+  .editor-toolbar,
+  .monaco-editor-container,
+  .ai-sidebar,
+  .style-editor-panel,
+  .template-selector,
+  .split-pane-handle,
+  .save-status,
+  .a4-page::before,
+  .a4-page::after {
+    display: none !important;
+  }
+
+  /* 打印容器：居中显示所有页面 */
+  .print-container {
+    display: block !important;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    background: white;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* A4 页面：精确尺寸，无阴影 */
+  .a4-page {
+    width: 210mm !important;
+    height: auto !important;
+    min-height: 297mm;
+    padding: 20mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  /* 最后一页不强制分页 */
+  .a4-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* 内容块：禁止跨页断裂（EXPT-03 break-inside: avoid） */
+  .page-content > * {
+    break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* h1/h2/h3 标题块禁止分页 */
+  .page-content h1,
+  .page-content h2,
+  .page-content h3 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* 表格禁止分页 */
+  .page-content table,
+  .page-content thead,
+  .page-content tbody,
+  .page-content tr,
+  .page-content th,
+  .page-content td {
+    break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* 列表项禁止分页 */
+  .page-content li {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* 强制背景色/背景图打印（EXPT-03） */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    -webkit-appearance: none !important;
+  }
+
+  /* 确保文字颜色正确 */
+  .page-content {
+    color: #1a1a1a !important;
+  }
+
+  /* 链接打印时显示 URL */
+  .page-content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #666;
+  }
+
+  /* 分页线隐藏类（EXPT-04） */
+  .hide-page-breaks .a4-page::before,
+  .hide-page-breaks .a4-page::after {
+    display: none !important;
+  }
+
+  /* 字体大小（确保与预览一致） */
+  html, body {
+    font-size: 10.5pt !important;
+  }
+}
+
+@page {
+  size: 210mm 297mm;
+  margin: 0;
+}
