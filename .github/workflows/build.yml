@@ -1,0 +1,326 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.0.0)'
+        required: false
+        type: string
+
+env:
+  NODE_OPTIONS: '--max-old-space-size=4096'
+  GO_VERSION: '1.25'
+  APP_NAME: 'Darvin-Resume'
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 1: Build Linux binary (no packaging — handled by package-deb-rpm job)
+  # ─────────────────────────────────────────────────────────────────────────
+  build-linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libgtk-3-dev \
+            libwebkit2gtk-4.0-dev \
+            pkg-config \
+            build-essential \
+            gcc
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build Linux binary
+        run: |
+          cd frontend && npm install && cd ..
+          wails build --platform linux/amd64 --nopackage
+
+      - name: Upload Linux binary and assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-amd64-binary
+          path: |
+            build/bin/Darvin-Resume
+            packaging/linux/
+          retention-days: 5
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 2: Build Windows NSIS installer
+  # ─────────────────────────────────────────────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build Windows NSIS installer
+        run: |
+          npm install
+          wails build --platform windows/amd64 --nsis
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-amd64-installer
+          path: build/bin/Darvin-Resume-*-amd64.exe
+          retention-days: 5
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 3: Build macOS app bundle
+  # ─────────────────────────────────────────────────────────────────────────
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build macOS app bundle
+        run: |
+          npm install
+          wails build --platform darwin/universal
+
+      - name: Install create-dmg
+        run: |
+          brew install create-dmg
+
+      - name: Package as DMG
+        run: |
+          create-dmg \
+            --volname "Darvin-Resume" \
+            --volicon "" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "Darvin-Resume.app" 150 185 \
+            --app-drop-link 450 185 \
+            --hide-extension "Darvin-Resume.app" \
+            --format UDBZ \
+            --compression-level 9 \
+            --add-volume-size-offset 50 \
+            "build/Darvin-Resume-macos-universal.dmg" \
+            "build/bin/Darvin-Resume.app"
+
+      - name: Verify DMG
+        run: |
+          ls -lh build/*.dmg
+          hdiutil imageinfo build/Darvin-Resume-macos-universal.dmg 2>&1 | grep -E "(Format:|Max Compression)" || true
+
+      - name: Upload macOS DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-universal-dmg
+          path: build/Darvin-Resume-macos-universal.dmg
+          retention-days: 5
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 4: Package Linux binary into .deb and .rpm (runs after build-linux)
+  # ─────────────────────────────────────────────────────────────────────────
+  package-deb-rpm:
+    needs: build-linux
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Linux binary
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-amd64-binary
+          path: ./bin
+
+      - name: Make binary executable
+        run: chmod +x ./bin/Darvin-Resume
+
+      - name: Download nfpm
+        run: |
+          NFMV_VERSION=$(curl -s https://api.github.com/repos/goreleaser/nfpm/releases/latest | grep '"tag_name":' | sed 's/.*"v\?\([^"]*\)".*/\1/' | head -1)
+          echo "Latest nfpm version: $NFMV_VERSION"
+          curl -sL "https://github.com/goreleaser/nfpm/releases/download/v${NFMV_VERSION}/nfpm_amd64.deb" -o nfpm.deb
+          sudo dpkg -i nfpm.deb
+          nfpm version
+
+      - name: Download nfpm config assets
+        run: |
+          cp build/linux/darvin-resume.desktop ./darvin-resume.desktop
+          cp build/linux/com.darven.darvin-resume.appdata.xml ./com.darven.darvin-resume.appdata.xml
+
+      - name: Create nfpm configuration
+        run: |
+          cat > nfpm.yml << 'YAML'
+          name: darvin-resume
+          arch: amd64
+          platform: linux
+          section: utils
+          priority: optional
+
+          scripts:
+            postinstall: |
+              # Create application menu entry
+              install -Dm644 darvin-resume.desktop \
+                /usr/share/applications/darvin-resume.desktop
+              install -Dm644 com.darven.darvin-resume.appdata.xml \
+                /usr/share/metainfo/com.darven.darvin-resume.appdata.xml
+              install -Dm644 packaging/linux/darvin-resume.desktop \
+                /usr/share/applications/darvin-resume.desktop 2>/dev/null || true
+            preremove: |
+              rm -f /usr/share/applications/darvin-resume.desktop
+              rm -f /usr/share/metainfo/com.darven.darvin-resume.appdata.xml
+
+          deb:
+            depends:
+              - libgtk-3-0
+              - libwebkit2gtk-4.0-37
+              - libayatana-appindicator3-1
+            desktop: darvin-resume.desktop
+          rpm:
+            depends:
+              - gtk3
+              - webkit2gtk4.0
+              - libappindicator-gtk3
+          YAML
+
+      - name: Build .deb package
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          nfpm pkg \
+            --packager deb \
+            --version "${VERSION:-1.0.0}" \
+            --description "Markdown原生、隐私优先的本地化简历工具" \
+            --vendor "Darvin-Resume" \
+            --maintainer "Darvin-Resume <darven@example.com>" \
+            --homepage "https://github.com/darven-cs/darvin-resume" \
+            --license MIT \
+            --targets deb \
+            --input ./bin \
+            --output ./dist \
+            -f nfpm.yml
+
+      - name: Build .rpm package
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          nfpm pkg \
+            --packager rpm \
+            --version "${VERSION:-1.0.0}" \
+            --description "Markdown原生、隐私优先的本地化简历工具" \
+            --vendor "Darvin-Resume" \
+            --maintainer "Darvin-Resume <darven@example.com>" \
+            --homepage "https://github.com/darven-cs/darvin-resume" \
+            --license MIT \
+            --targets rpm \
+            --input ./bin \
+            --output ./dist \
+            -f nfpm.yml
+
+      - name: Verify packages
+        run: |
+          echo "=== Generated packages ==="
+          ls -lh dist/
+          echo ""
+          echo "=== .deb metadata ==="
+          dpkg-deb -info dist/*.deb
+          echo ""
+          echo "=== .rpm metadata ==="
+          rpm -qpi dist/*.rpm
+
+      - name: Upload Linux packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            dist/*.deb
+            dist/*.rpm
+          retention-days: 5
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 5: Create GitHub Release (runs after all builds)
+  # ─────────────────────────────────────────────────────────────────────────
+  release:
+    needs: [build-linux, build-windows, build-macos, package-deb-rpm]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          # Flatten artifact directories
+          find ./artifacts -type f -exec cp {} release-assets/ \;
+          ls -lh release-assets/
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          echo "VERSION=${TAG_NAME#v}" >> $GITHUB_OUTPUT
+          echo "Version: $TAG_NAME"
+
+      - name: Generate release notes
+        run: |
+          # Generate simple changelog from recent commits
+          CHANGELOG=$(git log --oneline -20 | head -15)
+          echo "## Darvin-Resume v${GITHUB_REF#refs/tags/v}" > release-notes.md
+          echo "" >> release-notes.md
+          echo "### Downloads" >> release-notes.md
+          echo "" >> release-notes.md
+          echo "| Platform | File |" >> release-notes.md
+          echo "|----------|------|" >> release-notes.md
+          for f in release-assets/*; do
+            fname=$(basename "$f")
+            ext="${fname##*.}"
+            case "$ext" in
+              deb) plat="Linux (Debian/Ubuntu)" ;;
+              rpm) plat="Linux (Fedora/RHEL)" ;;
+              exe) plat="Windows (NSIS Installer)" ;;
+              dmg) plat="macOS (DMG)" ;;
+              *)   plat="Other" ;;
+            esac
+            echo "| $plat | \`$fname\` |" >> release-notes.md
+          done
+          echo "" >> release-notes.md
+          echo "### Recent Changes" >> release-notes.md
+          echo '```' >> release-notes.md
+          echo "$CHANGELOG" >> release-notes.md
+          echo '```' >> release-notes.md
+          cat release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref }}
+          name: 'Darvin-Resume ${{ github.ref }}'
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+          files: release-assets/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

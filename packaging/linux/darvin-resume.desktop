@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Darvin-Resume
+Comment=Markdown原生、隐私优先的本地化简历工具
+Comment[zh_CN]=Markdown原生、隐私优先的本地化简历工具
+Exec=Darvin-Resume
+Icon=darvin-resume
+Type=Application
+Categories=Office;TextEditor;Utility;
+Keywords=resume;cv;markdown;简历;
+StartupWMClass=Darvin-Resume
+Terminal=false
+StartupNotify=true

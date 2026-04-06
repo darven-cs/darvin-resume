@@ -1,0 +1,10 @@
+ID=com.darven.darvin-resume
+Type=Application
+Name=Darvin-Resume
+Summary=Markdown原生、隐私优先的本地化简历工具
+Summary[zh_CN]=Markdown原生、隐私优先的本地化简历工具
+DeveloperName=Darvin-Resume
+Categories=Office;TextEditor;Utility;
+Keywords=resume;cv;markdown;简历;
+Url[homepage]=https://github.com/darven-cs/darvin-resume
+LaunchableType=Application
