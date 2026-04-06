@@ -6,6 +6,7 @@ import (
 
 	"Darvin-Resume/internal/ai"
 	"Darvin-Resume/internal/database"
+	"Darvin-Resume/internal/export"
 	"Darvin-Resume/internal/model"
 	"Darvin-Resume/internal/service"
 
@@ -358,4 +359,41 @@ func (a *App) UpdateResumeTemplate(id string, templateId string) error {
 // UpdateResumeCustomCSS 更新简历自定义 CSS
 func (a *App) UpdateResumeCustomCSS(id string, customCss string) error {
 	return a.svc.UpdateCustomCSS(context.Background(), id, customCss)
+}
+
+// ExportPDFFromHTML 使用 Chromedp 无头浏览器导出 PDF
+// htmlContent: 完整的 HTML 内容（含 style 标签）
+// outputPath: 输出文件路径
+func (a *App) ExportPDFFromHTML(htmlContent string, outputPath string) (string, error) {
+	ctx := context.Background()
+	opts := &export.PDFOptions{
+		PaperWidth:  8.27,
+		PaperHeight: 11.69,
+		Scale:       1.0, // DPI 96 / 72
+		PrintBg:     true,
+	}
+	err := export.ExportPDFFromHTML(ctx, htmlContent, outputPath, opts)
+	if err != nil {
+		return "", err
+	}
+	return outputPath, nil
+}
+
+// ShowSaveDialog 显示系统文件保存对话框并返回用户选择的路径
+func (a *App) ShowSaveDialog(dialogConfig map[string]interface{}) (map[string]interface{}, error) {
+	title := getString(dialogConfig, "title", "保存文件")
+	defaultFilename := getString(dialogConfig, "defaultPath", "")
+
+	path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           title,
+		DefaultFilename: defaultFilename,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"filePath": path,
+		"canceled": path == "",
+	}, nil
 }
