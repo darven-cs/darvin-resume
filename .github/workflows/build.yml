@@ -211,10 +211,9 @@ jobs:
                 - libappindicator-gtk3
 
           contents:
-            # Main executable
+            # Main executable - regular file, no type needed
             - src: ./build/bin/Darvin-Resume
               dst: /usr/bin/darvin-resume
-              type: executable
             # Desktop entry
             - src: darvin-resume.desktop
               dst: /usr/share/applications/darvin-resume.desktop
