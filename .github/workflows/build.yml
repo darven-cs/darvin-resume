@@ -117,7 +117,6 @@ jobs:
         run: |
           create-dmg \
             --volname "Darvin-Resume" \
-            --volicon "" \
             --window-pos 200 120 \
             --window-size 600 400 \
             --icon-size 100 \
@@ -125,8 +124,6 @@ jobs:
             --app-drop-link 450 185 \
             --hide-extension "Darvin-Resume.app" \
             --format UDBZ \
-            --compression-level 9 \
-            --add-volume-size-offset 50 \
             "build/Darvin-Resume-macos-universal.dmg" \
             "build/bin/Darvin-Resume.app"
 
@@ -165,8 +162,10 @@ jobs:
         run: |
           NFMV_VERSION=$(curl -s https://api.github.com/repos/goreleaser/nfpm/releases/latest | grep '"tag_name":' | sed 's/.*"v\?\([^"]*\)".*/\1/' | head -1)
           echo "Latest nfpm version: $NFMV_VERSION"
-          curl -sL "https://github.com/goreleaser/nfpm/releases/download/v${NFMV_VERSION}/nfpm_amd64.deb" -o nfpm.deb
-          sudo dpkg -i nfpm.deb
+          curl -sL "https://github.com/goreleaser/nfpm/releases/download/v${NFMV_VERSION}/nfpm_${NFMV_VERSION}_Linux_x86_64.tar.gz" -o nfpm.tar.gz
+          tar xzf nfpm.tar.gz
+          sudo mv nfpm /usr/local/bin/nfpm
+          chmod +x /usr/local/bin/nfpm
           nfpm version
 
       - name: Download nfpm config assets
