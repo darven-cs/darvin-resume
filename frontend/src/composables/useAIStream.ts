@@ -116,11 +116,31 @@ export function useAIStream(operationIdRef: { value: string }) {
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
   const DEBOUNCE_MS = 16 // ~60fps for smooth typewriter effect
+  let currentEventName = ''
 
-  // Dynamically compute event name from the ref, so we always listen to the current ID
-  function getEventName() {
-    return `ai:stream:${operationIdRef.value}`
-  }
+  // 【关键修复】动态注册事件监听：每次 operationIdRef.value 变化时，
+  // 取消旧监听器并注册新监听器。解决新消息使用新 ID 时前端仍监听旧 ID 的问题。
+  watch(
+    () => operationIdRef.value,
+    (newId) => {
+      const newEventName = `ai:stream:${newId}`
+
+      // 取消旧监听器（如果有）
+      if (currentEventName && currentEventName !== newEventName) {
+        EventsOff(currentEventName)
+        // 重置状态，为新操作做准备
+        content.value = ''
+        error.value = null
+        aiError.value = null
+      }
+
+      // 注册新监听器
+      currentEventName = newEventName
+      EventsOn(currentEventName, handleEvent)
+      isStreaming.value = true
+    },
+    { immediate: true }
+  )
 
   const handleEvent = (data: AIStreamChunk) => {
     switch (data.type) {
@@ -155,11 +175,6 @@ export function useAIStream(operationIdRef: { value: string }) {
     }
   }
 
-  // Start listening to events with the current operation ID
-  const eventName = getEventName()
-  EventsOn(eventName, handleEvent)
-  isStreaming.value = true
-
   /**
    * Abort the streaming operation.
    * Implements AIAI-13: user-initiated abort with content preservation.
@@ -171,7 +186,9 @@ export function useAIStream(operationIdRef: { value: string }) {
       console.warn('[AI] Backend cancel failed:', err)
     }
 
-    EventsOff(eventName)
+    if (currentEventName) {
+      EventsOff(currentEventName)
+    }
     isStreaming.value = false
 
     if (debounceTimer) {
@@ -206,7 +223,9 @@ export function useAIStream(operationIdRef: { value: string }) {
 
   // Cleanup on unmount
   onUnmounted(() => {
-    EventsOff(eventName)
+    if (currentEventName) {
+      EventsOff(currentEventName)
+    }
     if (debounceTimer) {
       clearTimeout(debounceTimer)
     }

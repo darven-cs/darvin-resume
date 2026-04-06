@@ -565,15 +565,26 @@ defineExpose({
 // ============================================================
 
 async function handleAIOperation(operation: string) {
-  // Bug fix: 点击浮动工具栏时，Monaco 编辑器会先触发 mousedown
-  // 导致 selectionRange.value 被清空（useAISelection 的 updateSelection 执行）。
-  // 解决方案：在函数入口处立即将选区状态复制到局部变量（闭包捕获），
-  // 避免依赖可能被清空的响应式状态。
-  if (!editor || !selectionRange.value) return
+  if (!editor) return
 
-  // 保存原始选区文本和范围用于 diff 对比（闭包捕获，非响应式）
-  const originalText = selectedText.value
-  const savedRange = { ...selectionRange.value }
+  // 【关键修复】用 Monaco API 直接获取选区，绕过 mousedown 清空 reactive 状态的问题
+  // 事件顺序：mousedown → Monaco onDidChangeCursorSelection → selectionRange.value=null → click → handleAIOperation
+  // 所以这里必须从 Monaco API 取原始选区，而不是依赖响应式状态
+  const rawSelection = editor.getSelection()
+  if (!rawSelection) return
+  const model = editor.getModel()
+  if (!model) return
+  const rawText = model.getValueInRange(rawSelection)
+  if (!rawText || !rawText.trim()) return
+
+  // 闭包捕获捕获的原始选区，后续不再依赖响应式状态
+  const originalText = rawText
+  const savedRange = {
+    startLineNumber: rawSelection.startLineNumber,
+    startColumn: rawSelection.startColumn,
+    endLineNumber: rawSelection.endLineNumber,
+    endColumn: rawSelection.endColumn,
+  }
 
   // 显示 diff 视图，进入 streaming 状态
   aiDiff.visible = true
@@ -586,8 +597,8 @@ async function handleAIOperation(operation: string) {
   // 隐藏工具栏（diff 视图替代显示）
   toolbarVisible.value = false
 
-  // 执行 AI 操作
-  const result = await performAIOperation(operation as AIOperationType)
+  // 执行 AI 操作（将原始选区文本作为参数传入，不再依赖响应式状态）
+  const result = await performAIOperation(operation as AIOperationType, originalText)
 
   // 更新 diff 内容
   if (result) {

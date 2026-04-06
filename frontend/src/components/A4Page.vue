@@ -71,20 +71,137 @@ onUnmounted(() => {
 const A4_WIDTH_MM = 210
 const A4_HEIGHT_MM = 297
 const MM_TO_PX = 3.78
+const A4_HEIGHT_PX = Math.floor(A4_HEIGHT_MM * MM_TO_PX) // ~1123px
 
-void A4_WIDTH_MM
-void MM_TO_PX
-void A4_HEIGHT_MM
+// 估算单行高度的辅助函数（基于默认行高 1.5）
+const LINE_HEIGHT_PX = 22
+const CHARS_PER_LINE = 45 // A4 宽 210mm，约 45 中文字符/行
 
-// 按 A4 高度分页
+/**
+ * 估算一段文本渲染后的高度（像素）
+ * 原理：计算字符数 / 每行字符数 = 行数，行数 * 行高 = 高度
+ */
+function estimateTextHeight(text: string): number {
+  const lines = Math.ceil(text.length / CHARS_PER_LINE)
+  return lines * LINE_HEIGHT_PX
+}
+
+// 多页内容分割
 const pages = computed(() => {
   if (!props.content) return []
-  const html = renderMarkdown(props.content)
 
-  // Phase 2: 仅实现单页 A4 边界线（满足 EDIT-05 页面边界显示要求）
-  // Phase 5: 多页分页逻辑将在 PDF 导出时完善（实际页面换行计算）
-  return [html]
+  // 方案：按自然节分割 Markdown 内容（标题/分隔线/段落边界）
+  // 原理：将内容分成若干"节"，每个节尽量填满一页 A4
+  const raw = props.content.trim()
+  if (!raw) return []
+
+  // 估算总高度，如果能塞进一页就直接返回
+  const estimatedTotal = estimateTextHeight(raw)
+  if (estimatedTotal <= A4_HEIGHT_PX) {
+    return [renderMarkdown(raw)]
+  }
+
+  // 多页分割：找到所有自然节边界（h1/h2/h3/hr/空行）
+  const sections = splitMarkdownIntoSections(raw)
+  if (sections.length <= 1) {
+    // 无法分割，退化成单页（内容可能被截断）
+    return [renderMarkdown(raw)]
+  }
+
+  // 贪心装箱：将节分配到各页，每页尽量填满 A4_HEIGHT_PX
+  const pageContents: string[] = []
+  let currentPage = ''
+  let currentPageHeight = 0
+
+  for (const section of sections) {
+    const sectionHeight = estimateTextHeight(section.text)
+
+    // 如果当前节单独能超过一页，直接强制放入（可能溢出）
+    if (sectionHeight > A4_HEIGHT_PX && currentPage.length > 0) {
+      pageContents.push(currentPage.trim())
+      currentPage = ''
+      currentPageHeight = 0
+    }
+
+    if (currentPageHeight + sectionHeight <= A4_HEIGHT_PX) {
+      // 能放入当前页
+      currentPage += (currentPage ? '\n\n' : '') + section.text
+      currentPageHeight += sectionHeight
+    } else {
+      // 放不下，先保存当前页
+      if (currentPage.trim()) {
+        pageContents.push(currentPage.trim())
+      }
+      currentPage = section.text
+      currentPageHeight = sectionHeight
+    }
+  }
+
+  // 最后一页
+  if (currentPage.trim()) {
+    pageContents.push(currentPage.trim())
+  }
+
+  if (pageContents.length === 0) {
+    return [renderMarkdown(raw)]
+  }
+
+  return pageContents.map(c => renderMarkdown(c))
 })
+
+/**
+ * 将 Markdown 内容按自然节边界分割
+ * 返回每节文本和类型信息
+ */
+interface Section {
+  text: string
+  type: 'h1' | 'h2' | 'h3' | 'hr' | 'blank' | 'content'
+}
+
+function splitMarkdownIntoSections(markdown: string): Section[] {
+  const lines = markdown.split('\n')
+  const sections: Section[] = []
+  let currentBlock: string[] = []
+
+  function flushBlock() {
+    if (currentBlock.length > 0) {
+      const text = currentBlock.join('\n')
+      sections.push({ text, type: 'content' })
+      currentBlock = []
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+
+    // 标题行 → 新节开始
+    if (/^#{1,3}\s+/.test(line)) {
+      flushBlock()
+      sections.push({ text: line, type: 'h1' })
+      continue
+    }
+
+    // 分隔线 → 新节开始
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
+      flushBlock()
+      sections.push({ text: line, type: 'hr' })
+      continue
+    }
+
+    // 连续空行 → 合并为段落分隔（但不立即开新节）
+    if (line.trim() === '') {
+      // 保留空行在当前块中
+      currentBlock.push(line)
+      continue
+    }
+
+    // 非空内容行
+    currentBlock.push(line)
+  }
+
+  flushBlock()
+  return sections
+}
 
 /** 根据 templateId 生成模板 CSS 类名 */
 const templateClass = computed(() => {

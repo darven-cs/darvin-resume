@@ -123,20 +123,21 @@ export function useAISelection(
   }
 
   /**
-   * Performs an AI operation on the selected text.
-   * Sets up streaming listener, calls the backend, and returns streamed content.
+   * Performs an AI operation on the given text.
+   * Uses provided text instead of reactive state (avoids stale selection after mousedown).
    *
    * @param operation - The operation type (polish/translate/summarize/rewrite)
+   * @param selectedTextValue - The text to operate on (captured before mousedown clears selection)
    * @returns The streamed content after completion
    */
-  async function performAIOperation(operation: AIOperationType): Promise<string> {
-    if (!hasSelection.value || !selectedText.value || !selectionRange.value) {
+  async function performAIOperation(operation: AIOperationType, selectedTextValue: string): Promise<string> {
+    if (!selectedTextValue || !selectedTextValue.trim()) {
       return ''
     }
 
     // Generate a unique operation ID
     currentOperationId = crypto.randomUUID()
-    const prompt = OPERATION_PROMPTS[operation](selectedText.value, jobTarget)
+    const prompt = OPERATION_PROMPTS[operation](selectedTextValue, jobTarget)
 
     isLoading.value = true
     currentOperation.value = operation
