@@ -1,12 +1,5 @@
 import { ref, computed, type Ref } from 'vue'
-import { GetResume } from '../wailsjs/wailsjs/go/main/App'
-
-/** Wails bridge shim — 尚未生成的 bridge 方法通过 window.go 调用 */
-type AppBridge = {
-  UpdateResumeTemplate(id: string, templateId: string): Promise<void>
-  UpdateResumeCustomCSS(id: string, customCss: string): Promise<void>
-}
-const bridge = (window as any).go?.main?.App as AppBridge | undefined
+import { GetResume, UpdateResumeTemplate, UpdateResumeCustomCSS } from '../wailsjs/wailsjs/go/main/App'
 
 /**
  * 模板定义
@@ -89,7 +82,7 @@ export function useTemplate(resumeId: Ref<string>) {
     if (templateId === currentTemplateId.value) return
     currentTemplateId.value = templateId
     try {
-      await bridge?.UpdateResumeTemplate(resumeId.value, templateId)
+      await UpdateResumeTemplate(resumeId.value, templateId)
     } catch (err) {
       console.error('[useTemplate] Failed to update template:', err)
     }
@@ -101,7 +94,7 @@ export function useTemplate(resumeId: Ref<string>) {
   async function saveAsTemplate(css: string) {
     customCss.value = css
     try {
-      await bridge?.UpdateResumeCustomCSS(resumeId.value, css)
+      await UpdateResumeCustomCSS(resumeId.value, css)
     } catch (err) {
       console.error('[useTemplate] Failed to save custom CSS:', err)
     }
