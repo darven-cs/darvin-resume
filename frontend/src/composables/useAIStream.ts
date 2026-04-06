@@ -118,30 +118,7 @@ export function useAIStream(operationIdRef: { value: string }) {
   const DEBOUNCE_MS = 16 // ~60fps for smooth typewriter effect
   let currentEventName = ''
 
-  // 【关键修复】动态注册事件监听：每次 operationIdRef.value 变化时，
-  // 取消旧监听器并注册新监听器。解决新消息使用新 ID 时前端仍监听旧 ID 的问题。
-  watch(
-    () => operationIdRef.value,
-    (newId) => {
-      const newEventName = `ai:stream:${newId}`
-
-      // 取消旧监听器（如果有）
-      if (currentEventName && currentEventName !== newEventName) {
-        EventsOff(currentEventName)
-        // 重置状态，为新操作做准备
-        content.value = ''
-        error.value = null
-        aiError.value = null
-      }
-
-      // 注册新监听器
-      currentEventName = newEventName
-      EventsOn(currentEventName, handleEvent)
-      isStreaming.value = true
-    },
-    { immediate: true }
-  )
-
+  // 【关键修复】handleEvent 必须在 watch 之前定义，因为 watch(immediate:true) 会立即执行
   const handleEvent = (data: AIStreamChunk) => {
     switch (data.type) {
       case 'content':
@@ -174,6 +151,30 @@ export function useAIStream(operationIdRef: { value: string }) {
         break
     }
   }
+
+  // 【关键修复】动态注册事件监听：每次 operationIdRef.value 变化时，
+  // 取消旧监听器并注册新监听器。解决新消息使用新 ID 时前端仍监听旧 ID 的问题。
+  watch(
+    () => operationIdRef.value,
+    (newId) => {
+      const newEventName = `ai:stream:${newId}`
+
+      // 取消旧监听器（如果有）
+      if (currentEventName && currentEventName !== newEventName) {
+        EventsOff(currentEventName)
+        // 重置状态，为新操作做准备
+        content.value = ''
+        error.value = null
+        aiError.value = null
+      }
+
+      // 注册新监听器
+      currentEventName = newEventName
+      EventsOn(currentEventName, handleEvent)
+      isStreaming.value = true
+    },
+    { immediate: true }
+  )
 
   /**
    * Abort the streaming operation.
