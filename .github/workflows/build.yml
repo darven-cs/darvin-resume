@@ -77,7 +77,7 @@ jobs:
 
       - name: Build Windows NSIS installer
         run: |
-          npm install
+          cd frontend && npm install && cd ..
           wails build --platform windows/amd64 --nsis
 
       - name: Upload Windows installer
@@ -106,7 +106,7 @@ jobs:
 
       - name: Build macOS app bundle
         run: |
-          npm install
+          cd frontend && npm install && cd ..
           wails build --platform darwin/universal
 
       - name: Install create-dmg
@@ -156,10 +156,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: linux-amd64-binary
-          path: ./bin
+          path: .
 
       - name: Make binary executable
-        run: chmod +x ./bin/Darvin-Resume
+        run: chmod +x ./build/bin/Darvin-Resume
 
       - name: Download nfpm
         run: |
@@ -222,7 +222,7 @@ jobs:
             --homepage "https://github.com/darven-cs/darvin-resume" \
             --license MIT \
             --targets deb \
-            --input ./bin \
+            --input ./build/bin \
             --output ./dist \
             -f nfpm.yml
 
@@ -239,7 +239,7 @@ jobs:
             --homepage "https://github.com/darven-cs/darvin-resume" \
             --license MIT \
             --targets rpm \
-            --input ./bin \
+            --input ./build/bin \
             --output ./dist \
             -f nfpm.yml
 
