@@ -3,7 +3,6 @@ package export
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"os"
 
 	"github.com/chromedp/chromedp"
@@ -29,6 +28,7 @@ func DefaultPDFOptions() *PDFOptions {
 }
 
 // ExportPDFFromHTML 使用 Chromedp 无头浏览器从 HTML 内容导出 PDF
+// 使用临时文件方案避免 data: URL 编码破坏 CSS（{} 被编码成 %7B%7D）
 func ExportPDFFromHTML(ctx context.Context, htmlContent string, outputPath string, opts *PDFOptions) error {
 	if opts == nil {
 		opts = DefaultPDFOptions()
@@ -38,6 +38,22 @@ func ExportPDFFromHTML(ctx context.Context, htmlContent string, outputPath strin
 	if err := validateOutputPath(outputPath); err != nil {
 		return err
 	}
+
+	// 写入临时 HTML 文件（避免 data: URL 编码问题）
+	tmpFile, err := os.CreateTemp("", "darvin-resume-export-*.html")
+	if err != nil {
+		return fmt.Errorf("create temp file failed: %w", err)
+	}
+	tmpPath := tmpFile.Name()
+	tmpFile.Close()
+	defer os.Remove(tmpPath) // 使用后清理
+
+	if err := os.WriteFile(tmpPath, []byte(htmlContent), 0644); err != nil {
+		return fmt.Errorf("write temp HTML failed: %w", err)
+	}
+
+	// 使用 file URL 加载（无编码问题）
+	fileURL := "file://" + tmpPath
 
 	// 创建无头浏览器分配器
 	allocCtx, cancel := chromedp.NewExecAllocator(ctx,
@@ -58,9 +74,9 @@ func ExportPDFFromHTML(ctx context.Context, htmlContent string, outputPath strin
 	defer cancel3()
 
 	var pdfBuf []byte
-	err := chromedp.Run(browserCtx,
-		// 加载 HTML 内容（使用 data: URL 避免外部资源加载）
-		chromedp.Navigate("data:text/html,"+url.QueryEscape(htmlContent)),
+	err = chromedp.Run(browserCtx,
+		// 使用 file URL 加载 HTML（避免 data: URL 编码破坏 CSS）
+		chromedp.Navigate(fileURL),
 		chromedp.WaitReady("body"),
 
 		// 生成 PDF

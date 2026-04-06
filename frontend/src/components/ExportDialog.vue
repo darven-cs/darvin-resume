@@ -197,81 +197,204 @@ async function exportWithSystemPrint() {
 }
 
 /**
+ * 获取当前生效的 CSS 变量值（解决 Chromedp 无法解析 var() 的问题）
+ */
+function getResolvedCSSVars(): string {
+  const root = document.documentElement
+  const computed = getComputedStyle(root)
+  const vars = [
+    '--resume-primary-color',
+    '--resume-heading-color',
+    '--resume-link-color',
+    '--resume-bg-color',
+    '--resume-font-size',
+    '--resume-line-height',
+    '--resume-padding',
+    '--resume-font-family',
+  ]
+  const declarations = vars.map(v => {
+    const value = computed.getPropertyValue(v)
+    return value ? `  ${v}: ${value};` : null
+  }).filter(Boolean)
+  return declarations.length > 0 ? `:root {\n${declarations.join('\n')}\n}` : ''
+}
+
+/**
+ * 获取所有非外部的样式表 CSS 文本
+ * 排除外部 CDN 样式，只收集本地打包的样式
+ */
+function getLocalStyles(): string {
+  const styleTexts: string[] = []
+  const sheets = Array.from(document.styleSheets)
+  for (const sheet of sheets) {
+    try {
+      if (sheet.href && !sheet.href.startsWith(window.location.origin)) {
+        continue // skip external stylesheets
+      }
+      const rules = Array.from(sheet.cssRules || [])
+      for (const rule of rules) {
+        styleTexts.push(rule.cssText)
+      }
+    } catch {
+      // cross-origin stylesheet, skip
+    }
+  }
+  return styleTexts.join('\n\n')
+}
+
+/**
  * Chromedp 高级模式导出
  * 通过 Wails bridge 调用后端无头浏览器导出
  */
 async function exportWithChromedp() {
-  // 获取 A4Page 的完整 HTML 内容
+  // 获取 A4Page 组件的 HTML 内容
   const a4PageEl = document.querySelector('.preview-container') as HTMLElement | null
   if (!a4PageEl) {
     errorMessage.value = '无法获取预览内容'
     return
   }
 
-  // 克隆节点并移除分页线装饰
+  // 克隆节点（深克隆避免引用问题）
   const clone = a4PageEl.cloneNode(true) as HTMLElement
-  const pageBreaks = clone.querySelectorAll('.a4-page::before, .a4-page::after')
-  pageBreaks.forEach(el => el.remove())
 
-  // 获取所有内联样式表内容
-  const allStyles = Array.from(document.styleSheets)
-    .filter(sheet => !sheet.href || sheet.href.startsWith(window.location.origin))
-    .flatMap(sheet => {
-      try {
-        return Array.from(sheet.cssRules).map(rule => rule.cssText)
-      } catch {
-        return []
-      }
-    })
-    .join('\n')
+  // 移除分页线装饰元素
+  clone.querySelectorAll('.a4-page::before, .a4-page::after').forEach(el => {
+    if (el.parentNode) el.parentNode.removeChild(el)
+  })
+  // 移除 .preview-empty 空状态提示
+  const emptyEl = clone.querySelector('.preview-empty')
+  if (emptyEl && emptyEl.parentNode) {
+    emptyEl.parentNode.removeChild(emptyEl)
+  }
 
-  // 构建完整 HTML 文档
+  // 解析 CSS 变量为实际值（解决 var() 引用问题）
+  const resolvedVars = getResolvedCSSVars()
+
+  // 收集本地样式表（排除外部 CDN）
+  const localStyles = getLocalStyles()
+
+  // 获取当前模板 CSS 类名（如 template-minimal）
+  const templateClass = document.querySelector('.a4-page')?.className
+    .split(' ')
+    .find(c => c.startsWith('template-')) || 'template-minimal'
+
+  // 关键：注入 @font-face 确保中文字体可用
+  const fontFallback = `
+/* Chrome/Linux 中文字体降级方案 */
+@font-face {
+  font-family: 'ChineseFontFallback';
+  src: local('WenQuanYi Micro Hei'), local('WenQuanYi Zen Hei'),
+       local('Noto Sans CJK SC'), local('Source Han Sans SC'),
+       local('AR PL UMing CN'), local('AR PL ShanHeiSun Uni');
+  font-weight: normal;
+}
+`
+
+  // 构建完整 HTML 文档（无外部依赖）
   const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <style>
-${allStyles}
-/* 打印样式 */
+/* Chrome headless 环境字体 */
+${fontFallback}
+
+/* CSS 变量实际值（解决 var() 无法解析问题） */
+${resolvedVars}
+
+/* 本地样式表（editor.css + 模板 CSS） */
+${localStyles}
+
+/* 模板样式覆盖（强制应用当前模板） */
+.${templateClass} .page-content {
+  font-family: var(--resume-font-family, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'ChineseFontFallback', sans-serif) !important;
+  color: var(--resume-primary-color, #1a1a1a) !important;
+  font-size: var(--resume-font-size, 10.5pt) !important;
+  line-height: var(--resume-line-height, 1.6) !important;
+}
+
+/* 确保打印时内容区域白底 */
+.print-container {
+  background: white !important;
+}
+.a4-page {
+  background: white !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* 打印媒体查询 */
 @media print {
   body > *:not(.print-container) { display: none !important; }
-  .print-container { display: block !important; width: 100%; }
+  .print-container {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
   .a4-page {
     width: 210mm !important;
     height: auto !important;
-    min-height: 297mm;
+    min-height: 297mm !important;
     padding: 20mm !important;
     margin: 0 !important;
     box-shadow: none !important;
-    page-break-after: always;
-    break-after: page;
+    background: white !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-  .a4-page:last-child { page-break-after: auto; break-after: auto; }
-  .page-content > * { break-inside: avoid !important; page-break-inside: avoid !important; }
+  .a4-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+  .page-content > * {
+    break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
   .page-content h1, .page-content h2, .page-content h3 {
-    break-after: avoid !important; page-break-after: avoid !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
   }
   .page-content table, .page-content thead, .page-content tbody,
   .page-content tr, .page-content th, .page-content td {
-    break-inside: avoid !important; page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
-  .page-content li { break-inside: avoid !important; page-break-inside: avoid !important; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  .page-content { color: #1a1a1a !important; }
-  html, body { font-size: 10.5pt !important; }
+  .page-content li {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  html, body {
+    background: white !important;
+    font-size: 10.5pt !important;
+  }
   .hide-page-breaks .a4-page::before,
-  .hide-page-breaks .a4-page::after { display: none !important; }
+  .hide-page-breaks .a4-page::after {
+    display: none !important;
+  }
 }
 </style>
 </head>
 <body>
 <div class="print-container">
-${clone.outerHTML}
+${clone.innerHTML}
 </div>
 </body>
 </html>`
 
-  // 5. 调用后端 Chromedp 导出
+  // 调用后端 Chromedp 导出
   isExporting.value = true
   errorMessage.value = ''
 
