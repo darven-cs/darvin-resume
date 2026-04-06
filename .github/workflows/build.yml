@@ -193,37 +193,39 @@ jobs:
           section: utils
           priority: optional
           description: Markdown原生、隐私优先的本地化简历工具
-          vendor: Darvin-Resume
           maintainer: Darvin-Resume <darven@example.com>
           homepage: https://github.com/darven-cs/darvin-resume
           license: MIT
 
+          # Per-packager overrides for different dependency names
+          overrides:
+            deb:
+              depends:
+                - libgtk-3-0
+                - libwebkit2gtk-4.0-37
+                - libayatana-appindicator3-1
+            rpm:
+              depends:
+                - gtk3
+                - webkit2gtk4.0
+                - libappindicator-gtk3
+
           contents:
+            # Main executable
             - src: ./build/bin/Darvin-Resume
               dst: /usr/bin/darvin-resume
               type: executable
+            # Desktop entry
+            - src: darvin-resume.desktop
+              dst: /usr/share/applications/darvin-resume.desktop
+            # AppStream metadata
+            - src: com.darven.darvin-resume.appdata.xml
+              dst: /usr/share/metainfo/com.darven.darvin-resume.appdata.xml
 
           scripts:
-            postinstall: |
-              install -Dm644 darvin-resume.desktop \
-                /usr/share/applications/darvin-resume.desktop
-              install -Dm644 com.darven.darvin-resume.appdata.xml \
-                /usr/share/metainfo/com.darven.darvin-resume.appdata.xml
             preremove: |
               rm -f /usr/share/applications/darvin-resume.desktop
               rm -f /usr/share/metainfo/com.darven.darvin-resume.appdata.xml
-
-          deb:
-            depends:
-              - libgtk-3-0
-              - libwebkit2gtk-4.0-37
-              - libayatana-appindicator3-1
-            desktop: darvin-resume.desktop
-          rpm:
-            depends:
-              - gtk3
-              - webkit2gtk4.0
-              - libappindicator-gtk3
           YAML
 
       - name: Build .deb package
