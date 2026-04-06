@@ -2,21 +2,28 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
+	"os"
+	"time"
 
 	"Darvin-Resume/internal/ai"
+	"Darvin-Resume/internal/backup"
 	"Darvin-Resume/internal/database"
 	"Darvin-Resume/internal/export"
 	"Darvin-Resume/internal/model"
 	"Darvin-Resume/internal/service"
+	"Darvin-Resume/internal/settings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
 type App struct {
-	ctx context.Context
-	svc service.ResumeService
+	ctx         context.Context
+	svc         service.ResumeService
+	backupSched *backup.Scheduler
 }
 
 // NewApp creates a new App application struct
@@ -35,10 +42,32 @@ func (a *App) startup(ctx context.Context) {
 	if err := database.Init(); err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
+
+	// Initialize auto backup scheduler based on saved settings
+	a.initAutoBackup(ctx)
+}
+
+// initAutoBackup reads auto backup settings and starts the scheduler if enabled.
+func (a *App) initAutoBackup(ctx context.Context) {
+	enabled, _ := settings.Get(ctx, backup.SettingKeyAutoBackupEnabled)
+	interval, _ := settings.Get(ctx, backup.SettingKeyAutoBackupInterval)
+
+	if enabled == "true" {
+		dur := backup.ParseInterval(interval)
+		a.backupSched = backup.NewScheduler(dur)
+		a.backupSched.Start(ctx)
+		log.Printf("[App] auto backup scheduler started: interval=%v", dur)
+	}
 }
 
 // shutdown is called when the app stops
 func (a *App) shutdown(ctx context.Context) {
+	// Stop auto backup scheduler
+	if a.backupSched != nil {
+		a.backupSched.Stop()
+		a.backupSched = nil
+	}
+
 	// Close database connection
 	if err := database.Close(); err != nil {
 		log.Printf("Error closing database: %v", err)
@@ -270,6 +299,139 @@ func getInt(m map[string]interface{}, key string, defaults ...int) int {
 		return defaults[0]
 	}
 	return 0
+}
+
+// ============================================================
+// Backup Bridge Methods (EXPT-10, EXPT-11)
+// ============================================================
+
+// CreateManualBackup creates a manual backup file.
+// password is optional; if empty, the backup is not encrypted.
+func (a *App) CreateManualBackup(password string) (string, error) {
+	path, err := backup.CreateBackup(password)
+	if err != nil {
+		return "", err
+	}
+	return path, nil
+}
+
+// RestoreFromBackup restores data from a backup file.
+// password is required if the backup is encrypted.
+func (a *App) RestoreFromBackup(filePath string, password string) error {
+	return backup.RestoreBackup(filePath, password)
+}
+
+// ListBackups returns JSON array of all local backups.
+func (a *App) ListBackups() (string, error) {
+	backups, err := backup.ListBackups()
+	if err != nil {
+		return "", err
+	}
+	data, err := json.Marshal(backups)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+// ShowSaveBackupDialog opens a save dialog for the user to choose a backup destination.
+// Returns the selected path, or empty string if cancelled.
+func (a *App) ShowSaveBackupDialog() (string, error) {
+	return runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "导出备份",
+		DefaultFilename: fmt.Sprintf("darvin-resume-backup-%s.darvin-backup",
+			time.Now().Format("20060102-150405")),
+		Filters: []runtime.FileFilter{
+			{DisplayName: "Darvin Resume 备份", Pattern: "*.darvin-backup"},
+		},
+	})
+}
+
+// ShowOpenBackupDialog opens a file dialog for the user to select a backup file.
+// Returns the selected path, or empty string if cancelled.
+func (a *App) ShowOpenBackupDialog() (string, error) {
+	return runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "选择备份文件",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "Darvin Resume 备份", Pattern: "*.darvin-backup"},
+		},
+	})
+}
+
+// ExportBackupToPath creates a backup and exports it to the specified path.
+// password is optional.
+func (a *App) ExportBackupToPath(savePath string, password string) (string, error) {
+	tmpPath, err := backup.CreateBackup(password)
+	if err != nil {
+		return "", err
+	}
+	defer os.Remove(tmpPath)
+
+	data, err := os.ReadFile(tmpPath)
+	if err != nil {
+		return "", err
+	}
+	if err := os.WriteFile(savePath, data, 0644); err != nil {
+		return "", err
+	}
+	return savePath, nil
+}
+
+// GetBackupDir returns the local backup directory path.
+func (a *App) GetBackupDir() (string, error) {
+	return backup.GetBackupDir()
+}
+
+// GetAutoBackupSettings returns the current auto backup settings as JSON.
+func (a *App) GetAutoBackupSettings() (string, error) {
+	enabled, _ := settings.Get(a.ctx, backup.SettingKeyAutoBackupEnabled)
+	interval, _ := settings.Get(a.ctx, backup.SettingKeyAutoBackupInterval)
+
+	if enabled == "" {
+		enabled = "false"
+	}
+	if interval == "" {
+		interval = "daily"
+	}
+
+	result := map[string]string{
+		"enabled":  enabled,
+		"interval": interval,
+	}
+	data, err := json.Marshal(result)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+// SetAutoBackupSettings enables or disables automatic backups.
+func (a *App) SetAutoBackupSettings(enabled bool, interval string) error {
+	enabledStr := "false"
+	if enabled {
+		enabledStr = "true"
+	}
+
+	if err := settings.Set(a.ctx, backup.SettingKeyAutoBackupEnabled, enabledStr); err != nil {
+		return err
+	}
+	if err := settings.Set(a.ctx, backup.SettingKeyAutoBackupInterval, interval); err != nil {
+		return err
+	}
+
+	// Update scheduler: stop existing, start new if enabled
+	if a.backupSched != nil {
+		a.backupSched.Stop()
+		a.backupSched = nil
+	}
+
+	if enabled {
+		dur := backup.ParseInterval(interval)
+		a.backupSched = backup.NewScheduler(dur)
+		a.backupSched.Start(a.ctx)
+	}
+
+	return nil
 }
 
 // ============================================================

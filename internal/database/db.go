@@ -134,3 +134,68 @@ func getUserDataDir() (string, error) {
 
 	return filepath.Join(dataHome, "Darvin-Resume"), nil
 }
+
+// GetUserDataDir returns the platform-specific user data directory (exported for backup package).
+func GetUserDataDir() (string, error) {
+	return getUserDataDir()
+}
+
+// Reinit re-initializes the database connection after a restore operation.
+// It closes the existing connection and reopens with the same path.
+func Reinit() error {
+	mu.Lock()
+	defer mu.Unlock()
+
+	// Close existing connection if any
+	if DB != nil {
+		if err := DB.Close(); err != nil {
+			return err
+		}
+		DB = nil
+	}
+
+	// Re-initialize using the same path logic as Init
+	userDataDir, err := getUserDataDir()
+	if err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(userDataDir, 0755); err != nil {
+		return err
+	}
+
+	dbPath := filepath.Join(userDataDir, "data.db")
+
+	DB, err = sql.Open("sqlite", dbPath)
+	if err != nil {
+		return err
+	}
+
+	DB.SetMaxOpenConns(1)
+	DB.SetMaxIdleConns(1)
+	DB.SetConnMaxLifetime(0)
+
+	// Set pragmas
+	pragmas := []string{
+		"PRAGMA journal_mode=WAL",
+		"PRAGMA foreign_keys=ON",
+		"PRAGMA synchronous=NORMAL",
+		"PRAGMA cache_size=-64000",
+	}
+	for _, pragma := range pragmas {
+		if _, err := DB.Exec(pragma); err != nil {
+			return err
+		}
+	}
+
+	// Run migrations
+	_, currentFile, _, _ := runtime.Caller(0)
+	migrationsDir := filepath.Join(filepath.Dir(currentFile), "migrations")
+	goose.SetDialect("sqlite")
+	if err := goose.Up(DB, migrationsDir); err != nil {
+		return err
+	}
+
+	log.Println("Database re-initialized at:", dbPath)
+	return nil
+}

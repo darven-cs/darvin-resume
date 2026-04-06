@@ -20,7 +20,10 @@ const (
 )
 
 // AIConfig holds the AI service configuration.
-// APIKey is stored in plaintext this phase; encryption added in Phase 6.
+// APIKey is encrypted with AES-256-GCM via secure_config.go. Uses device-key
+// derived from platform identifiers (Windows MachineGuid / macOS IOPlatformUUID /
+// Linux machine-id). Same plaintext API key produces different ciphertext each
+// encryption due to random salt + nonce (Argon2id key derivation).
 type AIConfig struct {
 	APIKey       string `json:"apiKey"`
 	BaseURL      string `json:"baseURL"`

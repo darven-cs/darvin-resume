@@ -479,16 +479,15 @@ func extractTextContent(blocks []ContentBlock) string {
 }
 
 // LoadConfig loads AI configuration from settings storage.
+// API Key is loaded from encrypted storage via LoadSecureAPIKey.
 func LoadConfig(ctx context.Context) (AIConfig, error) {
 	cfg := DefaultAIConfig()
 
-	apiKey, err := settings.Get(ctx, SettingKeyAPIKey)
+	apiKey, err := LoadSecureAPIKey(ctx)
 	if err != nil && !errors.Is(err, settings.ErrSettingNotFound) {
 		return cfg, err
 	}
-	if err == nil {
-		cfg.APIKey = apiKey
-	}
+	cfg.APIKey = apiKey
 
 	baseURL, err := settings.Get(ctx, SettingKeyBaseURL)
 	if err == nil {
@@ -518,8 +517,9 @@ func LoadConfig(ctx context.Context) (AIConfig, error) {
 }
 
 // SaveConfig persists AI configuration to settings storage.
+// API Key is encrypted with AES-256-GCM via SaveSecureAPIKey.
 func SaveConfig(ctx context.Context, cfg AIConfig) error {
-	if err := settings.Set(ctx, SettingKeyAPIKey, cfg.APIKey); err != nil {
+	if err := SaveSecureAPIKey(ctx, cfg.APIKey); err != nil {
 		return err
 	}
 	if err := settings.Set(ctx, SettingKeyBaseURL, cfg.BaseURL); err != nil {

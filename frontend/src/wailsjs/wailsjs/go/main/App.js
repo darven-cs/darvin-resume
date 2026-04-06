@@ -22,6 +22,10 @@ export function ClearChatHistory(arg1) {
   return window['go']['main']['App']['ClearChatHistory'](arg1);
 }
 
+export function CreateManualBackup(arg1) {
+  return window['go']['main']['App']['CreateManualBackup'](arg1);
+}
+
 export function CreateResume(arg1) {
   return window['go']['main']['App']['CreateResume'](arg1);
 }
@@ -46,12 +50,24 @@ export function DuplicateResume(arg1) {
   return window['go']['main']['App']['DuplicateResume'](arg1);
 }
 
+export function ExportBackupToPath(arg1, arg2) {
+  return window['go']['main']['App']['ExportBackupToPath'](arg1, arg2);
+}
+
 export function ExportPDFFromHTML(arg1, arg2) {
   return window['go']['main']['App']['ExportPDFFromHTML'](arg1, arg2);
 }
 
 export function GetAIConfig() {
   return window['go']['main']['App']['GetAIConfig']();
+}
+
+export function GetAutoBackupSettings() {
+  return window['go']['main']['App']['GetAutoBackupSettings']();
+}
+
+export function GetBackupDir() {
+  return window['go']['main']['App']['GetBackupDir']();
 }
 
 export function GetChatHistory(arg1) {
@@ -74,6 +90,10 @@ export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
+export function ListBackups() {
+  return window['go']['main']['App']['ListBackups']();
+}
+
 export function ListDeletedResumes() {
   return window['go']['main']['App']['ListDeletedResumes']();
 }
@@ -94,6 +114,10 @@ export function RenameResume(arg1, arg2) {
   return window['go']['main']['App']['RenameResume'](arg1, arg2);
 }
 
+export function RestoreFromBackup(arg1, arg2) {
+  return window['go']['main']['App']['RestoreFromBackup'](arg1, arg2);
+}
+
 export function RestoreResume(arg1) {
   return window['go']['main']['App']['RestoreResume'](arg1);
 }
@@ -108,6 +132,18 @@ export function SaveAIConfig(arg1) {
 
 export function SaveChatMessage(arg1) {
   return window['go']['main']['App']['SaveChatMessage'](arg1);
+}
+
+export function SetAutoBackupSettings(arg1, arg2) {
+  return window['go']['main']['App']['SetAutoBackupSettings'](arg1, arg2);
+}
+
+export function ShowOpenBackupDialog() {
+  return window['go']['main']['App']['ShowOpenBackupDialog']();
+}
+
+export function ShowSaveBackupDialog() {
+  return window['go']['main']['App']['ShowSaveBackupDialog']();
 }
 
 export function ShowSaveDialog(arg1) {

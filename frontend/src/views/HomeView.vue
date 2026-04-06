@@ -41,6 +41,14 @@
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
         </button>
+        <!-- 备份按钮 -->
+        <button class="backup-btn" @click="showBackupManager = true" title="数据备份">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </button>
       </div>
     </header>
 
@@ -97,6 +105,11 @@
       :visible="showSettings"
       @close="showSettings = false"
     />
+    <!-- 备份管理弹窗 -->
+    <BackupManager
+      :visible="showBackupManager"
+      @close="showBackupManager = false"
+    />
   </div>
 </template>
 
@@ -109,6 +122,7 @@ import ResumeCard from '../components/ResumeCard.vue'
 import CreateModeModal from '../components/CreateModeModal.vue'
 import RecycleBinSection from '../components/RecycleBinSection.vue'
 import AIConfigModal from '../components/AIConfigModal.vue'
+import BackupManager from '../components/BackupManager.vue'
 
 const router = useRouter()
 const {
@@ -124,6 +138,7 @@ const {
 
 const showCreateModal = ref(false)
 const showSettings = ref(false)
+const showBackupManager = ref(false)
 
 // 页面加载时获取简历列表
 onMounted(() => {
@@ -346,6 +361,26 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
 }
 
 .settings-btn:hover {
+  border-color: #58a6ff;
+  color: #e6edf3;
+}
+
+/* 备份按钮 */
+.backup-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #3c3c3c;
+  border-radius: 6px;
+  background: #2d2d2d;
+  color: #8b949e;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.backup-btn:hover {
   border-color: #58a6ff;
   color: #e6edf3;
 }
