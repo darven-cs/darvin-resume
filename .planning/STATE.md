@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-04-06T02:45:15.160Z"
+stopped_at: Completed 05-04-PLAN.md
+last_updated: "2026-04-06T03:00:21.176Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 20
-  completed_plans: 18
-  percent: 90
+  completed_plans: 19
+  percent: 95
 ---
 
 # Project State
@@ -51,6 +51,8 @@ Progress: [▓▓▓▓▓▓░░░░] 57%
 | Phase 05 P01 | 469 | 5 tasks | 11 files |
 | Phase 05 P02 | 7 | 3 tasks | 4 files |
 | Phase 05 P03 | 28 | 4 tasks | 5 files |
+| Phase 05 P04 | 1775444414s | 6 tasks | 11 files |
+| Phase 05 P04 | 15min | 6 tasks | 11 files |
 
 ## Phase 4 Plan Summary
 
@@ -88,6 +90,10 @@ Recent decisions affecting current work:
 - [Phase 05]: 模板系统使用 CSS 类名前缀区分（template-minimal/dual-col/academic/campus），切换仅改变类名不重新渲染 markdown-it
 - [Phase 05]: CSS 变量作为样式调整的统一入口（与模板 CSS 解耦）
 - [Phase 05]: sanitizeCustomCSS() 白名单过滤：38 项属性白名单 + 危险值正则黑名单 + .page-content 前缀选择器
+- [Phase 05]: 快照存储完整数据（JSON + Markdown + Template + CSS），支持完整回滚
+- [Phase 05]: Diff 使用 diffmatchpatch 库，后端计算 delta，前端使用 diff npm 包展示
+- [Phase 05]: 回滚前自动创建 rollback 类型快照，防止误操作数据丢失
+- [Phase 05]: 每简历最多 50 个快照，超出自动删除最旧的
 
 ### Phase 4 Decisions (from 04-CONTEXT.md)
 
@@ -111,8 +117,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-06T02:45:15.149Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-04-06T03:00:21.168Z
+Stopped at: Completed 05-04-PLAN.md
 Resume file: None
 
 ### Phase 4 Decisions (04-02 execution)

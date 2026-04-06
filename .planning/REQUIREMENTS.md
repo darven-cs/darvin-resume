@@ -63,11 +63,11 @@
 - [x] **EXPT-02**: PDF导出保留Chromedp无头浏览器渲染作为高级可选模式
 - [x] **EXPT-03**: PDF导出严格遵循A4标准纸张尺寸，自动处理break-inside: avoid规则
 - [x] **EXPT-04**: 支持用户自定义导出页码范围、是否隐藏分页线、导出DPI参数
-- [ ] **EXPT-05**: 版本快照 — 支持用户手动创建版本快照，可自定义版本标签和备注
-- [ ] **EXPT-06**: 版本快照 — 每次成功导出PDF后自动创建版本快照
-- [ ] **EXPT-07**: 版本管理 — 查看全量历史版本列表，支持两版本Diff对比
-- [ ] **EXPT-08**: 版本管理 — 一键回滚到指定历史版本，回滚前自动为当前内容创建快照
-- [ ] **EXPT-09**: 版本快照完整存储结构化JSON、Markdown内容、模板信息、自定义CSS
+- [x] **EXPT-05**: 版本快照 — 支持用户手动创建版本快照，可自定义版本标签和备注
+- [x] **EXPT-06**: 版本快照 — 每次成功导出PDF后自动创建版本快照
+- [x] **EXPT-07**: 版本管理 — 查看全量历史版本列表，支持两版本Diff对比
+- [x] **EXPT-08**: 版本管理 — 一键回滚到指定历史版本，回滚前自动为当前内容创建快照
+- [x] **EXPT-09**: 版本快照完整存储结构化JSON、Markdown内容、模板信息、自定义CSS
 - [ ] **EXPT-10**: 手动备份 — 一键导出全量数据备份包（加密压缩格式），仅可本软件解密导入
 - [ ] **EXPT-11**: 自动备份 — 支持设置自动备份周期（每日/每周/每月），可设置最大备份数量
 - [ ] **EXPT-12**: 数据恢复 — 选择备份包一键导入，恢复前自动为当前数据创建备份
@@ -159,11 +159,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXPT-02 | Phase 5 | Complete |
 | EXPT-03 | Phase 5 | Complete |
 | EXPT-04 | Phase 5 | Complete |
-| EXPT-05 | Phase 5 | Pending |
-| EXPT-06 | Phase 5 | Pending |
-| EXPT-07 | Phase 5 | Pending |
-| EXPT-08 | Phase 5 | Pending |
-| EXPT-09 | Phase 5 | Pending |
+| EXPT-05 | Phase 5 | Complete |
+| EXPT-06 | Phase 5 | Complete |
+| EXPT-07 | Phase 5 | Complete |
+| EXPT-08 | Phase 5 | Complete |
+| EXPT-09 | Phase 5 | Complete |
 | EXPT-10 | Phase 6 | Pending |
 | EXPT-11 | Phase 6 | Pending |
 | EXPT-12 | Phase 6 | Pending |
