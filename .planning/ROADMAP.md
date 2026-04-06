@@ -13,7 +13,7 @@
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: 项目骨架与数据层** - Wails项目初始化、SQLite存储层、简历结构化JSON Schema、基础导航框架
-- [ ] **Phase 2: 核心编辑器** - Monaco编辑器集成、双栏布局、实时预览、统一渲染引擎、A4分页线
+- [x] **Phase 2: 核心编辑器** - Monaco编辑器集成、双栏布局、实时预览、统一渲染引擎、A4分页线 (completed 2026-04-06)
 - [ ] **Phase 3: AI核心能力** - API对接、流式传输、选区快捷操作、Diff对比、AI对话侧边栏、简历解析
 - [ ] **Phase 4: 简历创建与管理** - AI引导式创建、空白页创建、简历列表、回收站、自动保存
 - [ ] **Phase 5: 模板与导出** - 4套内置模板、样式调整、自定义CSS、PDF导出、版本快照管理
@@ -155,7 +155,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. 项目骨架与数据层 | 3/3 | ✅ Complete | 2026-04-05 |
-| 2. 核心编辑器 | 4/4 | ✅ Complete | 2026-04-05 |
+| 2. 核心编辑器 | 5/4 | Complete   | 2026-04-06 |
 | 3. AI核心能力 | 6/6 | ✅ Complete | 2026-04-05 |
 | 4. 简历创建与管理 | 3/3 | ✅ Complete | 2026-04-06 |
 | 5. 模板与导出 | 0/4 | Not started | - |

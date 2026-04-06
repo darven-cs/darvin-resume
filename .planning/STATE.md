@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: verifying
 stopped_at: Completed 05-01 template system plan
-last_updated: "2026-04-06T02:34:42.259Z"
+last_updated: "2026-04-06T02:45:07.018Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 20
-  completed_plans: 16
-  percent: 80
+  completed_plans: 18
+  percent: 90
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Progress: [▓▓▓▓▓▓░░░░] 57%
 | 4     | 3/3   | ✅ Complete |
 | 5     | 0/4   | ⏳ Planned |
 | Phase 05 P01 | 469 | 5 tasks | 11 files |
+| Phase 05 P02 | 7 | 3 tasks | 4 files |
 
 ## Phase 4 Plan Summary
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase 04]: Title editing uses v-if input/button toggle with Enter confirm and Escape cancel
 - [Phase 04]: Route leave guard checks saveStatus === unsaved only (saving/error states do not block navigation)
 - [Phase 05]: 模板系统使用 CSS 类名前缀区分（template-minimal/dual-col/academic/campus），切换仅改变类名不重新渲染 markdown-it
+- [Phase 05]: CSS 变量作为样式调整的统一入口（与模板 CSS 解耦）
+- [Phase 05]: sanitizeCustomCSS() 白名单过滤：38 项属性白名单 + 危险值正则黑名单 + .page-content 前缀选择器
 
 ### Phase 4 Decisions (from 04-CONTEXT.md)
 

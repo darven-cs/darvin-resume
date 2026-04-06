@@ -51,9 +51,9 @@
 - [x] **TMPL-01**: 内置4套标准化模板 — 极简通用风、大厂校招风、学术科研风、双栏简约风
 - [x] **TMPL-02**: 模板切换仅修改渲染样式，底层结构化JSON数据完全复用，切换后内容无丢失
 - [x] **TMPL-03**: 支持用户将自定义样式保存为个人模板，可复用至新建简历
-- [ ] **TMPL-04**: 可视化样式调整 — 滑块/选择器调整主色调、基础字号、行高、页面边距、字体选择
-- [ ] **TMPL-05**: 自定义CSS能力 — 安全白名单机制（仅开放字体/颜色/边距/行高/列表样式属性）
-- [ ] **TMPL-06**: 一键重置默认样式功能
+- [x] **TMPL-04**: 可视化样式调整 — 滑块/选择器调整主色调、基础字号、行高、页面边距、字体选择
+- [x] **TMPL-05**: 自定义CSS能力 — 安全白名单机制（仅开放字体/颜色/边距/行高/列表样式属性）
+- [x] **TMPL-06**: 一键重置默认样式功能
 - [ ] **TMPL-07**: JSON→Markdown正向同步自动执行（结构化JSON修改后自动生成Markdown）
 - [ ] **TMPL-08**: Markdown→JSON反向同步需用户手动触发，AI解析+Diff视图展示修改差异，用户确认后执行
 
@@ -150,9 +150,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TMPL-01 | Phase 5 | Complete |
 | TMPL-02 | Phase 5 | Complete |
 | TMPL-03 | Phase 5 | Complete |
-| TMPL-04 | Phase 5 | Pending |
-| TMPL-05 | Phase 5 | Pending |
-| TMPL-06 | Phase 5 | Pending |
+| TMPL-04 | Phase 5 | Complete |
+| TMPL-05 | Phase 5 | Complete |
+| TMPL-06 | Phase 5 | Complete |
 | TMPL-07 | Phase 1 | Pending |
 | TMPL-08 | Phase 1 | Pending |
 | EXPT-01 | Phase 5 | Pending |
