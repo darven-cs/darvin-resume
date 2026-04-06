@@ -72,6 +72,15 @@
         <span class="btn-icon">💬</span>
         <span class="btn-label">AI 助手</span>
       </button>
+      <button
+        class="toolbar-btn"
+        :class="{ active: styleEditorVisible }"
+        @click="styleEditorVisible = !styleEditorVisible"
+        title="样式调整"
+      >
+        <span class="btn-icon">🎨</span>
+        <span class="btn-label">样式</span>
+      </button>
     </div>
 
     <!-- 双栏模式 (窗口宽度 >= 1200px) per D-09 -->
@@ -98,7 +107,16 @@
             <div class="pane-header">
               <span class="pane-title">预览</span>
             </div>
-            <A4Page :content="debouncedContent" />
+            <div class="preview-content-wrapper">
+              <A4Page :content="debouncedContent" :template-id="currentTemplateId" :custom-css="customCss" />
+              <StyleEditor
+                v-if="styleEditorVisible"
+                v-model="styleEditorVisible"
+                :resume-id="resumeId"
+                :template-id="currentTemplateId"
+                :initial-css="customCss"
+              />
+            </div>
           </div>
         </template>
       </SplitPane>
@@ -132,7 +150,14 @@
             />
           </div>
           <div v-else class="preview-wrapper">
-            <A4Page :content="debouncedContent" />
+            <A4Page :content="debouncedContent" :template-id="currentTemplateId" :custom-css="customCss" />
+            <StyleEditor
+              v-if="styleEditorVisible"
+              v-model="styleEditorVisible"
+              :resume-id="resumeId"
+              :template-id="currentTemplateId"
+              :initial-css="customCss"
+            />
           </div>
         </div>
       </div>
@@ -187,7 +212,9 @@ import AIChatSidebar from '../components/AIChatSidebar.vue'
 import AIConfigModal from '../components/AIConfigModal.vue'
 import ResumeWizardSidebar from '../components/ResumeWizardSidebar.vue'
 import SaveStatusIndicator from '../components/SaveStatusIndicator.vue'
+import StyleEditor from '../components/StyleEditor.vue'
 import { useAutoSave } from '../composables/useAutoSave'
+import { useTemplate } from '../composables/useTemplate'
 import { GetResume, RenameResume } from '../wailsjs/wailsjs/go/main/App'
 import type { Resume } from '../types/resume'
 
@@ -239,6 +266,13 @@ const { saveStatus, errorMessage, markDirty, triggerSave, startAutoSave, stopAut
   getData: () => ({ markdownContent: content.value, jobTarget: jobTarget.value })
 })
 
+// 模板样式 composable (05-02)
+const resumeIdRef = computed(() => resumeId.value)
+const { currentTemplateId, customCss, loadTemplate, saveAsTemplate } = useTemplate(resumeIdRef)
+
+// 样式编辑器面板显示状态 (05-02 TMPL-04)
+const styleEditorVisible = ref(false)
+
 // 加载简历数据
 onMounted(async () => {
   const id = resumeId.value
@@ -253,6 +287,9 @@ onMounted(async () => {
       console.error('Failed to load resume:', err)
     }
   }
+
+  // 加载模板设置 (05-02 TMPL-04)
+  await loadTemplate()
 
   // 启动自动保存定时器 per D-26
   startAutoSave()
@@ -568,6 +605,12 @@ function setupScrollSync() {
   overflow: hidden;
 }
 
+.preview-content-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
 .pane-header {
   height: 36px;
   min-height: 36px;
@@ -636,5 +679,7 @@ function setupScrollSync() {
 .single-pane-content .preview-wrapper {
   height: 100%;
   overflow: hidden;
+  display: flex;
+  flex: 1;
 }
 </style>
