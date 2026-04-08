@@ -82,9 +82,9 @@
 - [x] **UIUX-06**: 快捷键体系 — 核心编辑快捷键100%兼容VS Code，AI快捷键（Ctrl/Cmd+R润色/T翻译/D缩写）
 - [x] **UIUX-07**: 支持用户自定义所有快捷键，配置本地存储
 - [x] **UIUX-08**: 空状态设计 — 无简历时首页展示内置模板Demo预览+醒目新建按钮
-- [ ] **UIUX-09**: 全异步操作提供明确加载提示，AI流式生成提供打字机动效
-- [ ] **UIUX-10**: 全操作即时反馈（toast/弹窗），无无反馈操作
-- [ ] **UIUX-11**: 全场景异常状态覆盖（网络异常/API失败/渲染异常/数据加载失败），提供错误提示+可执行方案
+- [x] **UIUX-09**: 全异步操作提供明确加载提示，AI流式生成提供打字机动效
+- [x] **UIUX-10**: 全操作即时反馈（toast/弹窗），无无反馈操作
+- [x] **UIUX-11**: 全场景异常状态覆盖（网络异常/API失败/渲染异常/数据加载失败），提供错误提示+可执行方案
 
 ## v2 Requirements
 
@@ -175,9 +175,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UIUX-06 | Phase 7 | Complete |
 | UIUX-07 | Phase 7 | Complete |
 | UIUX-08 | Phase 7 | Complete |
-| UIUX-09 | Phase 7 | Pending |
-| UIUX-10 | Phase 7 | Pending |
-| UIUX-11 | Phase 7 | Pending |
+| UIUX-09 | Phase 7 | Complete |
+| UIUX-10 | Phase 7 | Complete |
+| UIUX-11 | Phase 7 | Complete |
 
 **Coverage:**
 - v1 requirements: 63 total
