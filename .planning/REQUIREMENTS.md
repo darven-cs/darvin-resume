@@ -77,11 +77,11 @@
 - [ ] **UIUX-01**: 极简主义视觉风格，低饱和度专业色系，聚焦文字内容
 - [ ] **UIUX-02**: 深色/浅色双模式适配，支持根据系统主题自动切换
 - [ ] **UIUX-03**: 编辑区等宽代码字体，预览区无衬线系统字体，支持用户自定义字体
-- [ ] **UIUX-04**: 响应式适配 — 支持窗口大小自由缩放，最小适配宽度1200px
-- [ ] **UIUX-05**: 窗口宽度<1200px时自动切换为单栏布局，支持手动切换编辑/预览视图
-- [ ] **UIUX-06**: 快捷键体系 — 核心编辑快捷键100%兼容VS Code，AI快捷键（Ctrl/Cmd+R润色/T翻译/D缩写）
-- [ ] **UIUX-07**: 支持用户自定义所有快捷键，配置本地存储
-- [ ] **UIUX-08**: 空状态设计 — 无简历时首页展示内置模板Demo预览+醒目新建按钮
+- [x] **UIUX-04**: 响应式适配 — 支持窗口大小自由缩放，最小适配宽度1200px
+- [x] **UIUX-05**: 窗口宽度<1200px时自动切换为单栏布局，支持手动切换编辑/预览视图
+- [x] **UIUX-06**: 快捷键体系 — 核心编辑快捷键100%兼容VS Code，AI快捷键（Ctrl/Cmd+R润色/T翻译/D缩写）
+- [x] **UIUX-07**: 支持用户自定义所有快捷键，配置本地存储
+- [x] **UIUX-08**: 空状态设计 — 无简历时首页展示内置模板Demo预览+醒目新建按钮
 - [ ] **UIUX-09**: 全异步操作提供明确加载提示，AI流式生成提供打字机动效
 - [ ] **UIUX-10**: 全操作即时反馈（toast/弹窗），无无反馈操作
 - [ ] **UIUX-11**: 全场景异常状态覆盖（网络异常/API失败/渲染异常/数据加载失败），提供错误提示+可执行方案
@@ -170,11 +170,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UIUX-01 | Phase 7 | Pending |
 | UIUX-02 | Phase 7 | Pending |
 | UIUX-03 | Phase 7 | Pending |
-| UIUX-04 | Phase 7 | Pending |
-| UIUX-05 | Phase 7 | Pending |
-| UIUX-06 | Phase 7 | Pending |
-| UIUX-07 | Phase 7 | Pending |
-| UIUX-08 | Phase 7 | Pending |
+| UIUX-04 | Phase 7 | Complete |
+| UIUX-05 | Phase 7 | Complete |
+| UIUX-06 | Phase 7 | Complete |
+| UIUX-07 | Phase 7 | Complete |
+| UIUX-08 | Phase 7 | Complete |
 | UIUX-09 | Phase 7 | Pending |
 | UIUX-10 | Phase 7 | Pending |
 | UIUX-11 | Phase 7 | Pending |
