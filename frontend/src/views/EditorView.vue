@@ -72,14 +72,44 @@
         @retry="handleRetrySave"
       />
 
-      <button
-        class="toolbar-btn"
-        @click="showAIConfigModal = true"
-        title="AI 设置"
-      >
-        <span class="btn-icon">⚙</span>
-        <span class="btn-label">设置</span>
-      </button>
+      <!-- 视图模式切换按钮组 -->
+      <div class="view-mode-group">
+        <button
+          class="view-mode-btn"
+          :class="{ active: viewMode === 'split' }"
+          @click="viewMode = 'split'"
+          title="双栏模式"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="12" y1="3" x2="12" y2="21"/>
+          </svg>
+        </button>
+        <button
+          class="view-mode-btn"
+          :class="{ active: viewMode === 'editor' }"
+          @click="viewMode = 'editor'"
+          title="仅编辑"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="12" height="18" rx="2"/>
+            <line x1="7" y1="8" x2="11" y2="8"/>
+            <line x1="7" y1="12" x2="11" y2="12"/>
+          </svg>
+        </button>
+        <button
+          class="view-mode-btn"
+          :class="{ active: viewMode === 'preview' }"
+          @click="viewMode = 'preview'"
+          title="仅预览"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="3" width="12" height="18" rx="2"/>
+            <circle cx="15" cy="12" r="2"/>
+          </svg>
+        </button>
+      </div>
+
       <button
         class="toolbar-btn"
         :class="{ active: chatSidebarVisible }"
@@ -101,7 +131,7 @@
     </div>
 
     <!-- 双栏模式 (窗口宽度 >= 1200px) per D-09 -->
-    <template v-if="!isSinglePane">
+    <template v-if="!isSinglePane && effectiveViewMode === 'split'">
       <SplitPane :default-ratio="40" :min-width="300">
         <template #left>
           <div class="editor-pane">
@@ -140,9 +170,9 @@
     </template>
 
     <!-- 单栏模式 (窗口宽度 < 1200px) per D-09 -->
-    <template v-else>
+    <template v-else-if="isSinglePane || effectiveViewMode !== 'split'">
       <div class="single-pane-mode">
-        <div class="view-tabs">
+        <div class="view-tabs" v-if="effectiveViewMode === 'split'">
           <button
             :class="{ active: activeView === 'editor' }"
             @click="activeView = 'editor'"
@@ -158,7 +188,7 @@
         </div>
 
         <div class="single-pane-content">
-          <div v-if="activeView === 'editor'" class="editor-wrapper">
+          <div v-if="effectiveSingleView === 'editor'" class="editor-wrapper">
             <MonacoEditor
               ref="monacoRef"
               v-model="content"
@@ -199,10 +229,10 @@
       @insert-text="handleInsertText"
     />
 
-    <!-- AI Config Modal -->
-    <AIConfigModal
-      :visible="showAIConfigModal"
-      @close="showAIConfigModal = false"
+    <!-- Settings Dialog -->
+    <SettingsDialog
+      :visible="showSettingsDialog"
+      @close="showSettingsDialog = false"
     />
 
     <!-- Export Dialog -->
@@ -242,7 +272,7 @@ import A4Page from '../components/A4Page.vue'
 import JobTargetChip from '../components/JobTargetChip.vue'
 import ResumeParserModal from '../components/ResumeParserModal.vue'
 import AIChatSidebar from '../components/AIChatSidebar.vue'
-import AIConfigModal from '../components/AIConfigModal.vue'
+import SettingsDialog from '../components/SettingsDialog.vue'
 import ExportDialog from '../components/ExportDialog.vue'
 import SnapshotSidebar from '../components/SnapshotSidebar.vue'
 import ResumeWizardSidebar from '../components/ResumeWizardSidebar.vue'
@@ -274,7 +304,7 @@ const titleInputRef = ref<HTMLInputElement | null>(null)
 
 // Modal 状态
 const showParserModal = ref(false)
-const showAIConfigModal = ref(false)
+const showSettingsDialog = ref(false)
 
 // AI Chat Sidebar 状态
 const chatSidebarVisible = ref(false)
@@ -298,6 +328,22 @@ const {
 const windowWidth = ref(window.innerWidth)
 const isSinglePane = computed(() => windowWidth.value < 1200)
 const activeView = ref<'editor' | 'preview'>('editor')
+
+// 手动视图模式 (Task 3)
+const viewMode = ref<'split' | 'editor' | 'preview'>('split')
+
+/** 实际生效的视图模式：在窄屏时强制为 split（即单栏 Tab 切换） */
+const effectiveViewMode = computed(() => {
+  if (isSinglePane.value) return 'split'
+  return viewMode.value
+})
+
+/** 单栏模式下实际显示哪个面板 */
+const effectiveSingleView = computed(() => {
+  if (viewMode.value === 'editor') return 'editor'
+  if (viewMode.value === 'preview') return 'preview'
+  return activeView.value
+})
 
 // 键盘快捷键处理 — Ctrl+S / Cmd+S 保存
 function handleKeydown(e: KeyboardEvent) {
@@ -552,8 +598,8 @@ function setupScrollSync() {
   height: 40px;
   min-height: 40px;
   padding: 0 12px;
-  background: #2d2d2d;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--ui-bg-toolbar);
+  border-bottom: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -565,22 +611,22 @@ function setupScrollSync() {
   gap: 4px;
   padding: 4px 10px;
   background: transparent;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #cccccc;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-secondary);
   font-size: 12px;
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
+  transition: background-color var(--ui-transition-fast), border-color var(--ui-transition-fast);
 }
 
 .toolbar-btn:hover {
-  background: #3c3c3c;
-  border-color: #4c4c4c;
+  background: var(--ui-bg-hover);
+  border-color: var(--ui-border-hover);
 }
 
 .toolbar-btn.active {
-  background: #0078d4;
-  border-color: #0078d4;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
   color: #ffffff;
 }
 
@@ -595,12 +641,48 @@ function setupScrollSync() {
 .toolbar-divider {
   width: 1px;
   height: 20px;
-  background: #3c3c3c;
+  background: var(--ui-border);
   margin: 0 4px;
 }
 
 .toolbar-spacer {
   flex: 1;
+}
+
+/* 视图模式按钮组 */
+.view-mode-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  overflow: hidden;
+}
+
+.view-mode-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  color: var(--ui-text-tertiary);
+  cursor: pointer;
+  transition: background-color var(--ui-transition-fast), color var(--ui-transition-fast);
+}
+
+.view-mode-btn:not(:last-child) {
+  border-right: 1px solid var(--ui-border);
+}
+
+.view-mode-btn:hover {
+  background: var(--ui-bg-hover);
+  color: var(--ui-text-secondary);
+}
+
+.view-mode-btn.active {
+  background: var(--ui-accent);
+  color: #ffffff;
 }
 
 /* 简历标题编辑 per D-30 */
@@ -616,20 +698,20 @@ function setupScrollSync() {
   padding: 2px 6px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
+  transition: background-color var(--ui-transition-fast), border-color var(--ui-transition-fast);
   max-width: 200px;
 }
 
 .title-display:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #3c3c3c;
+  background: var(--ui-bg-hover);
+  border-color: var(--ui-border);
 }
 
 .title-text {
   font-size: 12px;
-  color: #e6edf3;
+  color: var(--ui-text-primary);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -638,10 +720,10 @@ function setupScrollSync() {
 }
 
 .title-edit-icon {
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity var(--ui-transition-fast);
 }
 
 .title-display:hover .title-edit-icon {
@@ -652,10 +734,10 @@ function setupScrollSync() {
   padding: 2px 6px;
   font-size: 12px;
   font-weight: 500;
-  color: #e6edf3;
-  background: #1e1e1e;
-  border: 1px solid #58a6ff;
-  border-radius: 4px;
+  color: var(--ui-text-primary);
+  background: var(--ui-input-bg);
+  border: 1px solid var(--ui-border-focus);
+  border-radius: var(--ui-radius-sm);
   outline: none;
   width: 180px;
 }
@@ -679,15 +761,15 @@ function setupScrollSync() {
   height: 36px;
   min-height: 36px;
   padding: 0 12px;
-  background: #f3f3f3;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--ui-bg-secondary);
+  border-bottom: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
 }
 
 .pane-title {
   font-size: 12px;
-  color: #555;
+  color: var(--ui-text-secondary);
   font-weight: 500;
 }
 
@@ -708,29 +790,29 @@ function setupScrollSync() {
   display: flex;
   height: 36px;
   min-height: 36px;
-  background: #f3f3f3;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--ui-bg-secondary);
+  border-bottom: 1px solid var(--ui-border);
 }
 
 .view-tabs button {
   flex: 1;
   background: transparent;
   border: none;
-  color: #555;
+  color: var(--ui-text-secondary);
   font-size: 13px;
   cursor: pointer;
-  transition: color 0.15s, background-color 0.15s;
+  transition: color var(--ui-transition-fast), background-color var(--ui-transition-fast);
 }
 
 .view-tabs button.active {
-  color: #1a1a1a;
-  background: #ffffff;
-  border-bottom: 2px solid #0078d4;
+  color: var(--ui-text-primary);
+  background: var(--ui-bg-primary);
+  border-bottom: 2px solid var(--ui-accent);
 }
 
 .view-tabs button:hover:not(.active) {
-  color: #1a1a1a;
-  background: #e8e8e8;
+  color: var(--ui-text-primary);
+  background: var(--ui-bg-hover);
 }
 
 .single-pane-content {
