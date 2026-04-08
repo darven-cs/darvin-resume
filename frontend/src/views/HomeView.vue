@@ -59,21 +59,47 @@
         <span>加载中...</span>
       </div>
 
-      <!-- 空状态 -->
-      <EmptyState
-        v-else-if="filteredResumes.length === 0 && !searchQuery"
-        title="还没有简历"
-        description="点击下方按钮创建你的第一份简历"
-        action-label="新建简历"
-        @action="showCreateModal = true"
-      >
-        <template #icon>
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
-        </template>
-      </EmptyState>
+      <!-- 空状态 + 模板 Demo 预览 -->
+      <div v-else-if="filteredResumes.length === 0 && !searchQuery" class="empty-area">
+        <EmptyState
+          title="还没有简历"
+          description="选择一个模板快速开始，或创建空白简历"
+          action-label="空白简历"
+          @action="handleCreateMode('blank')"
+        >
+          <template #icon>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </template>
+        </EmptyState>
+
+        <div class="template-preview-section">
+          <h3 class="template-section-title">内置模板</h3>
+          <div class="template-preview-grid">
+            <div
+              v-for="tpl in builtinTemplates"
+              :key="tpl.id"
+              class="template-preview-card"
+              @click="handleCreateFromTemplate(tpl.id)"
+            >
+              <div class="template-color-bar" :style="{ background: getTemplateColor(tpl.id) }" />
+              <div class="template-preview-body">
+                <div class="template-preview-line long" />
+                <div class="template-preview-line short" />
+                <div class="template-preview-line medium" />
+                <div class="template-preview-line long" />
+                <div class="template-preview-line short" />
+              </div>
+              <div class="template-preview-footer">
+                <span class="template-preview-name">{{ tpl.name }}</span>
+                <span class="template-preview-tag">{{ tpl.tag }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- 搜索无结果 -->
       <EmptyState
@@ -132,6 +158,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { CreateResume, UpdateResume } from '../wailsjs/wailsjs/go/main/App'
 import { useResumeList } from '../composables/useResumeList'
+import { BUILTIN_TEMPLATES, type TemplateDef } from '../composables/useTemplate'
 import ResumeCard from '../components/ResumeCard.vue'
 import CreateModeModal from '../components/CreateModeModal.vue'
 import RecycleBinSection from '../components/RecycleBinSection.vue'
@@ -154,6 +181,36 @@ const {
 const showCreateModal = ref(false)
 const showSettings = ref(false)
 const showBackupManager = ref(false)
+
+// 内置模板列表
+const builtinTemplates: TemplateDef[] = BUILTIN_TEMPLATES
+
+// 模板对应的主题色
+const TEMPLATE_COLORS: Record<string, string> = {
+  minimal: '#007acc',
+  'dual-col': '#238636',
+  academic: '#6e40c9',
+  campus: '#d32f2f',
+}
+
+function getTemplateColor(id: string): string {
+  return TEMPLATE_COLORS[id] || '#007acc'
+}
+
+// 从模板创建简历
+async function handleCreateFromTemplate(templateId: string) {
+  try {
+    const resume = await CreateResume('未命名简历')
+    await UpdateResume(resume.id, JSON.stringify({
+      markdownContent: BLANK_TEMPLATE,
+      jobTarget: '',
+      templateId
+    }))
+    router.push(`/editor/${resume.id}`)
+  } catch (err) {
+    console.error('从模板创建简历失败:', err)
+  }
+}
 
 // 页面加载时获取简历列表
 onMounted(() => {
@@ -422,5 +479,110 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
   height: 200px;
   color: var(--ui-text-tertiary);
   font-size: 0.875rem;
+}
+
+/* 空状态区域 */
+.empty-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 模板 Demo 预览 */
+.template-preview-section {
+  width: 100%;
+  max-width: 720px;
+  padding: 0 var(--ui-spacing-xl);
+  margin-top: var(--ui-spacing-xl);
+}
+
+.template-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ui-text-secondary);
+  margin: 0 0 var(--ui-spacing-md) 0;
+  padding-left: var(--ui-spacing-sm);
+}
+
+.template-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--ui-spacing-md);
+}
+
+@media (max-width: 600px) {
+  .template-preview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.template-preview-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--ui-transition-fast), box-shadow var(--ui-transition-fast), transform var(--ui-transition-fast);
+  background: var(--ui-bg-primary);
+}
+
+.template-preview-card:hover {
+  border-color: var(--ui-border-focus);
+  box-shadow: var(--ui-shadow-md);
+  transform: translateY(-2px);
+}
+
+.template-color-bar {
+  height: 4px;
+  flex-shrink: 0;
+}
+
+.template-preview-body {
+  padding: 12px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.template-preview-line {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ui-bg-tertiary);
+}
+
+.template-preview-line.long {
+  width: 100%;
+}
+
+.template-preview-line.medium {
+  width: 75%;
+}
+
+.template-preview-line.short {
+  width: 50%;
+}
+
+.template-preview-footer {
+  padding: 6px 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.template-preview-name {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ui-text-primary);
+}
+
+.template-preview-tag {
+  font-size: 0.625rem;
+  padding: 1px 6px;
+  background: var(--ui-bg-secondary);
+  border-radius: 8px;
+  color: var(--ui-text-tertiary);
 }
 </style>
