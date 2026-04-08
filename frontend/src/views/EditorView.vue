@@ -281,8 +281,11 @@ import StyleEditor from '../components/StyleEditor.vue'
 import { useAutoSave } from '../composables/useAutoSave'
 import { useTemplate } from '../composables/useTemplate'
 import { useSnapshot } from '../composables/useSnapshot'
+import { useKeyboard } from '../composables/useKeyboard'
+import { useAISelection } from '../composables/useAISelection'
 import { GetResume, RenameResume } from '../wailsjs/wailsjs/go/main/App'
 import type { Resume } from '../types/resume'
+import type { AIOperationType } from '../types/ai'
 
 const route = useRoute()
 const router = useRouter()
@@ -345,11 +348,73 @@ const effectiveSingleView = computed(() => {
   return activeView.value
 })
 
-// 键盘快捷键处理 — Ctrl+S / Cmd+S 保存
-function handleKeydown(e: KeyboardEvent) {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault()
+// 全局快捷键系统 (07-03)
+const keyboard = useKeyboard()
+
+// AI 选区操作 (07-03: 用于快捷键触发的 AI 操作)
+const aiSelection = useAISelection(
+  () => monacoRef.value?.getEditor?.(),
+  jobTarget.value
+)
+
+// 注册快捷键 handler
+function registerShortcuts() {
+  keyboard.register('file.save', () => {
     triggerSave()
+  })
+
+  keyboard.register('view.togglePreview', () => {
+    if (effectiveViewMode.value === 'split') {
+      viewMode.value = 'editor'
+    } else {
+      viewMode.value = 'split'
+    }
+  })
+
+  keyboard.register('view.toggleChat', () => {
+    chatSidebarVisible.value = !chatSidebarVisible.value
+  })
+
+  keyboard.register('ai.polish', () => {
+    handleAIShortcut('polish')
+  })
+
+  keyboard.register('ai.translate', () => {
+    handleAIShortcut('translate')
+  })
+
+  keyboard.register('ai.shorten', () => {
+    handleAIShortcut('summarize')
+  })
+}
+
+// AI 快捷键处理：检查选中文本后执行 AI 操作
+async function handleAIShortcut(operation: AIOperationType) {
+  const editor = monacoRef.value?.getEditor?.()
+  if (!editor) return
+
+  const selection = editor.getSelection?.()
+  const model = editor.getModel?.()
+  if (!selection || !model) return
+
+  const selectedText = model.getValueInRange(selection)
+  if (!selectedText || !selectedText.trim()) {
+    console.info(`[Shortcut] AI ${operation}: 没有选中文本，跳过`)
+    return
+  }
+
+  try {
+    const result = await aiSelection.performAIOperation(operation, selectedText)
+    if (result && selection) {
+      // 用 AI 结果替换选区
+      editor.executeEdits('ai-shortcut', [{
+        range: selection,
+        text: result,
+      }])
+      markDirty()
+    }
+  } catch (err) {
+    console.error(`AI ${operation} 快捷键操作失败:`, err)
   }
 }
 
@@ -387,8 +452,9 @@ onMounted(async () => {
   // 启动自动保存定时器 per D-26
   startAutoSave()
 
-  // 注册 Ctrl+S / Cmd+S 保存快捷键
-  window.addEventListener('keydown', handleKeydown)
+  // 启动全局快捷键系统并注册 handler (07-03)
+  registerShortcuts()
+  await keyboard.start()
 
   // 监听窗口宽度变化
   window.addEventListener('resize', handleResize)
@@ -402,7 +468,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
-  window.removeEventListener('keydown', handleKeydown)
+  // 停止全局快捷键系统 (07-03)
+  keyboard.stop()
   stopAutoSave()
 })
 
