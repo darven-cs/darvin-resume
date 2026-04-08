@@ -119,11 +119,9 @@ function handleDuplicate() {
   emit('duplicate', props.resume.id)
 }
 
-// 删除（二次确认）
+// 删除（由父组件处理确认）
 function handleDelete() {
-  if (confirm(`确定删除「${props.resume.title}」吗？`)) {
-    emit('delete', props.resume.id)
-  }
+  emit('delete', props.resume.id)
 }
 </script>
 
@@ -131,18 +129,18 @@ function handleDelete() {
 .resume-card {
   position: relative;
   height: 160px;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
-  background: #1e1e1e;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-bg-primary);
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color var(--ui-transition-fast), box-shadow var(--ui-transition-fast);
   display: flex;
   flex-direction: column;
 }
 
 .resume-card:hover {
-  border-color: #58a6ff;
+  border-color: var(--ui-accent);
   box-shadow: 0 2px 8px rgba(88, 166, 255, 0.15);
 }
 
@@ -151,9 +149,9 @@ function handleDelete() {
   top: 8px;
   right: 8px;
   display: flex;
-  gap: 4px;
+  gap: var(--ui-radius-sm);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--ui-transition-fast);
   z-index: 2;
 }
 
@@ -168,21 +166,21 @@ function handleDelete() {
   width: 28px;
   height: 28px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   background: rgba(255, 255, 255, 0.1);
-  color: #ccc;
+  color: var(--ui-text-secondary);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .action-btn:hover {
   background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  color: var(--ui-text-inverse);
 }
 
 .action-btn-danger:hover {
   background: rgba(248, 81, 73, 0.3);
-  color: #f85149;
+  color: var(--ui-danger);
 }
 
 .card-body {
@@ -201,7 +199,7 @@ function handleDelete() {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #e6edf3;
+  color: var(--ui-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -212,16 +210,16 @@ function handleDelete() {
   padding: 2px 6px;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #e6edf3;
-  background: #2d2d2d;
-  border: 1px solid #58a6ff;
-  border-radius: 4px;
+  color: var(--ui-text-primary);
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-accent);
+  border-radius: var(--ui-radius-sm);
   outline: none;
   box-sizing: border-box;
 }
 
 .card-time {
   font-size: 0.75rem;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 </style>

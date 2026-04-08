@@ -1,5 +1,21 @@
 <template>
   <div class="editor-view">
+    <!-- 加载失败状态 -->
+    <div v-if="loadError" class="editor-error-state">
+      <div class="error-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <div class="error-title">加载简历失败</div>
+      <div class="error-message">{{ loadError }}</div>
+      <button class="error-retry-btn" @click="loadResume">重试</button>
+      <button class="error-back-btn" @click="router.push('/')">返回首页</button>
+    </div>
+
+    <template v-else>
     <!-- Editor Toolbar -->
     <div class="editor-toolbar">
       <!-- 返回按钮 per D-29 -->
@@ -260,6 +276,7 @@
       @complete="handleWizardComplete"
       @save-draft="handleWizardSaveDraft"
     />
+    </template>
   </div>
 </template>
 
@@ -283,6 +300,8 @@ import { useTemplate } from '../composables/useTemplate'
 import { useSnapshot } from '../composables/useSnapshot'
 import { useKeyboard } from '../composables/useKeyboard'
 import { useAISelection } from '../composables/useAISelection'
+import { useToast } from '../composables/useToast'
+import { useConfirm } from '../composables/useConfirm'
 import { GetResume, RenameResume } from '../wailsjs/wailsjs/go/main/App'
 import type { Resume } from '../types/resume'
 import type { AIOperationType } from '../types/ai'
@@ -357,6 +376,15 @@ const aiSelection = useAISelection(
   jobTarget.value
 )
 
+// Toast 通知
+const toast = useToast()
+
+// 确认对话框
+const { confirm } = useConfirm()
+
+// 加载失败状态
+const loadError = ref('')
+
 // 注册快捷键 handler
 function registerShortcuts() {
   keyboard.register('file.save', () => {
@@ -414,6 +442,7 @@ async function handleAIShortcut(operation: AIOperationType) {
       markDirty()
     }
   } catch (err) {
+    toast.error(`AI ${operation} 操作失败`, String(err))
     console.error(`AI ${operation} 快捷键操作失败:`, err)
   }
 }
@@ -436,13 +465,16 @@ onMounted(async () => {
   const id = resumeId.value
   if (id) {
     try {
+      loadError.value = ''
       const resume = await GetResume(id)
       content.value = resume.markdownContent || ''
       debouncedContent.value = resume.markdownContent || ''
       jobTarget.value = (resume as any).jobTarget || ''
       resumeTitle.value = resume.title || '未命名简历'
     } catch (err) {
+      loadError.value = String(err)
       console.error('Failed to load resume:', err)
+      return
     }
   }
 
@@ -497,13 +529,18 @@ function handleRetrySave() {
 }
 
 // 返回按钮处理 per D-29
-function handleBack() {
+async function handleBack() {
   // 有未保存内容时弹确认框
   if (saveStatus.value === 'unsaved' || saveStatus.value === 'error') {
-    if (confirm('有未保存的内容，确定要离开吗？')) {
-      triggerSave().then(() => router.push('/'))
-      return
-    }
+    const ok = await confirm({
+      title: '离开编辑器',
+      message: '有未保存的内容，确定要离开吗？',
+      confirmLabel: '离开',
+      cancelLabel: '留下',
+      type: 'default'
+    })
+    if (!ok) return
+    await triggerSave()
   }
   router.push('/')
 }
@@ -529,8 +566,9 @@ async function confirmTitleEdit() {
   try {
     await RenameResume(resumeId.value, newTitle)
     resumeTitle.value = newTitle
+    toast.success('重命名成功')
   } catch (err) {
-    console.error('重命名失败:', err)
+    toast.error('重命名失败', String(err))
   }
 }
 
@@ -568,8 +606,13 @@ function handleInsertText(text: string) {
 // 导出完成后自动创建快照
 async function handleExportCompleted() {
   const dateStr = new Date().toLocaleDateString('zh-CN')
-  await autoCreateSnapshot(resumeId.value, `PDF 导出快照 ${dateStr}`, '')
-  console.log('PDF 导出成功，已自动创建版本快照')
+  try {
+    await autoCreateSnapshot(resumeId.value, `PDF 导出快照 ${dateStr}`, '')
+    toast.success('PDF 导出成功', '已自动创建版本快照')
+  } catch (err) {
+    toast.success('PDF 导出成功')  // 快照失败不影响导出成功提示
+    console.error('创建导出快照失败:', err)
+  }
 }
 
 // 回滚后重新加载简历内容
@@ -577,6 +620,7 @@ async function handleRollback(snapshotId: string) {
   // 重新加载简历数据
   await loadResume()
   snapshotSidebarVisible.value = false
+  toast.success('已回滚到选定版本')
 }
 
 // 向导完成后重新加载简历内容（后端已自动生成 Markdown）
@@ -596,6 +640,7 @@ async function handleWizardSaveDraft() {
 async function loadResume() {
   const id = resumeId.value
   if (!id) return
+  loadError.value = ''
   try {
     const resume = await GetResume(id)
     content.value = resume.markdownContent || ''
@@ -603,20 +648,27 @@ async function loadResume() {
     jobTarget.value = (resume as any).jobTarget || ''
     resumeTitle.value = resume.title || '未命名简历'
   } catch (err) {
+    loadError.value = String(err)
     console.error('Failed to load resume:', err)
   }
 }
 
 // 路由离开守卫 per D-31
-onBeforeRouteLeave((to, from, next) => {
+onBeforeRouteLeave(async (to, from, next) => {
   if (saveStatus.value === 'unsaved') {
-    const confirmed = confirm('有未保存的内容，确定要离开吗？')
-    if (confirmed) {
-      triggerSave().then(() => next())
-      return
-    } else {
+    const ok = await confirm({
+      title: '离开编辑器',
+      message: '有未保存的内容，确定要离开吗？',
+      confirmLabel: '离开',
+      cancelLabel: '留下',
+      type: 'default'
+    })
+    if (!ok) {
       next(false)
+      return
     }
+    await triggerSave()
+    next()
   } else {
     next()
   }
@@ -880,6 +932,69 @@ function setupScrollSync() {
 .view-tabs button:hover:not(.active) {
   color: var(--ui-text-primary);
   background: var(--ui-bg-hover);
+}
+
+/* 加载失败状态 */
+.editor-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+  background: var(--ui-bg-primary);
+}
+
+.editor-error-state .error-icon {
+  color: var(--ui-danger);
+  opacity: 0.7;
+}
+
+.editor-error-state .error-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ui-text-primary);
+}
+
+.editor-error-state .error-message {
+  font-size: 13px;
+  color: var(--ui-text-tertiary);
+  max-width: 300px;
+  word-break: break-word;
+}
+
+.error-retry-btn {
+  padding: 6px 16px;
+  background: var(--ui-accent);
+  border: none;
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-inverse);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--ui-transition-fast);
+}
+
+.error-retry-btn:hover {
+  background: var(--ui-accent-hover);
+}
+
+.error-back-btn {
+  padding: 6px 16px;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--ui-transition-fast);
+}
+
+.error-back-btn:hover {
+  background: var(--ui-border);
 }
 
 .single-pane-content {

@@ -228,10 +228,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { diffLines as computeDiffLines, Change } from 'diff'
 import { useSnapshot } from '@/composables/useSnapshot'
+import { useToast } from '@/composables/useToast'
 import type { Snapshot } from '@/types/snapshot'
+
+const toast = useToast()
 
 interface Props {
   visible: boolean
@@ -269,7 +272,6 @@ if (props.visible) {
 }
 
 // 监听 visible 变化
-import { watch } from 'vue'
 watch(() => props.visible, (val) => {
   if (val) {
     loadList()
@@ -378,8 +380,9 @@ async function handleCreate() {
   try {
     await createSnapshot(props.resumeId, createForm.value.label.trim(), createForm.value.note.trim(), 'manual')
     closeCreateDialog()
+    toast.success('快照已创建')
   } catch (err) {
-    console.error('创建快照失败:', err)
+    toast.error('创建快照失败', String(err))
   }
 }
 
@@ -479,8 +482,9 @@ async function handleRollback() {
     await rollback(props.resumeId, rollbackTargetId.value)
     closeRollbackDialog()
     emit('rollback', rollbackTargetId.value)
+    toast.success('已回滚到选定版本')
   } catch (err) {
-    console.error('回滚失败:', err)
+    toast.error('回滚失败', String(err))
   }
 }
 
@@ -505,8 +509,9 @@ async function handleDeleteConfirm() {
     if (idx > -1) {
       selectedSnapshots.value.splice(idx, 1)
     }
+    toast.success('快照已删除')
   } catch (err) {
-    console.error('删除快照失败:', err)
+    toast.error('删除快照失败', String(err))
   }
 }
 </script>
@@ -527,13 +532,13 @@ async function handleDeleteConfirm() {
   right: 0;
   width: 360px;
   height: 100vh;
-  background: #1e1e1e;
-  border-left: 1px solid #3c3c3c;
+  background: var(--ui-bg-primary);
+  border-left: 1px solid var(--ui-border);
   z-index: 9991;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--ui-shadow-lg);
 }
 
 /* 头部 */
@@ -542,31 +547,31 @@ async function handleDeleteConfirm() {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: #252526;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--ui-bg-secondary);
+  border-bottom: 1px solid var(--ui-border);
   flex-shrink: 0;
 }
 
 .sidebar-title {
   font-size: 14px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  color: #888;
+  color: var(--ui-text-tertiary);
   font-size: 20px;
   cursor: pointer;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   line-height: 1;
 }
 
 .close-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--ui-text-primary);
+  background: var(--ui-bg-hover);
 }
 
 /* 操作栏 */
@@ -574,44 +579,44 @@ async function handleDeleteConfirm() {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  border-bottom: 1px solid #3c3c3c;
+  border-bottom: 1px solid var(--ui-border);
   flex-shrink: 0;
 }
 
 .action-btn {
   padding: 6px 12px;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  background: #333;
-  color: #ccc;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-secondary);
   font-size: 12px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  transition: all 0.15s;
+  transition: all var(--ui-transition-fast);
 }
 
 .action-btn:hover {
-  background: #3c3c3c;
-  border-color: #555;
+  background: var(--ui-border);
+  border-color: var(--ui-border-hover);
 }
 
 .action-btn-primary {
-  background: #409eff;
-  border-color: #409eff;
-  color: #fff;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .action-btn-primary:hover {
-  background: #66b1ff;
-  border-color: #66b1ff;
+  background: var(--ui-accent-hover);
+  border-color: var(--ui-accent-hover);
 }
 
 .action-btn-compare {
   background: #7c3aed;
   border-color: #7c3aed;
-  color: #fff;
+  color: var(--ui-text-inverse);
 }
 
 .action-btn-compare:hover {
@@ -633,7 +638,7 @@ async function handleDeleteConfirm() {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   text-align: center;
 }
 
@@ -645,13 +650,13 @@ async function handleDeleteConfirm() {
 
 .empty-text {
   font-size: 14px;
-  color: #aaa;
+  color: var(--ui-text-secondary);
   margin-bottom: 8px;
 }
 
 .empty-hint {
   font-size: 12px;
-  color: #666;
+  color: var(--ui-text-tertiary);
 }
 
 /* 快照项 */
@@ -665,13 +670,13 @@ async function handleDeleteConfirm() {
   align-items: flex-start;
   gap: 8px;
   padding: 10px 16px;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid var(--ui-border);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .snapshot-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--ui-bg-hover);
 }
 
 .snapshot-item.selected {
@@ -704,7 +709,7 @@ async function handleDeleteConfirm() {
 .item-label {
   font-size: 13px;
   font-weight: 500;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .trigger-badge {
@@ -716,22 +721,22 @@ async function handleDeleteConfirm() {
 
 .badge-manual {
   background: rgba(64, 158, 255, 0.2);
-  color: #409eff;
+  color: var(--ui-accent);
 }
 
 .badge-auto {
   background: rgba(82, 196, 26, 0.2);
-  color: #52c41a;
+  color: var(--ui-success);
 }
 
 .badge-rollback {
   background: rgba(250, 173, 20, 0.2);
-  color: #faad14;
+  color: var(--ui-warning);
 }
 
 .item-note {
   font-size: 11px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   font-style: italic;
   margin-top: 2px;
   overflow: hidden;
@@ -741,7 +746,7 @@ async function handleDeleteConfirm() {
 
 .item-time {
   font-size: 11px;
-  color: #666;
+  color: var(--ui-text-tertiary);
   margin-top: 4px;
 }
 
@@ -753,31 +758,31 @@ async function handleDeleteConfirm() {
 
 .item-btn {
   padding: 2px 6px;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--ui-border);
   border-radius: 3px;
   background: transparent;
-  color: #888;
+  color: var(--ui-text-tertiary);
   font-size: 11px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all var(--ui-transition-fast);
 }
 
 .item-btn:hover {
-  background: #3c3c3c;
-  color: #ccc;
+  background: var(--ui-border);
+  color: var(--ui-text-secondary);
 }
 
 .item-btn-danger:hover {
   background: rgba(229, 57, 53, 0.2);
-  border-color: #e53935;
-  color: #ff7b7b;
+  border-color: var(--ui-danger);
+  color: var(--ui-danger);
 }
 
 /* 对话框 */
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--ui-overlay-bg);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -787,16 +792,16 @@ async function handleDeleteConfirm() {
 .create-dialog,
 .diff-dialog,
 .view-dialog {
-  background: #252526;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
+  background: var(--ui-bg-secondary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
   width: 90%;
   max-width: 480px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--ui-shadow-lg);
 }
 
 .dialog-header {
@@ -804,14 +809,14 @@ async function handleDeleteConfirm() {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: #2d2d2d;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--ui-bg-tertiary);
+  border-bottom: 1px solid var(--ui-border);
 }
 
 .dialog-title {
   font-size: 14px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .dialog-body {
@@ -825,8 +830,8 @@ async function handleDeleteConfirm() {
   justify-content: flex-end;
   gap: 8px;
   padding: 12px 16px;
-  border-top: 1px solid #3c3c3c;
-  background: #2d2d2d;
+  border-top: 1px solid var(--ui-border);
+  background: var(--ui-bg-tertiary);
 }
 
 /* 表单 */
@@ -839,32 +844,32 @@ async function handleDeleteConfirm() {
   display: block;
   font-size: 12px;
   font-weight: 500;
-  color: #ccc;
+  color: var(--ui-text-secondary);
   margin-bottom: 6px;
 }
 
 .form-group .required {
-  color: #e53935;
+  color: var(--ui-danger);
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
   padding: 8px 10px;
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #e0e0e0;
+  background: var(--ui-input-bg);
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-primary);
   font-size: 13px;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--ui-transition-fast);
   box-sizing: border-box;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: #409eff;
+  border-color: var(--ui-accent);
 }
 
 .form-group textarea {
@@ -877,7 +882,7 @@ async function handleDeleteConfirm() {
   right: 8px;
   bottom: -18px;
   font-size: 10px;
-  color: #666;
+  color: var(--ui-text-tertiary);
 }
 
 /* 回滚警告 */
@@ -892,18 +897,18 @@ async function handleDeleteConfirm() {
 }
 
 .warning-icon.danger {
-  color: #e53935;
+  color: var(--ui-danger);
 }
 
 .warning-text {
   font-size: 14px;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   margin-bottom: 8px;
 }
 
 .warning-hint {
   font-size: 12px;
-  color: #888;
+  color: var(--ui-text-tertiary);
 }
 
 /* 对比视图 */
@@ -916,20 +921,20 @@ async function handleDeleteConfirm() {
   display: flex;
   gap: 12px;
   padding: 8px 12px;
-  background: #1e1e1e;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--ui-bg-primary);
+  border-bottom: 1px solid var(--ui-border);
   margin: -16px -16px 0;
   padding: 8px 16px;
 }
 
 .stat-added {
-  color: #52c41a;
+  color: var(--ui-success);
   font-size: 12px;
   font-weight: 600;
 }
 
 .stat-removed {
-  color: #e53935;
+  color: var(--ui-danger);
   font-size: 12px;
   font-weight: 600;
 }
@@ -965,11 +970,11 @@ async function handleDeleteConfirm() {
 }
 
 .diff-line-added .line-prefix {
-  color: #52c41a;
+  color: var(--ui-success);
 }
 
 .diff-line-added .line-text {
-  color: #b5e8b5;
+  color: var(--ui-success);
 }
 
 .diff-line-removed {
@@ -977,11 +982,11 @@ async function handleDeleteConfirm() {
 }
 
 .diff-line-removed .line-prefix {
-  color: #e53935;
+  color: var(--ui-danger);
 }
 
 .diff-line-removed .line-text {
-  color: #f5b7b7;
+  color: var(--ui-danger);
 }
 
 .diff-line-unchanged {
@@ -989,16 +994,16 @@ async function handleDeleteConfirm() {
 }
 
 .diff-line-unchanged .line-prefix {
-  color: #666;
+  color: var(--ui-text-tertiary);
 }
 
 .diff-line-unchanged .line-text {
-  color: #888;
+  color: var(--ui-text-tertiary);
 }
 
 .diff-empty {
   text-align: center;
-  color: #666;
+  color: var(--ui-text-tertiary);
   padding: 20px;
 }
 
@@ -1017,21 +1022,21 @@ async function handleDeleteConfirm() {
 
 .view-time {
   font-size: 12px;
-  color: #888;
+  color: var(--ui-text-tertiary);
 }
 
 .view-note {
   font-size: 12px;
-  color: #aaa;
+  color: var(--ui-text-secondary);
   padding: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
+  background: var(--ui-bg-hover);
+  border-radius: var(--ui-radius-sm);
 }
 
 .view-preview {
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
+  background: var(--ui-bg-primary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
   padding: 12px;
   max-height: 300px;
   overflow-y: auto;
@@ -1040,7 +1045,7 @@ async function handleDeleteConfirm() {
 .markdown-preview {
   font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
   font-size: 12px;
-  color: #ccc;
+  color: var(--ui-text-secondary);
   white-space: pre-wrap;
   word-break: break-all;
   margin: 0;
@@ -1049,18 +1054,18 @@ async function handleDeleteConfirm() {
 /* 对话框按钮 */
 .dialog-btn {
   padding: 6px 16px;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  background: #333;
-  color: #ccc;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-secondary);
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all var(--ui-transition-fast);
 }
 
 .dialog-btn:hover:not(:disabled) {
-  background: #3c3c3c;
-  border-color: #555;
+  background: var(--ui-border);
+  border-color: var(--ui-border-hover);
 }
 
 .dialog-btn:disabled {
@@ -1069,42 +1074,42 @@ async function handleDeleteConfirm() {
 }
 
 .dialog-btn-confirm {
-  background: #409eff;
-  border-color: #409eff;
-  color: #fff;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .dialog-btn-confirm:hover:not(:disabled) {
-  background: #66b1ff;
-  border-color: #66b1ff;
+  background: var(--ui-accent-hover);
+  border-color: var(--ui-accent-hover);
 }
 
 .dialog-btn-danger {
-  background: #e53935;
-  border-color: #e53935;
-  color: #fff;
+  background: var(--ui-danger);
+  border-color: var(--ui-danger);
+  color: var(--ui-text-inverse);
 }
 
 .dialog-btn-danger:hover:not(:disabled) {
-  background: #f44336;
-  border-color: #f44336;
+  background: var(--ui-danger-hover);
+  border-color: var(--ui-danger-hover);
 }
 
 .rollback-confirm {
-  background: #faad14;
-  border-color: #faad14;
-  color: #1e1e1e;
+  background: var(--ui-warning);
+  border-color: var(--ui-warning);
+  color: var(--ui-bg-primary);
 }
 
 .rollback-confirm:hover:not(:disabled) {
-  background: #ffc53d;
-  border-color: #ffc53d;
+  background: var(--ui-warning);
+  border-color: var(--ui-warning);
 }
 
 /* 过渡动画 */
 .sidebar-overlay-enter-active,
 .sidebar-overlay-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity var(--ui-transition-fast) ease;
 }
 
 .sidebar-overlay-enter-from,
@@ -1114,7 +1119,7 @@ async function handleDeleteConfirm() {
 
 .sidebar-slide-enter-active,
 .sidebar-slide-leave-active {
-  transition: transform 0.25s ease;
+  transition: transform var(--ui-transition-normal) ease;
 }
 
 .sidebar-slide-enter-from,

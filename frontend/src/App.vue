@@ -18,10 +18,18 @@
     <main class="main-content">
       <router-view />
     </main>
+
+    <!-- 全局 Toast 通知容器 -->
+    <ToastContainer />
+
+    <!-- 全局确认对话框 -->
+    <ConfirmDialog />
   </div>
 </template>
 
 <script setup lang="ts">
+import ToastContainer from './components/ToastContainer.vue'
+import ConfirmDialog from './components/ConfirmDialog.vue'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const SIDEBAR_COLLAPSE_BREAKPOINT = 1200

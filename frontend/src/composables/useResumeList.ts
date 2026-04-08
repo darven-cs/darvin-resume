@@ -46,6 +46,7 @@ export function useResumeList() {
     } catch (err) {
       error.value = String(err)
       console.error('加载简历列表失败:', err)
+      throw err  // 重新抛出以便调用方处理
     } finally {
       loading.value = false
     }

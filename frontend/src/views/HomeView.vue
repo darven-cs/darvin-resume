@@ -56,7 +56,22 @@
     <main class="resume-grid-area">
       <!-- 加载状态 -->
       <div v-if="loading" class="loading-state">
+        <div class="loading-spinner"></div>
         <span>加载中...</span>
+      </div>
+
+      <!-- 加载失败 -->
+      <div v-else-if="loadError" class="error-state">
+        <div class="error-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="error-title">加载失败</div>
+        <div class="error-message">{{ loadError }}</div>
+        <button class="retry-btn" @click="fetchResumes">重试</button>
       </div>
 
       <!-- 空状态 + 模板 Demo 预览 -->
@@ -158,6 +173,8 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { CreateResume, UpdateResume } from '../wailsjs/wailsjs/go/main/App'
 import { useResumeList } from '../composables/useResumeList'
+import { useToast } from '../composables/useToast'
+import { useConfirm } from '../composables/useConfirm'
 import { BUILTIN_TEMPLATES, type TemplateDef } from '../composables/useTemplate'
 import ResumeCard from '../components/ResumeCard.vue'
 import CreateModeModal from '../components/CreateModeModal.vue'
@@ -172,11 +189,18 @@ const {
   sortOrder,
   filteredResumes,
   loading,
+  error: resumeError,
   fetchResumes,
   renameResume,
   duplicateResume,
   deleteResume
 } = useResumeList()
+
+const toast = useToast()
+const { confirm } = useConfirm()
+
+// 加载失败状态
+const loadError = ref('')
 
 const showCreateModal = ref(false)
 const showSettings = ref(false)
@@ -206,20 +230,33 @@ async function handleCreateFromTemplate(templateId: string) {
       jobTarget: '',
       templateId
     }))
+    toast.success('简历已创建')
     router.push(`/editor/${resume.id}`)
   } catch (err) {
-    console.error('从模板创建简历失败:', err)
+    toast.error('创建失败', String(err))
   }
 }
 
 // 页面加载时获取简历列表
 onMounted(() => {
-  fetchResumes()
+  fetchResumes().catch((err: unknown) => {
+    loadError.value = String(err)
+  })
 })
 
 // 切换排序
 function toggleSort() {
   sortOrder.value = sortOrder.value === 'newest' ? 'oldest' : 'newest'
+}
+
+// 刷新列表（重试用）
+async function refreshResumes() {
+  loadError.value = ''
+  try {
+    await fetchResumes()
+  } catch (err: unknown) {
+    loadError.value = String(err)
+  }
 }
 
 // 打开编辑器
@@ -231,8 +268,9 @@ function openEditor(id: string) {
 async function handleRename(id: string, title: string) {
   try {
     await renameResume(id, title)
-  } catch {
-    // 错误已在 composable 中处理
+    toast.success('重命名成功')
+  } catch (err) {
+    toast.error('重命名失败', String(err))
   }
 }
 
@@ -240,23 +278,36 @@ async function handleRename(id: string, title: string) {
 async function handleDuplicate(id: string) {
   try {
     await duplicateResume(id)
-  } catch {
-    // 错误已在 composable 中处理
+    toast.success('简历已复制')
+  } catch (err) {
+    toast.error('复制失败', String(err))
   }
 }
 
 // 处理删除
 async function handleDelete(id: string) {
+  const ok = await confirm({
+    title: '删除简历',
+    message: '该简历将移入回收站，30天内可恢复',
+    confirmLabel: '删除',
+    type: 'danger'
+  })
+  if (!ok) return
   try {
     await deleteResume(id)
-  } catch {
-    // 错误已在 composable 中处理
+    toast.success('已移入回收站', '30天内可恢复')
+  } catch (err) {
+    toast.error('删除失败', String(err))
   }
 }
 
 // 回收站操作后刷新列表
-function handleRecycleAction() {
-  fetchResumes()
+async function handleRecycleAction() {
+  try {
+    await fetchResumes()
+  } catch (err: unknown) {
+    toast.error('刷新失败', String(err))
+  }
 }
 
 // 空白简历模板 per D-02 / RESM-05
@@ -287,6 +338,7 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
     if (mode === 'wizard') {
       // AI 引导模式：创建简历后带 wizard 参数跳转
       const resume = await CreateResume('我的简历')
+      toast.success('简历已创建')
       router.push(`/editor/${resume.id}?wizard=true`)
     } else {
       // 空白页模式 per D-02 / RESM-05
@@ -297,10 +349,11 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
         markdownContent: BLANK_TEMPLATE,
         jobTarget: ''
       }))
+      toast.success('简历已创建')
       router.push(`/editor/${resume.id}`)
     }
   } catch (err) {
-    console.error('创建简历失败:', err)
+    toast.error('创建失败', String(err))
   }
 }
 </script>
@@ -474,11 +527,72 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
 /* 加载状态 */
 .loading-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   height: 200px;
   color: var(--ui-text-tertiary);
   font-size: 0.875rem;
+}
+
+.loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--ui-border);
+  border-top-color: var(--ui-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 加载失败 */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 200px;
+  padding: 20px;
+  text-align: center;
+}
+
+.error-icon {
+  color: var(--ui-danger);
+  opacity: 0.7;
+}
+
+.error-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ui-text-primary);
+}
+
+.error-message {
+  font-size: 13px;
+  color: var(--ui-text-tertiary);
+  max-width: 300px;
+  word-break: break-word;
+}
+
+.retry-btn {
+  padding: 6px 16px;
+  background: var(--ui-accent);
+  border: none;
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-inverse);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--ui-transition-fast);
+}
+
+.retry-btn:hover {
+  background: var(--ui-accent-hover);
 }
 
 /* 空状态区域 */

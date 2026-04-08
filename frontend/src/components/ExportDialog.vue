@@ -129,6 +129,7 @@
               @click="handleExport"
               :disabled="isExporting || (exportMode === 'chromedp' && !outputPath.trim())"
             >
+              <span v-if="isExporting" class="btn-spinner"></span>
               {{ isExporting ? '导出中...' : '导出 PDF' }}
             </button>
           </div>
@@ -141,6 +142,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ExportPDFFromHTML, ShowSaveDialog } from '../wailsjs/wailsjs/go/main/App'
+import { useToast } from '../composables/useToast'
 
 interface Props {
   visible: boolean
@@ -152,6 +154,8 @@ const emit = defineEmits<{
   close: []
   exported: []
 }>()
+
+const toast = useToast()
 
 // 导出模式
 const exportMode = ref<'system' | 'chromedp'>('system')
@@ -193,6 +197,7 @@ async function exportWithSystemPrint() {
     document.body.classList.remove('hide-page-breaks')
   }, { once: true })
 
+  toast.success('PDF 导出请求已发送')
   emit('exported')
 }
 
@@ -400,10 +405,12 @@ ${clone.innerHTML}
 
   try {
     await ExportPDFFromHTML(htmlContent, outputPath.value)
+    toast.success('PDF 导出成功', `已保存到: ${outputPath.value}`)
     emit('exported')
     emit('close')
   } catch (err) {
     errorMessage.value = `导出失败: ${err}`
+    toast.error('PDF 导出失败', String(err))
   } finally {
     isExporting.value = false
   }
@@ -540,15 +547,15 @@ async function handleExport() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--ui-overlay-bg);
   backdrop-filter: blur(2px);
 }
 
 .modal-box {
-  background: #252526;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: var(--ui-bg-secondary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-lg);
   width: 90%;
   max-width: 520px;
   max-height: 90vh;
@@ -565,24 +572,24 @@ async function handleExport() {
 .modal-title {
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: var(--ui-text-primary);
   margin: 0;
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  color: #888;
+  color: var(--ui-text-tertiary);
   font-size: 20px;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   line-height: 1;
 }
 
 .close-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--ui-text-primary);
+  background: var(--ui-bg-hover);
 }
 
 .modal-body {
@@ -595,7 +602,7 @@ async function handleExport() {
 .section-title {
   font-size: 12px;
   font-weight: 600;
-  color: #888;
+  color: var(--ui-text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
@@ -607,19 +614,19 @@ async function handleExport() {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
   cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
+  transition: border-color var(--ui-transition-fast), background-color var(--ui-transition-fast);
 }
 
 .mode-option:hover {
-  border-color: #555;
-  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--ui-border-hover);
+  background: var(--ui-bg-hover);
 }
 
 .mode-option.selected {
-  border-color: #3d8bfd;
+  border-color: var(--ui-accent);
   background: rgba(61, 139, 253, 0.08);
 }
 
@@ -631,16 +638,16 @@ async function handleExport() {
   display: block;
   width: 18px;
   height: 18px;
-  border: 2px solid #555;
+  border: 2px solid var(--ui-border-hover);
   border-radius: 50%;
   cursor: pointer;
   position: relative;
   flex-shrink: 0;
-  transition: border-color 0.15s;
+  transition: border-color var(--ui-transition-fast);
 }
 
 .mode-option.selected .mode-radio label {
-  border-color: #3d8bfd;
+  border-color: var(--ui-accent);
 }
 
 .mode-option.selected .mode-radio label::after {
@@ -650,7 +657,7 @@ async function handleExport() {
   left: 3px;
   width: 8px;
   height: 8px;
-  background: #3d8bfd;
+  background: var(--ui-accent);
   border-radius: 50%;
 }
 
@@ -661,26 +668,26 @@ async function handleExport() {
 .mode-name {
   font-size: 13px;
   font-weight: 500;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .mode-desc {
   font-size: 11px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   margin-top: 2px;
 }
 
 .mode-badge {
   font-size: 10px;
   padding: 2px 6px;
-  background: #3d8bfd;
-  color: #fff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
   border-radius: 3px;
   flex-shrink: 0;
 }
 
 .mode-badge.advanced {
-  background: #7c3aed;
+  background: var(--ui-accent);
 }
 
 /* 高级选项 */
@@ -689,9 +696,9 @@ async function handleExport() {
   flex-direction: column;
   gap: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
+  background: var(--ui-bg-hover);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
 }
 
 /* 表单 */
@@ -704,28 +711,28 @@ async function handleExport() {
 .form-group label {
   font-size: 12px;
   font-weight: 500;
-  color: #ccc;
+  color: var(--ui-text-secondary);
 }
 
 .form-group input[type="text"],
 .form-group input[type="number"] {
   padding: 8px 10px;
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #e0e0e0;
+  background: var(--ui-input-bg);
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-primary);
   font-size: 13px;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--ui-transition-fast);
 }
 
 .form-group input:focus {
-  border-color: #3d8bfd;
+  border-color: var(--ui-accent);
 }
 
 .field-hint {
   font-size: 11px;
-  color: #888;
+  color: var(--ui-text-tertiary);
 }
 
 .input-row {
@@ -757,22 +764,22 @@ async function handleExport() {
 
 .toggle-text {
   font-size: 13px;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   font-weight: 500;
 }
 
 .toggle-hint {
   font-size: 11px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   margin-left: auto;
 }
 
 .error-message {
   padding: 8px 12px;
-  background: #2d1f1f;
-  border: 1px solid #e5484d;
-  border-radius: 4px;
-  color: #ff7b7b;
+  background: var(--ui-bg-active);
+  border: 1px solid var(--ui-danger);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-danger);
   font-size: 12px;
 }
 
@@ -787,14 +794,14 @@ async function handleExport() {
 
 .btn {
   padding: 6px 16px;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  background: #333;
-  color: #e0e0e0;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-primary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+  transition: background-color var(--ui-transition-fast), border-color var(--ui-transition-fast), opacity var(--ui-transition-fast);
 }
 
 .btn:disabled {
@@ -803,24 +810,40 @@ async function handleExport() {
 }
 
 .btn:hover:not(:disabled) {
-  background: #3c3c3c;
-  border-color: #555;
+  background: var(--ui-border);
+  border-color: var(--ui-border-hover);
 }
 
 .btn-primary {
-  background: #3d8bfd;
-  border-color: #3d8bfd;
-  color: #fff;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #5a9bff;
-  border-color: #5a9bff;
+  background: var(--ui-accent-hover);
+  border-color: var(--ui-accent-hover);
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Transition */
 .modal-enter-active {
-  animation: modal-in 0.2s ease-out;
+  animation: modal-in var(--ui-transition-fast) ease-out;
 }
 
 .modal-leave-active {
@@ -839,7 +862,7 @@ async function handleExport() {
 
 /* 高级选项滑入动画 */
 .slide-fade-enter-active {
-  transition: all 0.2s ease-out;
+  transition: all var(--ui-transition-fast) ease-out;
 }
 
 .slide-fade-leave-active {

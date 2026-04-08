@@ -100,63 +100,69 @@ function estimateTextHeight(text: string): number {
 const pages = computed(() => {
   if (!props.content) return []
 
-  // 方案：按自然节分割 Markdown 内容（标题/分隔线/段落边界）
-  // 原理：将内容分成若干"节"，每个节尽量填满一页 A4
-  const raw = props.content.trim()
-  if (!raw) return []
+  try {
+    // 方案：按自然节分割 Markdown 内容（标题/分隔线/段落边界）
+    // 原理：将内容分成若干"节"，每个节尽量填满一页 A4
+    const raw = props.content.trim()
+    if (!raw) return []
 
-  // 估算总高度，如果能塞进一页就直接返回
-  const estimatedTotal = estimateTextHeight(raw)
-  if (estimatedTotal <= A4_HEIGHT_PX) {
-    return [renderMarkdown(raw)]
-  }
-
-  // 多页分割：找到所有自然节边界（h1/h2/h3/hr/空行）
-  const sections = splitMarkdownIntoSections(raw)
-  if (sections.length <= 1) {
-    // 无法分割，退化成单页（内容可能被截断）
-    return [renderMarkdown(raw)]
-  }
-
-  // 贪心装箱：将节分配到各页，每页尽量填满 A4_HEIGHT_PX
-  const pageContents: string[] = []
-  let currentPage = ''
-  let currentPageHeight = 0
-
-  for (const section of sections) {
-    const sectionHeight = estimateTextHeight(section.text)
-
-    // 如果当前节单独能超过一页，直接强制放入（可能溢出）
-    if (sectionHeight > A4_HEIGHT_PX && currentPage.length > 0) {
-      pageContents.push(currentPage.trim())
-      currentPage = ''
-      currentPageHeight = 0
+    // 估算总高度，如果能塞进一页就直接返回
+    const estimatedTotal = estimateTextHeight(raw)
+    if (estimatedTotal <= A4_HEIGHT_PX) {
+      return [renderMarkdown(raw)]
     }
 
-    if (currentPageHeight + sectionHeight <= A4_HEIGHT_PX) {
-      // 能放入当前页
-      currentPage += (currentPage ? '\n\n' : '') + section.text
-      currentPageHeight += sectionHeight
-    } else {
-      // 放不下，先保存当前页
-      if (currentPage.trim()) {
+    // 多页分割：找到所有自然节边界（h1/h2/h3/hr/空行）
+    const sections = splitMarkdownIntoSections(raw)
+    if (sections.length <= 1) {
+      // 无法分割，退化成单页（内容可能被截断）
+      return [renderMarkdown(raw)]
+    }
+
+    // 贪心装箱：将节分配到各页，每页尽量填满 A4_HEIGHT_PX
+    const pageContents: string[] = []
+    let currentPage = ''
+    let currentPageHeight = 0
+
+    for (const section of sections) {
+      const sectionHeight = estimateTextHeight(section.text)
+
+      // 如果当前节单独能超过一页，直接强制放入（可能溢出）
+      if (sectionHeight > A4_HEIGHT_PX && currentPage.length > 0) {
         pageContents.push(currentPage.trim())
+        currentPage = ''
+        currentPageHeight = 0
       }
-      currentPage = section.text
-      currentPageHeight = sectionHeight
+
+      if (currentPageHeight + sectionHeight <= A4_HEIGHT_PX) {
+        // 能放入当前页
+        currentPage += (currentPage ? '\n\n' : '') + section.text
+        currentPageHeight += sectionHeight
+      } else {
+        // 放不下，先保存当前页
+        if (currentPage.trim()) {
+          pageContents.push(currentPage.trim())
+        }
+        currentPage = section.text
+        currentPageHeight = sectionHeight
+      }
     }
-  }
 
-  // 最后一页
-  if (currentPage.trim()) {
-    pageContents.push(currentPage.trim())
-  }
+    // 最后一页
+    if (currentPage.trim()) {
+      pageContents.push(currentPage.trim())
+    }
 
-  if (pageContents.length === 0) {
-    return [renderMarkdown(raw)]
-  }
+    if (pageContents.length === 0) {
+      return [renderMarkdown(raw)]
+    }
 
-  return pageContents.map(c => renderMarkdown(c))
+    return pageContents.map(c => renderMarkdown(c))
+  } catch (err) {
+    // 渲染异常：显示原始文本 + 错误提示
+    console.error('Markdown 渲染异常:', err)
+    return [renderMarkdown(props.content)]
+  }
 })
 
 /**

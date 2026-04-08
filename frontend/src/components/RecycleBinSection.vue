@@ -83,7 +83,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ListDeletedResumes, RestoreResume, PermanentDeleteResume } from '../wailsjs/wailsjs/go/main/App'
+import { useToast } from '../composables/useToast'
+import { useConfirm } from '../composables/useConfirm'
 import type { ResumeListItem } from '../types/resume'
+
+const toast = useToast()
+const { confirm } = useConfirm()
 
 // 展开/折叠状态
 const isExpanded = ref(false)
@@ -125,22 +130,31 @@ async function handleRestore(id: string) {
     deletedResumes.value = deletedResumes.value.filter(r => r.id !== id)
     // 通知父组件刷新主列表（通过自定义事件）
     emit('restore')
+    toast.success('简历已恢复')
   } catch (err) {
-    console.error('恢复简历失败:', err)
+    toast.error('恢复失败', String(err))
   }
 }
 
 // 永久删除
 async function handlePermanentDelete(id: string) {
-  if (!confirm('永久删除后无法恢复，确定要删除吗？')) return
+  const ok = await confirm({
+    title: '永久删除',
+    message: '删除后无法恢复，确定要删除吗？',
+    confirmLabel: '删除',
+    cancelLabel: '取消',
+    type: 'danger'
+  })
+  if (!ok) return
   try {
     await PermanentDeleteResume(id)
     // 从列表中移除已删除的简历
     deletedResumes.value = deletedResumes.value.filter(r => r.id !== id)
     // 通知父组件刷新主列表（通过自定义事件）
     emit('permanent-delete')
+    toast.success('已永久删除')
   } catch (err) {
-    console.error('永久删除失败:', err)
+    toast.error('删除失败', String(err))
   }
 }
 
@@ -169,7 +183,7 @@ const emit = defineEmits<{
 
 <style scoped>
 .recycle-bin {
-  border-top: 1px solid #3c3c3c;
+  border-top: 1px solid var(--ui-border);
   margin-top: 24px;
 }
 
@@ -180,7 +194,7 @@ const emit = defineEmits<{
   padding: 12px 16px;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .recycle-bin-header:hover {
@@ -188,8 +202,8 @@ const emit = defineEmits<{
 }
 
 .recycle-bin-arrow {
-  color: #8b949e;
-  transition: transform 0.2s;
+  color: var(--ui-text-tertiary);
+  transition: transform var(--ui-transition-fast);
   flex-shrink: 0;
 }
 
@@ -198,22 +212,22 @@ const emit = defineEmits<{
 }
 
 .recycle-bin-icon {
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   flex-shrink: 0;
 }
 
 .recycle-bin-title {
   font-size: 13px;
   font-weight: 500;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .recycle-bin-count {
   font-size: 11px;
   padding: 1px 6px;
-  background: #3c3c3c;
+  background: var(--ui-bg-tertiary);
   border-radius: 10px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   margin-left: 4px;
 }
 
@@ -225,7 +239,7 @@ const emit = defineEmits<{
 .recycle-bin-empty {
   padding: 12px 16px 12px 40px;
   font-size: 12px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .recycle-bin-item {
@@ -233,8 +247,8 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px 8px 40px;
-  border-bottom: 1px solid #2d2d2d;
-  transition: background-color 0.15s;
+  border-bottom: 1px solid var(--ui-bg-tertiary);
+  transition: background-color var(--ui-transition-fast);
 }
 
 .recycle-bin-item:last-child {
@@ -255,7 +269,7 @@ const emit = defineEmits<{
 
 .recycle-bin-item-title {
   font-size: 13px;
-  color: #cccccc;
+  color: var(--ui-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -263,13 +277,13 @@ const emit = defineEmits<{
 
 .recycle-bin-item-date {
   font-size: 11px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .recycle-bin-item-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ui-radius-sm);
   flex-shrink: 0;
   margin-left: 12px;
 }
@@ -277,40 +291,40 @@ const emit = defineEmits<{
 .action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ui-radius-sm);
   padding: 4px 8px;
   font-size: 12px;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
   background: transparent;
   cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
+  transition: border-color var(--ui-transition-fast), background-color var(--ui-transition-fast);
 }
 
 .restore-btn {
-  color: #58a6ff;
+  color: var(--ui-accent);
   border-color: rgba(88, 166, 255, 0.3);
 }
 
 .restore-btn:hover {
   background: rgba(88, 166, 255, 0.1);
-  border-color: #58a6ff;
+  border-color: var(--ui-accent);
 }
 
 .delete-btn {
-  color: #f85149;
+  color: var(--ui-danger);
   border-color: rgba(248, 81, 73, 0.3);
 }
 
 .delete-btn:hover {
   background: rgba(248, 81, 73, 0.1);
-  border-color: #f85149;
+  border-color: var(--ui-danger);
 }
 
 /* 展开动画 */
 .expand-enter-active,
 .expand-leave-active {
-  transition: max-height 0.25s ease, opacity 0.2s ease;
+  transition: max-height var(--ui-transition-normal) ease, opacity var(--ui-transition-fast) ease;
   max-height: 500px;
   overflow: hidden;
 }

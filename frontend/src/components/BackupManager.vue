@@ -34,6 +34,7 @@
                 :disabled="isExporting"
                 @click="handleExport"
               >
+                <span v-if="isExporting" class="btn-spinner"></span>
                 {{ isExporting ? '导出中...' : '导出备份' }}
               </button>
             </div>
@@ -63,6 +64,7 @@
                 :disabled="isImporting"
                 @click="handleImport"
               >
+                <span v-if="isImporting" class="btn-spinner"></span>
                 {{ isImporting ? '恢复中...' : '选择备份文件并恢复' }}
               </button>
             </div>
@@ -181,6 +183,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useBackup } from '../composables/useBackup'
+import { useToast } from '../composables/useToast'
 
 interface Props {
   visible: boolean
@@ -190,6 +193,8 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   close: []
 }>()
+
+const toast = useToast()
 
 const {
   isExporting,
@@ -256,8 +261,10 @@ async function handleAutoBackupChange() {
   try {
     await setAutoBackupSettings(autoEnabled.value, autoInterval.value)
     successMsg.value = `自动备份${autoEnabled.value ? '已启用' : '已禁用'}`
-  } catch {
-    // error already in compError
+    toast.success(autoEnabled.value ? '自动备份已启用' : '自动备份已禁用')
+  } catch (err) {
+    errorMsg.value = String(err)
+    toast.error('保存设置失败', String(err))
   } finally {
     isSavingAuto.value = false
   }
@@ -270,10 +277,12 @@ async function handleExport() {
     const result = await exportBackup(exportPassword.value)
     if (result) {
       successMsg.value = `备份导出成功`
+      toast.success('备份已创建', result)
       exportPassword.value = ''
     }
-  } catch {
-    // error already in compError
+  } catch (err) {
+    errorMsg.value = String(err)
+    toast.error('备份导出失败', String(err))
   }
 }
 
@@ -287,9 +296,10 @@ async function confirmImport() {
   confirmVisible.value = false
   try {
     await importBackup(undefined, importPassword.value)
+    toast.success('数据已恢复')
     // Page will reload on success
-  } catch {
-    // error already in compError
+  } catch (err) {
+    toast.error('数据恢复失败', String(err))
   }
 }
 
@@ -316,15 +326,15 @@ watch(compSuccess, (s) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--ui-overlay-bg);
   backdrop-filter: blur(2px);
 }
 
 .modal-box {
-  background: #252526;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: var(--ui-bg-secondary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-lg);
   width: 90%;
   max-width: 520px;
   max-height: 90vh;
@@ -345,24 +355,24 @@ watch(compSuccess, (s) => {
 .modal-title {
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: var(--ui-text-primary);
   margin: 0;
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  color: #888;
+  color: var(--ui-text-tertiary);
   font-size: 20px;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   line-height: 1;
 }
 
 .close-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--ui-text-primary);
+  background: var(--ui-bg-hover);
 }
 
 .modal-body {
@@ -381,7 +391,7 @@ watch(compSuccess, (s) => {
 .section-title {
   font-size: 13px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .section-title-row {
@@ -392,22 +402,22 @@ watch(compSuccess, (s) => {
 
 .section-desc {
   font-size: 12px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   line-height: 1.5;
 }
 
 .section-desc.muted {
-  color: #666;
+  color: var(--ui-text-tertiary);
   font-size: 11px;
 }
 
 .section-desc.warning {
-  color: #e5a050;
+  color: var(--ui-warning);
 }
 
 .divider {
   height: 1px;
-  background: #3c3c3c;
+  background: var(--ui-border);
   margin: 4px 0;
 }
 
@@ -420,23 +430,23 @@ watch(compSuccess, (s) => {
 .form-group label {
   font-size: 12px;
   font-weight: 500;
-  color: #ccc;
+  color: var(--ui-text-secondary);
 }
 
 .form-group input[type="text"],
 .form-group input[type="password"] {
   padding: 8px 10px;
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #e0e0e0;
+  background: var(--ui-input-bg);
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-primary);
   font-size: 13px;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--ui-transition-fast);
 }
 
 .form-group input:focus {
-  border-color: #3d8bfd;
+  border-color: var(--ui-accent);
 }
 
 .modal-footer {
@@ -449,14 +459,14 @@ watch(compSuccess, (s) => {
 
 .btn {
   padding: 6px 16px;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  background: #333;
-  color: #e0e0e0;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-primary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+  transition: background-color var(--ui-transition-fast), border-color var(--ui-transition-fast), opacity var(--ui-transition-fast);
 }
 
 .btn:disabled {
@@ -465,8 +475,8 @@ watch(compSuccess, (s) => {
 }
 
 .btn:hover:not(:disabled) {
-  background: #3c3c3c;
-  border-color: #555;
+  background: var(--ui-border);
+  border-color: var(--ui-border-hover);
 }
 
 .btn-sm {
@@ -475,35 +485,35 @@ watch(compSuccess, (s) => {
 }
 
 .btn-primary {
-  background: #3d8bfd;
-  border-color: #3d8bfd;
-  color: #fff;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #5a9bff;
-  border-color: #5a9bff;
+  background: var(--ui-accent-hover);
+  border-color: var(--ui-accent-hover);
 }
 
 .btn-danger {
-  background: #c42b1c;
-  border-color: #c42b1c;
-  color: #fff;
+  background: var(--ui-danger);
+  border-color: var(--ui-danger);
+  color: var(--ui-text-inverse);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #d93d30;
-  border-color: #d93d30;
+  background: var(--ui-danger-hover);
+  border-color: var(--ui-danger-hover);
 }
 
 .empty-state {
   padding: 16px;
   text-align: center;
-  color: #666;
+  color: var(--ui-text-tertiary);
   font-size: 13px;
-  background: #1e1e1e;
-  border-radius: 4px;
-  border: 1px solid #3c3c3c;
+  background: var(--ui-input-bg);
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-border);
 }
 
 .backup-list {
@@ -519,9 +529,9 @@ watch(compSuccess, (s) => {
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
+  background: var(--ui-input-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
 }
 
 .backup-info {
@@ -533,7 +543,7 @@ watch(compSuccess, (s) => {
 
 .backup-name {
   font-size: 12px;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -542,19 +552,19 @@ watch(compSuccess, (s) => {
 
 .backup-meta {
   font-size: 11px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .meta-dot {
-  color: #555;
+  color: var(--ui-text-tertiary);
 }
 
 .badge-encrypted {
-  background: #2d4a1e;
-  color: #7ec850;
+  background: var(--ui-bg-active);
+  color: var(--ui-success);
   padding: 1px 5px;
   border-radius: 3px;
   font-size: 10px;
@@ -563,32 +573,32 @@ watch(compSuccess, (s) => {
 
 .message {
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 12px;
   word-break: break-all;
 }
 
 .message-error {
-  background: #2d1f1f;
-  border: 1px solid #e5484d;
-  color: #ff7b7b;
+  background: var(--ui-bg-active);
+  border: 1px solid var(--ui-danger);
+  color: var(--ui-danger);
 }
 
 .message-success {
-  background: #1f2d1f;
-  border: 1px solid #30a46c;
-  color: #7ec850;
+  background: var(--ui-bg-active);
+  border: 1px solid var(--ui-success);
+  color: var(--ui-success);
 }
 
 .confirm-text {
   font-size: 13px;
-  color: #ccc;
+  color: var(--ui-text-secondary);
   margin: 0 0 8px;
   line-height: 1.6;
 }
 
 .confirm-text.warn {
-  color: #e5a050;
+  color: var(--ui-warning);
   font-weight: 500;
 }
 
@@ -611,8 +621,8 @@ watch(compSuccess, (s) => {
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background-color: #3c3c3c;
-  transition: 0.2s;
+  background-color: var(--ui-border);
+  transition: var(--ui-transition-fast);
   border-radius: 20px;
 }
 
@@ -624,12 +634,12 @@ watch(compSuccess, (s) => {
   left: 3px;
   bottom: 3px;
   background-color: white;
-  transition: 0.2s;
+  transition: var(--ui-transition-fast);
   border-radius: 50%;
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background-color: #3d8bfd;
+  background-color: var(--ui-accent);
 }
 
 .toggle-switch input:checked + .toggle-slider::before {
@@ -639,24 +649,24 @@ watch(compSuccess, (s) => {
 /* Select input */
 .select-input {
   padding: 8px 10px;
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #e0e0e0;
+  background: var(--ui-input-bg);
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-primary);
   font-size: 13px;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--ui-transition-fast);
   cursor: pointer;
   appearance: auto;
 }
 
 .select-input:focus {
-  border-color: #3d8bfd;
+  border-color: var(--ui-accent);
 }
 
 /* Transition */
 .modal-enter-active {
-  animation: modal-in 0.2s ease-out;
+  animation: modal-in var(--ui-transition-fast) ease-out;
 }
 
 .modal-leave-active {
@@ -683,5 +693,21 @@ watch(compSuccess, (s) => {
     opacity: 0;
     transform: scale(0.95);
   }
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>
