@@ -86,6 +86,14 @@ export function GetSnapshotMarkdown(arg1) {
   return window['go']['main']['App']['GetSnapshotMarkdown'](arg1);
 }
 
+export function GetShortcuts() {
+  return window['go']['main']['App']['GetShortcuts']();
+}
+
+export function GetTheme() {
+  return window['go']['main']['App']['GetTheme']();
+}
+
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
@@ -136,6 +144,14 @@ export function SaveChatMessage(arg1) {
 
 export function SetAutoBackupSettings(arg1, arg2) {
   return window['go']['main']['App']['SetAutoBackupSettings'](arg1, arg2);
+}
+
+export function SetShortcuts(arg1) {
+  return window['go']['main']['App']['SetShortcuts'](arg1);
+}
+
+export function SetTheme(arg1) {
+  return window['go']['main']['App']['SetTheme'](arg1);
 }
 
 export function ShowOpenBackupDialog() {

@@ -31,6 +31,10 @@ export function GetChatHistory(arg1: string): Promise<Array<ai.ChatMessage>>;
 export function SaveChatMessage(arg1: ai.ChatMessage): Promise<void>;
 export function ClearChatHistory(arg1: string): Promise<void>;
 
+// Shortcut Methods
+export function GetShortcuts():Promise<string>;
+export function SetShortcuts(arg1:string):Promise<void>;
+
 // Template Methods
 export function UpdateResumeTemplate(arg1: string, arg2: string): Promise<void>;
 export function UpdateResumeCustomCSS(arg1: string, arg2: string): Promise<void>;
@@ -47,3 +51,9 @@ export function DiffSnapshots(arg1: string, arg2: string): Promise<model.DiffRes
 export function RollbackToSnapshot(arg1: string, arg2: string): Promise<model.Snapshot>;
 export function DeleteSnapshot(arg1: string): Promise<void>;
 export function GetSnapshotMarkdown(arg1: string): Promise<Array<string>>;
+
+// Theme Methods
+export function GetTheme(): Promise<string>;
+export function SetTheme(arg1: string): Promise<void>;
+
+// Backup Methods

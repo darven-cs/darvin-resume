@@ -45,6 +45,10 @@ export function GetSnapshot(arg1:string):Promise<model.Snapshot>;
 
 export function GetSnapshotMarkdown(arg1:string):Promise<string>;
 
+export function GetTheme():Promise<string>;
+
+export function GetShortcuts():Promise<string>;
+
 export function Greet(arg1:string):Promise<string>;
 
 export function ListBackups():Promise<string>;
@@ -70,6 +74,10 @@ export function SaveAIConfig(arg1:Record<string, any>):Promise<void>;
 export function SaveChatMessage(arg1:ai.ChatMessage):Promise<void>;
 
 export function SetAutoBackupSettings(arg1:boolean,arg2:string):Promise<void>;
+
+export function SetShortcuts(arg1:string):Promise<void>;
+
+export function SetTheme(arg1:string):Promise<void>;
 
 export function ShowOpenBackupDialog():Promise<string>;
 

@@ -43,6 +43,9 @@ func (a *App) startup(ctx context.Context) {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
+	// Initialize theme from settings
+	a.initTheme(ctx)
+
 	// Initialize auto backup scheduler based on saved settings
 	a.initAutoBackup(ctx)
 }
@@ -58,6 +61,55 @@ func (a *App) initAutoBackup(ctx context.Context) {
 		a.backupSched.Start(ctx)
 		log.Printf("[App] auto backup scheduler started: interval=%v", dur)
 	}
+}
+
+// initTheme reads theme setting and sets initial window background color.
+func (a *App) initTheme(ctx context.Context) {
+	theme := settings.GetWithDefault(ctx, "ui.theme", "system")
+
+	// Listen for frontend theme-changed events
+	runtime.EventsOn(ctx, "theme-changed", func(optional ...interface{}) {
+		if len(optional) > 0 {
+			if themeStr, ok := optional[0].(string); ok {
+				a.applyWindowBg(themeStr)
+			}
+		}
+	})
+
+	a.applyWindowBg(theme)
+}
+
+// applyWindowBg sets the Wails window background color based on theme.
+func (a *App) applyWindowBg(theme string) {
+	dark := theme == "dark"
+	if theme == "system" {
+		// Default to dark for desktop apps; frontend will override with actual system preference
+		dark = true
+	}
+
+	if dark {
+		runtime.WindowSetBackgroundColour(a.ctx, 30, 30, 30, 255)
+	} else {
+		runtime.WindowSetBackgroundColour(a.ctx, 255, 255, 255, 255)
+	}
+}
+
+// GetTheme returns the current UI theme setting.
+func (a *App) GetTheme() string {
+	return settings.GetWithDefault(a.ctx, "ui.theme", "system")
+}
+
+// SetTheme persists the UI theme setting.
+// Valid values: "light", "dark", "system".
+func (a *App) SetTheme(theme string) error {
+	if theme != "light" && theme != "dark" && theme != "system" {
+		return fmt.Errorf("invalid theme value: %s (must be light, dark, or system)", theme)
+	}
+	if err := settings.Set(a.ctx, "ui.theme", theme); err != nil {
+		return err
+	}
+	a.applyWindowBg(theme)
+	return nil
 }
 
 // shutdown is called when the app stops
@@ -567,6 +619,28 @@ func (a *App) AISendChatMessage(operationId string, prompt string, jobTarget str
 func (a *App) AICancelOperation(operationId string) error {
 	ai.CancelOperation(operationId)
 	return nil
+}
+
+// GetShortcuts returns user-customized keyboard shortcuts as JSON.
+// Returns only overridden shortcuts (not defaults).
+// Key: "ui.shortcuts" in settings table.
+func (a *App) GetShortcuts() (string, error) {
+	val, err := settings.Get(a.ctx, "ui.shortcuts")
+	if err != nil {
+		// No shortcuts saved yet — return empty object
+		return "{}", nil
+	}
+	return val, nil
+}
+
+// SetShortcuts persists user-customized keyboard shortcuts.
+// shortcutsJSON must be a valid JSON object mapping shortcut IDs to key bindings.
+func (a *App) SetShortcuts(shortcutsJSON string) error {
+	// Basic JSON validation
+	if !json.Valid([]byte(shortcutsJSON)) {
+		return fmt.Errorf("invalid JSON format for shortcuts")
+	}
+	return settings.Set(a.ctx, "ui.shortcuts", shortcutsJSON)
 }
 
 // UpdateResumeTemplate 更新简历模板 ID
