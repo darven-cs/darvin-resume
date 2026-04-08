@@ -60,21 +60,35 @@
       </div>
 
       <!-- 空状态 -->
-      <div v-else-if="filteredResumes.length === 0 && !searchQuery" class="empty-state">
-        <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-        </svg>
-        <p class="empty-title">还没有简历</p>
-        <p class="empty-desc">点击上方「新建简历」按钮开始创建</p>
-        <button class="empty-create-btn" @click="showCreateModal = true">新建简历</button>
-      </div>
+      <EmptyState
+        v-else-if="filteredResumes.length === 0 && !searchQuery"
+        title="还没有简历"
+        description="点击下方按钮创建你的第一份简历"
+        action-label="新建简历"
+        @action="showCreateModal = true"
+      >
+        <template #icon>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </template>
+      </EmptyState>
 
       <!-- 搜索无结果 -->
-      <div v-else-if="filteredResumes.length === 0 && searchQuery" class="empty-state">
-        <p class="empty-title">未找到匹配的简历</p>
-        <p class="empty-desc">尝试其他关键词搜索</p>
-      </div>
+      <EmptyState
+        v-else-if="filteredResumes.length === 0 && searchQuery"
+        title="未找到匹配的简历"
+        description="尝试调整搜索关键词"
+      >
+        <template #icon>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </template>
+      </EmptyState>
 
       <!-- 卡片网格 -->
       <div v-else class="resume-grid">
@@ -101,7 +115,7 @@
     />
 
     <!-- 设置弹窗 -->
-    <AIConfigModal
+    <SettingsDialog
       :visible="showSettings"
       @close="showSettings = false"
     />
@@ -121,8 +135,9 @@ import { useResumeList } from '../composables/useResumeList'
 import ResumeCard from '../components/ResumeCard.vue'
 import CreateModeModal from '../components/CreateModeModal.vue'
 import RecycleBinSection from '../components/RecycleBinSection.vue'
-import AIConfigModal from '../components/AIConfigModal.vue'
+import SettingsDialog from '../components/SettingsDialog.vue'
 import BackupManager from '../components/BackupManager.vue'
+import EmptyState from '../components/EmptyState.vue'
 
 const router = useRouter()
 const {
@@ -238,7 +253,7 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #181818;
+  background: var(--ui-bg-primary);
   overflow: hidden;
 }
 
@@ -248,7 +263,7 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-bottom: 1px solid #2d2d2d;
+  border-bottom: 1px solid var(--ui-border);
   flex-shrink: 0;
 }
 
@@ -260,7 +275,7 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
 .app-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #e6edf3;
+  color: var(--ui-text-primary);
   margin: 0;
 }
 
@@ -280,28 +295,28 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
 .search-icon {
   position: absolute;
   left: 10px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   pointer-events: none;
 }
 
 .search-input {
   padding: 6px 12px 6px 32px;
   font-size: 0.875rem;
-  color: #e6edf3;
-  background: #2d2d2d;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
+  color: var(--ui-text-primary);
+  background: var(--ui-input-bg);
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-md);
   outline: none;
   width: 200px;
-  transition: border-color 0.2s, width 0.2s;
+  transition: border-color var(--ui-transition-fast), width var(--ui-transition-fast);
 }
 
 .search-input::placeholder {
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .search-input:focus {
-  border-color: #58a6ff;
+  border-color: var(--ui-border-focus);
   width: 260px;
 }
 
@@ -312,17 +327,17 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
-  background: #2d2d2d;
-  color: #8b949e;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-tertiary);
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .sort-btn:hover {
-  border-color: #58a6ff;
-  color: #e6edf3;
+  border-color: var(--ui-border-focus);
+  color: var(--ui-text-primary);
 }
 
 /* 新建按钮 */
@@ -333,16 +348,16 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
   padding: 6px 16px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #fff;
-  background: #238636;
+  color: var(--ui-text-inverse);
+  background: var(--ui-success);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--ui-radius-md);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .create-btn:hover {
-  background: #2ea043;
+  background: var(--ui-success-hover);
 }
 
 /* 设置按钮 */
@@ -352,17 +367,17 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
-  background: #2d2d2d;
-  color: #8b949e;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-tertiary);
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .settings-btn:hover {
-  border-color: #58a6ff;
-  color: #e6edf3;
+  border-color: var(--ui-border-focus);
+  color: var(--ui-text-primary);
 }
 
 /* 备份按钮 */
@@ -372,17 +387,17 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
-  background: #2d2d2d;
-  color: #8b949e;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-tertiary);
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .backup-btn:hover {
-  border-color: #58a6ff;
-  color: #e6edf3;
+  border-color: var(--ui-border-focus);
+  color: var(--ui-text-primary);
 }
 
 /* 卡片网格区域 */
@@ -405,52 +420,7 @@ async function handleCreateMode(mode: 'wizard' | 'blank') {
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   font-size: 0.875rem;
-}
-
-/* 空状态 */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-height: 300px;
-  text-align: center;
-}
-
-.empty-icon {
-  color: #3c3c3c;
-  margin-bottom: 16px;
-}
-
-.empty-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #e6edf3;
-  margin: 0 0 8px 0;
-}
-
-.empty-desc {
-  font-size: 0.875rem;
-  color: #8b949e;
-  margin: 0 0 24px 0;
-}
-
-.empty-create-btn {
-  padding: 8px 24px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #fff;
-  background: #238636;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.empty-create-btn:hover {
-  background: #2ea043;
 }
 </style>

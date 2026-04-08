@@ -10,15 +10,25 @@
       <div class="page-content" v-html="pageContent" />
       <div class="page-number">{{ index + 1 }}</div>
     </div>
-    <div v-if="pages.length === 0" class="preview-empty">
-      开始编写 Markdown，预览将实时显示在这里
-    </div>
+    <EmptyState
+      v-if="pages.length === 0"
+      title="开始编写简历"
+      description="在编辑器中输入 Markdown，预览将实时显示在这里"
+    >
+      <template #icon>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+      </template>
+    </EmptyState>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, watch, onMounted, onUnmounted, ref } from 'vue'
 import { renderMarkdown } from '../utils/markdown'
+import EmptyState from './EmptyState.vue'
 import '../styles/editor.css'
 // 静态导入所有模板 CSS（确保打包）
 import '../styles/templates/template-minimal.css'
@@ -232,7 +242,7 @@ defineExpose({
   width: 100%;
   height: 100%;
   overflow: auto;
-  background: #f0f0f0;
+  background: var(--ui-bg-toolbar);
   padding: 20px;
   box-sizing: border-box;
 }
@@ -243,7 +253,7 @@ defineExpose({
   min-height: 297mm;
   margin: 0 auto 20px;
   background: white;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--ui-shadow-md);
   box-sizing: border-box;
   /* Bug修复：移除硬编码 padding，改用 editor.css 全局 CSS 变量 --resume-padding */
 }
@@ -269,7 +279,7 @@ defineExpose({
   right: 0;
   font-size: 11px;
   color: rgba(0, 120, 212, 0.5);
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--ui-font-sans);
 }
 
 /* 分页符参考线 */
@@ -284,14 +294,7 @@ defineExpose({
   bottom: 8mm;
   right: 20mm;
   font-size: 10pt;
-  color: #888;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-.preview-empty {
-  text-align: center;
-  color: #8b949e;
-  padding: 3rem;
-  font-size: 0.9rem;
+  color: var(--ui-text-tertiary);
+  font-family: var(--ui-font-sans);
 }
 </style>
