@@ -1,7 +1,10 @@
 package database
 
 import (
+	"context"
 	"database/sql"
+	"embed"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,6 +15,9 @@ import (
 
 	"github.com/pressly/goose/v3"
 )
+
+//go:embed migrations/*.sql
+var migrationsFS embed.FS
 
 // DB is the global database connection
 var DB *sql.DB
@@ -78,15 +84,17 @@ func Init() error {
 	return nil
 }
 
-// runMigrations runs database migrations using goose
+// runMigrations runs database migrations using goose with embedded SQL files
 func runMigrations(dbPath string) error {
-	// Get the directory containing migration files
-	_, currentFile, _, _ := runtime.Caller(0)
-	migrationsDir := filepath.Join(filepath.Dir(currentFile), "migrations")
-
-	// Run migrations with options
-	goose.SetDialect("sqlite")
-	if err := goose.Up(DB, migrationsDir); err != nil {
+	migrationsSubFS, err := fs.Sub(migrationsFS, "migrations")
+	if err != nil {
+		return err
+	}
+	provider, err := goose.NewProvider(goose.DialectSQLite3, DB, migrationsSubFS)
+	if err != nil {
+		return err
+	}
+	if _, err := provider.Up(context.Background()); err != nil {
 		return err
 	}
 
@@ -189,10 +197,7 @@ func Reinit() error {
 	}
 
 	// Run migrations
-	_, currentFile, _, _ := runtime.Caller(0)
-	migrationsDir := filepath.Join(filepath.Dir(currentFile), "migrations")
-	goose.SetDialect("sqlite")
-	if err := goose.Up(DB, migrationsDir); err != nil {
+	if err := runMigrations(dbPath); err != nil {
 		return err
 	}
 
