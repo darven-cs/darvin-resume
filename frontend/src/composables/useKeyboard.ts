@@ -239,8 +239,11 @@ export function useKeyboard() {
    * Update a shortcut's key binding (user customization).
    */
   async function setCustomKey(id: string, newKey: string) {
+    // Update binding if it exists (may not if EditorView hasn't registered)
     const binding = bindings.get(id)
-    if (!binding) return
+    if (binding) {
+      binding.customKey = newKey
+    }
 
     // Validate: check for conflicts
     const conflict = findConflict(id, newKey)
@@ -248,7 +251,7 @@ export function useKeyboard() {
       console.warn(`[useKeyboard] Shortcut conflict: ${newKey} already used by ${conflict.label}`)
     }
 
-    binding.customKey = newKey
+    // Always save override regardless of binding registration
     overrides.value = { ...overrides.value, [id]: newKey }
     await saveOverrides(overrides.value)
   }
@@ -258,9 +261,10 @@ export function useKeyboard() {
    */
   async function resetToDefault(id: string) {
     const binding = bindings.get(id)
-    if (!binding) return
+    if (binding) {
+      delete binding.customKey
+    }
 
-    delete binding.customKey
     const newOverrides = { ...overrides.value }
     delete newOverrides[id]
     overrides.value = newOverrides

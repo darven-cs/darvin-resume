@@ -117,11 +117,12 @@
                     v-for="opt in themeOptions"
                     :key="opt.value"
                     :class="['theme-option', { active: themeMode === opt.value }]"
+                    @click="handleThemeChange(opt.value)"
                   >
                     <input
                       type="radio"
                       :value="opt.value"
-                      v-model="themeMode"
+                      :checked="themeMode === opt.value"
                       class="theme-radio"
                     />
                     <span class="theme-icon">{{ opt.icon }}</span>
@@ -250,16 +251,15 @@ const errors = computed(() => {
 // Theme
 const { mode: themeMode, isDark, setTheme } = useTheme()
 
+function handleThemeChange(value: string) {
+  setTheme(value as 'light' | 'dark' | 'system')
+}
+
 const themeOptions = [
   { value: 'light', label: '浅色', icon: '☀️' },
   { value: 'dark', label: '深色', icon: '🌙' },
   { value: 'system', label: '跟随系统', icon: '💻' },
 ]
-
-// Theme changes apply immediately
-watch(themeMode, (newMode) => {
-  setTheme(newMode as 'light' | 'dark' | 'system')
-})
 
 // Load config when modal opens
 watch(() => props.visible, async (isVisible) => {

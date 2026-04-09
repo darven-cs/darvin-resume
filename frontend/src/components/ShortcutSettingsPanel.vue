@@ -19,7 +19,7 @@
               :class="['shortcut-key', {
                 'listening': listeningId === item.id,
                 'has-conflict': getConflict(item.id),
-                'is-custom': keyboard.isCustom(item.id),
+                'is-custom': isCustom(item.id),
               }]"
               @click="startListening(item.id)"
               :title="listeningId === item.id ? '按下新快捷键...' : '点击修改快捷键'"
@@ -35,7 +35,7 @@
               !
             </span>
             <button
-              v-if="keyboard.isCustom(item.id)"
+              v-if="isCustom(item.id)"
               class="reset-btn"
               @click="handleReset(item.id)"
               title="恢复默认"
@@ -65,8 +65,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useKeyboard, formatKeyDisplay as fmtDisplay } from '../composables/useKeyboard'
-import type { ShortcutBinding } from '../composables/useKeyboard'
+import { useKeyboard, formatKeyDisplay as fmtDisplay, DEFAULT_SHORTCUTS, normalizeKey } from '../composables/useKeyboard'
 
 const keyboard = useKeyboard()
 
@@ -84,8 +83,9 @@ interface ShortcutGroup {
   items: ShortcutItem[]
 }
 
+// 直接从 DEFAULT_SHORTCUTS 构建列表，不依赖 register() 后的 bindings Map
 const groupedShortcuts = computed<ShortcutGroup[]>(() => {
-  const bindings = keyboard.getAllBindings()
+  const currentOverrides = keyboard.overrides.value
   const groups: ShortcutGroup[] = []
 
   const groupMap: Record<string, { label: string; items: ShortcutItem[] }> = {
@@ -94,15 +94,16 @@ const groupedShortcuts = computed<ShortcutGroup[]>(() => {
     file: { label: '文件', items: [] },
   }
 
-  for (const b of bindings) {
-    const prefix = b.id.split('.')[0]
+  for (const def of DEFAULT_SHORTCUTS) {
+    const prefix = def.id.split('.')[0]
     const group = groupMap[prefix]
     if (group) {
+      const customKey = currentOverrides[def.id]
       group.items.push({
-        id: b.id,
-        label: b.label,
-        effectiveKey: b.customKey || b.defaultKey,
-        scope: b.scope,
+        id: def.id,
+        label: def.label,
+        effectiveKey: customKey || def.defaultKey,
+        scope: def.scope,
       })
     }
   }
@@ -120,13 +121,22 @@ function formatKeyDisplay(keyStr: string): string {
   return fmtDisplay(keyStr)
 }
 
+function isCustom(id: string): boolean {
+  return !!keyboard.overrides.value[id]
+}
+
 function getConflict(id: string): string | null {
-  const binding = keyboard.getAllBindings().find(b => b.id === id)
-  if (!binding) return null
-  const key = binding.customKey || binding.defaultKey
-  const conflict = keyboard.findConflict(id, key)
-  if (conflict) {
-    return `与"${conflict.label}"冲突`
+  const currentOverrides = keyboard.overrides.value
+  const myKey = currentOverrides[id] || DEFAULT_SHORTCUTS.find(s => s.id === id)?.defaultKey
+  if (!myKey) return null
+
+  const normalizedMyKey = normalizeKey(myKey)
+  for (const def of DEFAULT_SHORTCUTS) {
+    if (def.id === id) continue
+    const theirKey = currentOverrides[def.id] || def.defaultKey
+    if (normalizeKey(theirKey) === normalizedMyKey) {
+      return `与"${def.label}"冲突`
+    }
   }
   return null
 }
