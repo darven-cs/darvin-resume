@@ -80,10 +80,10 @@ jobs:
           choco install nsis -y
           echo "C:\Program Files (x86)\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
-      - name: Build Windows NSIS installer
+      - name: Build Windows NSIS installer (WebView2 embedded)
         run: |
           cd frontend; npm install; cd ..
-          wails build --platform windows/amd64 --nsis
+          wails build --platform windows/amd64 --nsis -webview2 embed
           Get-ChildItem build/bin/
 
       - name: Upload Windows installer
@@ -93,60 +93,10 @@ jobs:
           path: build/bin/
           retention-days: 5
 
-  # ─────────────────────────────────────────────────────────────────────────
-  # Job 3: Build macOS app bundle
-  # ─────────────────────────────────────────────────────────────────────────
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install Wails CLI
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-
-      - name: Build macOS app bundle
-        run: |
-          cd frontend && npm install && cd ..
-          wails build --platform darwin/universal
-
-      - name: Install create-dmg
-        run: |
-          brew install create-dmg
-
-      - name: Package as DMG
-        run: |
-          create-dmg \
-            --volname "Darvin-Resume" \
-            --window-pos 200 120 \
-            --window-size 600 400 \
-            --icon-size 100 \
-            --icon "Darvin-Resume.app" 150 185 \
-            --app-drop-link 450 185 \
-            --hide-extension "Darvin-Resume.app" \
-            --format UDBZ \
-            "build/Darvin-Resume-macos-universal.dmg" \
-            "build/bin/Darvin-Resume.app"
-
-      - name: Verify DMG
-        run: |
-          ls -lh build/*.dmg
-          hdiutil imageinfo build/Darvin-Resume-macos-universal.dmg 2>&1 | grep -E "(Format:|Max Compression)" || true
-
-      - name: Upload macOS DMG
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-universal-dmg
-          path: build/Darvin-Resume-macos-universal.dmg
-          retention-days: 5
+  # macOS build removed — keeping Windows + Linux only
 
   # ─────────────────────────────────────────────────────────────────────────
-  # Job 4: Package Linux binary into .deb and .rpm (runs after build-linux)
+  # Job 3: Package Linux binary into .deb and .rpm (runs after build-linux)
   # ─────────────────────────────────────────────────────────────────────────
   package-deb-rpm:
     needs: build-linux
@@ -269,7 +219,7 @@ jobs:
   # Job 5: Create GitHub Release (runs after all builds)
   # ─────────────────────────────────────────────────────────────────────────
   release:
-    needs: [build-linux, build-windows, build-macos, package-deb-rpm]
+    needs: [build-linux, build-windows, package-deb-rpm]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
@@ -286,8 +236,6 @@ jobs:
           # Linux packages: copy both .deb and .rpm from linux-packages artifact
           cp artifacts/linux-packages/*.deb release-assets/ 2>/dev/null || true
           cp artifacts/linux-packages/*.rpm release-assets/ 2>/dev/null || true
-          # macOS DMG from macos-universal-dmg artifact
-          cp artifacts/macos-universal-dmg/*.dmg release-assets/ 2>/dev/null || true
           # Windows installer from windows-amd64-installer artifact
           # (artifact is the whole build/bin/ dir — filter to only .exe files)
           find artifacts/windows-amd64-installer -name "*.exe" -type f -exec cp {} release-assets/ \; 2>/dev/null || true
