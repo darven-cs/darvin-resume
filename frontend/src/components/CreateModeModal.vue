@@ -78,7 +78,7 @@ function selectMode(mode: 'wizard' | 'blank') {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--ui-overlay-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,10 +90,10 @@ function selectMode(mode: 'wizard' | 'blank') {
   width: 480px;
   max-width: 90vw;
   padding: 32px;
-  background: #252526;
-  border: 1px solid #3c3c3c;
+  background: var(--ui-bg-secondary);
+  border: 1px solid var(--ui-border);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--ui-shadow-lg);
 }
 
 .modal-close {
@@ -106,29 +106,29 @@ function selectMode(mode: 'wizard' | 'blank') {
   width: 32px;
   height: 32px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--ui-radius-md);
   background: transparent;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .modal-close:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #e6edf3;
+  color: var(--ui-text-primary);
 }
 
 .modal-title {
   margin: 0 0 4px 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #e6edf3;
+  color: var(--ui-text-primary);
 }
 
 .modal-subtitle {
   margin: 0 0 24px 0;
   font-size: 0.875rem;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .mode-options {
@@ -142,18 +142,18 @@ function selectMode(mode: 'wizard' | 'blank') {
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
-  background: #1e1e1e;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-bg-primary);
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color var(--ui-transition-fast), background var(--ui-transition-fast);
   text-align: left;
   width: 100%;
 }
 
 .mode-card:hover {
-  border-color: #58a6ff;
-  background: #2a2d2e;
+  border-color: var(--ui-accent);
+  background: var(--ui-bg-hover);
 }
 
 .mode-icon {
@@ -162,26 +162,26 @@ function selectMode(mode: 'wizard' | 'blank') {
   justify-content: center;
   width: 48px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: var(--ui-radius-lg);
   background: rgba(88, 166, 255, 0.1);
-  color: #58a6ff;
+  color: var(--ui-accent);
   flex-shrink: 0;
 }
 
 .mode-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--ui-radius-sm);
 }
 
 .mode-name {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #e6edf3;
+  color: var(--ui-text-primary);
 }
 
 .mode-desc {
   font-size: 0.8rem;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 </style>

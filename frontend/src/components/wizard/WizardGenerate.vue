@@ -172,13 +172,13 @@ function generatePreview(type: string, data: any): string {
 .generate-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   margin: 0 0 6px 0;
 }
 
 .generate-desc {
   font-size: 13px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   margin: 0;
 }
 
@@ -193,9 +193,9 @@ function generatePreview(type: string, data: any): string {
 }
 
 .preview-module {
-  background: #2d2d2d;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
   overflow: hidden;
 }
 
@@ -204,7 +204,7 @@ function generatePreview(type: string, data: any): string {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-bottom: 1px solid #3c3c3c;
+  border-bottom: 1px solid var(--ui-border);
 }
 
 .module-icon {
@@ -214,7 +214,7 @@ function generatePreview(type: string, data: any): string {
 .module-name {
   font-size: 13px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   flex: 1;
 }
 
@@ -225,13 +225,13 @@ function generatePreview(type: string, data: any): string {
 }
 
 .module-status.filled {
-  background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
+  background: var(--ui-bg-active);
+  color: var(--ui-success);
 }
 
 .module-status.empty {
   background: rgba(139, 148, 158, 0.15);
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .module-preview {
@@ -241,7 +241,7 @@ function generatePreview(type: string, data: any): string {
 .preview-text {
   margin: 0;
   font-size: 12px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
@@ -251,10 +251,10 @@ function generatePreview(type: string, data: any): string {
 /* 底部操作 */
 .generate-footer {
   padding: 12px 20px;
-  border-top: 1px solid #3c3c3c;
+  border-top: 1px solid var(--ui-border);
   display: flex;
   justify-content: space-between;
-  background: #252526;
+  background: var(--ui-bg-secondary);
 }
 
 .generate-btn {
@@ -267,18 +267,18 @@ function generatePreview(type: string, data: any): string {
 
 .btn-primary {
   padding: 8px 20px;
-  background: #0e639c;
-  color: #ffffff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #1177bb;
+  background: var(--ui-accent-hover);
 }
 
 .btn-primary:disabled {
@@ -288,17 +288,17 @@ function generatePreview(type: string, data: any): string {
 
 .btn-secondary {
   padding: 8px 16px;
-  background: #3c3c3c;
-  color: #cccccc;
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-secondary);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 13px;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .btn-secondary:hover {
-  background: #4a4a4a;
+  background: var(--ui-border);
 }
 
 /* 加载动画 */
@@ -307,7 +307,7 @@ function generatePreview(type: string, data: any): string {
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
+  border-top-color: var(--ui-text-inverse);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

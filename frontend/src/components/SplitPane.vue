@@ -139,7 +139,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .divider:hover,
@@ -150,14 +150,14 @@ onUnmounted(() => {
 .divider-handle {
   width: 2px;
   height: 40px;
-  background: #ccc;
+  background: var(--ui-text-secondary);
   border-radius: 1px;
-  transition: background-color 0.15s, height 0.15s;
+  transition: background-color var(--ui-transition-fast), height var(--ui-transition-fast);
 }
 
 .divider:hover .divider-handle,
 .divider.dragging .divider-handle {
-  background: #0078d4;
+  background: var(--ui-accent);
   height: 48px;
 }
 

@@ -66,22 +66,22 @@ defineEmits<{
 }
 
 .status-dot.green {
-  background: #2ea043;
+  background: var(--ui-success);
 }
 
 .status-dot.orange {
-  background: #d29922;
+  background: var(--ui-warning);
 }
 
 .status-dot.red {
-  background: #f85149;
+  background: var(--ui-danger);
 }
 
 .status-spinner {
   width: 12px;
   height: 12px;
-  border: 2px solid #555;
-  border-top-color: #8b949e;
+  border: 2px solid var(--ui-border);
+  border-top-color: var(--ui-text-tertiary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   flex-shrink: 0;
@@ -92,7 +92,7 @@ defineEmits<{
 }
 
 .status-text {
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   font-size: 12px;
 }
 
@@ -104,11 +104,11 @@ defineEmits<{
   height: 20px;
   padding: 0;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   background: transparent;
-  color: #f85149;
+  color: var(--ui-danger);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .retry-btn:hover {
@@ -118,7 +118,7 @@ defineEmits<{
 /* Transition animations */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity var(--ui-transition-fast) ease;
 }
 
 .fade-enter-from,

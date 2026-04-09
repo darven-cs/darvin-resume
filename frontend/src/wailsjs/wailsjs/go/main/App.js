@@ -78,16 +78,16 @@ export function GetResume(arg1) {
   return window['go']['main']['App']['GetResume'](arg1);
 }
 
+export function GetShortcuts() {
+  return window['go']['main']['App']['GetShortcuts']();
+}
+
 export function GetSnapshot(arg1) {
   return window['go']['main']['App']['GetSnapshot'](arg1);
 }
 
 export function GetSnapshotMarkdown(arg1) {
   return window['go']['main']['App']['GetSnapshotMarkdown'](arg1);
-}
-
-export function GetShortcuts() {
-  return window['go']['main']['App']['GetShortcuts']();
 }
 
 export function GetTheme() {

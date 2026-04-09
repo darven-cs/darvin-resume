@@ -91,15 +91,15 @@ function handleClose() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--ui-overlay-bg);
   backdrop-filter: blur(2px);
 }
 
 .modal-box {
-  background: #252526;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: var(--ui-bg-secondary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-lg);
   width: 90%;
   max-width: 440px;
   overflow: hidden;
@@ -116,13 +116,13 @@ function handleClose() {
   flex-shrink: 0;
   width: 24px;
   height: 24px;
-  color: #f5a623;
+  color: var(--ui-warning);
 }
 
 .modal-title {
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: var(--ui-text-inverse);
   margin: 0;
 }
 
@@ -131,7 +131,7 @@ function handleClose() {
 }
 
 .modal-content {
-  color: #ccc;
+  color: var(--ui-text-secondary);
   font-size: 13px;
   line-height: 1.6;
   margin: 0 0 12px;
@@ -140,7 +140,7 @@ function handleClose() {
 .suggestions-list {
   margin: 0;
   padding: 0 0 0 20px;
-  color: #aaa;
+  color: var(--ui-text-secondary);
   font-size: 13px;
   line-height: 1.8;
 }
@@ -159,39 +159,39 @@ function handleClose() {
 
 .modal-btn {
   padding: 6px 16px;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  background: #333;
-  color: #e0e0e0;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-primary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
+  transition: background-color var(--ui-transition-fast), border-color var(--ui-transition-fast);
 }
 
 .modal-btn:hover {
-  background: #3c3c3c;
-  border-color: #555;
+  background: var(--ui-border);
+  border-color: var(--ui-text-tertiary);
 }
 
 .modal-btn-primary {
-  background: #3d8bfd;
-  border-color: #3d8bfd;
-  color: #fff;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .modal-btn-primary:hover {
-  background: #5a9bff;
-  border-color: #5a9bff;
+  background: var(--ui-accent-hover);
+  border-color: var(--ui-accent-hover);
 }
 
 /* Transition */
 .modal-enter-active {
-  animation: modal-in 0.2s ease-out;
+  animation: modal-in var(--ui-transition-normal) ease-out;
 }
 
 .modal-leave-active {
-  animation: modal-out 0.15s ease-in;
+  animation: modal-out var(--ui-transition-fast) ease-in;
 }
 
 @keyframes modal-in {

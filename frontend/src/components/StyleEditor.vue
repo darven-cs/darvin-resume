@@ -482,8 +482,8 @@ onMounted(() => {
 .style-editor {
   width: 280px;
   height: 100%;
-  background: #ffffff;
-  border-left: 1px solid #e0e0e0;
+  background: var(--ui-bg-primary);
+  border-left: 1px solid var(--ui-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -495,8 +495,8 @@ onMounted(() => {
   height: 40px;
   min-height: 40px;
   padding: 0 12px;
-  background: #f8f8f8;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--ui-bg-secondary);
+  border-bottom: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -505,7 +505,7 @@ onMounted(() => {
 .style-editor-title {
   font-size: 13px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--ui-text-primary);
 }
 
 .close-btn {
@@ -516,15 +516,15 @@ onMounted(() => {
   height: 24px;
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   cursor: pointer;
-  color: #666;
+  color: var(--ui-text-tertiary);
   padding: 0;
 }
 
 .close-btn:hover {
-  background: #e0e0e0;
-  color: #1a1a1a;
+  background: var(--ui-border);
+  color: var(--ui-text-primary);
 }
 
 /* Body */
@@ -550,12 +550,12 @@ onMounted(() => {
   justify-content: space-between;
   font-size: 12px;
   font-weight: 500;
-  color: #333;
+  color: var(--ui-text-primary);
 }
 
 .control-value {
   font-size: 11px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   font-weight: 400;
   font-family: monospace;
 }
@@ -570,8 +570,8 @@ onMounted(() => {
 .color-picker {
   width: 36px;
   height: 28px;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
   padding: 2px;
   cursor: pointer;
   flex-shrink: 0;
@@ -579,7 +579,7 @@ onMounted(() => {
 
 .color-presets {
   display: flex;
-  gap: 4px;
+  gap: var(--ui-radius-sm);
   flex-wrap: wrap;
 }
 
@@ -598,8 +598,8 @@ onMounted(() => {
 }
 
 .color-preset.active {
-  border-color: #0078d4;
-  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 2px var(--ui-bg-active);
 }
 
 /* Range Slider */
@@ -607,7 +607,7 @@ onMounted(() => {
   width: 100%;
   height: 4px;
   appearance: none;
-  background: #e0e0e0;
+  background: var(--ui-border);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -618,9 +618,9 @@ onMounted(() => {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #0078d4;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  background: var(--ui-accent);
+  border: 2px solid var(--ui-bg-primary);
+  box-shadow: var(--ui-shadow-sm);
   cursor: pointer;
 }
 
@@ -628,9 +628,9 @@ onMounted(() => {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #0078d4;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  background: var(--ui-accent);
+  border: 2px solid var(--ui-bg-primary);
+  box-shadow: var(--ui-shadow-sm);
   cursor: pointer;
 }
 
@@ -638,7 +638,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   font-size: 10px;
-  color: #aaa;
+  color: var(--ui-text-secondary);
   padding: 0 2px;
 }
 
@@ -647,16 +647,16 @@ onMounted(() => {
   width: 100%;
   padding: 6px 8px;
   font-size: 12px;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  background: #fff;
-  color: #333;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-primary);
+  color: var(--ui-text-primary);
   cursor: pointer;
   outline: none;
 }
 
 .font-select:focus {
-  border-color: #0078d4;
+  border-color: var(--ui-accent);
 }
 
 /* Custom CSS */
@@ -670,8 +670,8 @@ onMounted(() => {
   padding: 8px;
   font-size: 11px;
   font-family: 'SF Mono', 'Consolas', monospace;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
   resize: vertical;
   outline: none;
   line-height: 1.5;
@@ -679,7 +679,7 @@ onMounted(() => {
 }
 
 .custom-css-textarea:focus {
-  border-color: #0078d4;
+  border-color: var(--ui-accent);
 }
 
 .css-meta {
@@ -687,11 +687,11 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   font-size: 10px;
-  color: #aaa;
+  color: var(--ui-text-secondary);
 }
 
 .removed-hint {
-  color: #e67e22;
+  color: var(--ui-warning);
 }
 
 .char-count {
@@ -707,43 +707,43 @@ onMounted(() => {
 }
 
 .status-idle {
-  background: #f0f0f0;
-  color: #888;
+  background: var(--ui-bg-secondary);
+  color: var(--ui-text-tertiary);
 }
 
 .status-pass {
-  background: #d4edda;
-  color: #155724;
+  background: var(--ui-bg-active);
+  color: var(--ui-success);
 }
 
 .status-filtered {
-  background: #fff3cd;
-  color: #856404;
+  background: var(--ui-bg-active);
+  color: var(--ui-warning);
 }
 
 /* Reset */
 .reset-group {
   margin-top: auto;
   padding-top: 8px;
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid var(--ui-border);
 }
 
 .reset-btn {
   width: 100%;
   padding: 8px 12px;
   font-size: 12px;
-  background: #fff;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  color: #666;
+  background: var(--ui-bg-primary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-tertiary);
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
+  transition: background-color var(--ui-transition-fast), border-color var(--ui-transition-fast);
 }
 
 .reset-btn:hover {
-  background: #f5f5f5;
-  border-color: #bbb;
-  color: #333;
+  background: var(--ui-bg-secondary);
+  border-color: var(--ui-border-hover);
+  color: var(--ui-text-primary);
 }
 
 /* Reset Confirm Dialog */
@@ -753,7 +753,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--ui-overlay-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -761,12 +761,12 @@ onMounted(() => {
 }
 
 .reset-confirm-dialog {
-  background: #fff;
-  border-radius: 8px;
+  background: var(--ui-bg-primary);
+  border-radius: var(--ui-radius-lg);
   padding: 24px;
   width: 280px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--ui-shadow-md);
 }
 
 .dialog-icon {
@@ -777,13 +777,13 @@ onMounted(() => {
 .dialog-message {
   font-size: 14px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--ui-text-primary);
   margin-bottom: 4px;
 }
 
 .dialog-sub {
   font-size: 12px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   margin-bottom: 16px;
 }
 
@@ -796,27 +796,27 @@ onMounted(() => {
   flex: 1;
   padding: 8px;
   font-size: 13px;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   cursor: pointer;
   border: none;
   font-weight: 500;
 }
 
 .dialog-btn.cancel {
-  background: #f0f0f0;
-  color: #333;
+  background: var(--ui-bg-secondary);
+  color: var(--ui-text-primary);
 }
 
 .dialog-btn.cancel:hover {
-  background: #e0e0e0;
+  background: var(--ui-border);
 }
 
 .dialog-btn.confirm {
-  background: #dc3545;
-  color: #fff;
+  background: var(--ui-danger);
+  color: var(--ui-text-inverse);
 }
 
 .dialog-btn.confirm:hover {
-  background: #c82333;
+  background: var(--ui-danger-hover);
 }
 </style>

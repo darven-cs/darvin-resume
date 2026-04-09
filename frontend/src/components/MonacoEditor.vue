@@ -734,18 +734,18 @@ onUnmounted(() => {
 
 .fold-gutter-expanded::before {
   content: '▼';
-  color: #6e7681;
+  color: var(--ui-text-tertiary);
   font-size: 8px;
 }
 
 .fold-gutter-collapsed::before {
   content: '▶';
-  color: #6e7681;
+  color: var(--ui-text-tertiary);
   font-size: 8px;
 }
 
 .fold-gutter:hover::before {
-  color: #c6c6c6;
+  color: var(--ui-text-secondary);
 }
 
 .fold-decoration {

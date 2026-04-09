@@ -1,0 +1,100 @@
+/* ============================================================
+ * Darvin-Resume UI Design Tokens
+ *
+ * --ui-*  前缀控制 UI 外壳（sidebar/toolbar/dialog）
+ * --resume-* 前缀控制简历内容渲染（editor.css 中定义）
+ * 两套变量互不干扰
+ * ============================================================ */
+
+:root,
+[data-theme="light"] {
+  /* 基础色板 — 背景 */
+  --ui-bg-primary: #ffffff;
+  --ui-bg-secondary: #f5f5f5;
+  --ui-bg-tertiary: #ebebeb;
+  --ui-bg-sidebar: #f8f8f8;
+  --ui-bg-toolbar: #f0f0f0;
+  --ui-bg-hover: rgba(0, 0, 0, 0.06);
+  --ui-bg-active: rgba(0, 0, 0, 0.1);
+
+  /* 文字色 */
+  --ui-text-primary: #1a1a1a;
+  --ui-text-secondary: #666666;
+  --ui-text-tertiary: #999999;
+  --ui-text-inverse: #ffffff;
+
+  /* 边框 */
+  --ui-border: #e0e0e0;
+  --ui-border-focus: #007acc;
+  --ui-border-hover: #cccccc;
+
+  /* 交互色 */
+  --ui-accent: #007acc;
+  --ui-accent-hover: #005a9e;
+  --ui-danger: #d32f2f;
+  --ui-danger-hover: #b71c1c;
+  --ui-success: #238636;
+  --ui-success-hover: #2ea043;
+  --ui-warning: #f57c00;
+  --ui-info: #3d8bfd;
+
+  /* 间距 */
+  --ui-spacing-xs: 4px;
+  --ui-spacing-sm: 8px;
+  --ui-spacing-md: 12px;
+  --ui-spacing-lg: 16px;
+  --ui-spacing-xl: 24px;
+
+  /* 字体 */
+  --ui-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --ui-font-mono: 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace;
+
+  /* 圆角 */
+  --ui-radius-sm: 4px;
+  --ui-radius-md: 6px;
+  --ui-radius-lg: 8px;
+
+  /* 阴影 */
+  --ui-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --ui-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --ui-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+  /* 过渡 */
+  --ui-transition-fast: 150ms ease;
+  --ui-transition-normal: 250ms ease;
+
+  /* 输入框 */
+  --ui-input-bg: #ffffff;
+  --ui-input-border: #e0e0e0;
+
+  /* 模态框遮罩 */
+  --ui-overlay-bg: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] {
+  --ui-bg-primary: #1e1e1e;
+  --ui-bg-secondary: #252526;
+  --ui-bg-tertiary: #2d2d2d;
+  --ui-bg-sidebar: #181818;
+  --ui-bg-toolbar: #2d2d2d;
+  --ui-bg-hover: rgba(255, 255, 255, 0.08);
+  --ui-bg-active: rgba(255, 255, 255, 0.12);
+
+  --ui-text-primary: #e0e0e0;
+  --ui-text-secondary: #aaaaaa;
+  --ui-text-tertiary: #777777;
+  --ui-text-inverse: #1a1a1a;
+
+  --ui-border: #3c3c3c;
+  --ui-border-focus: #007acc;
+  --ui-border-hover: #4c4c4c;
+
+  --ui-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --ui-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --ui-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+  --ui-input-bg: #1e1e1e;
+  --ui-input-border: #3c3c3c;
+
+  --ui-overlay-bg: rgba(0, 0, 0, 0.6);
+}

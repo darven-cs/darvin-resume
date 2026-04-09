@@ -107,11 +107,11 @@ onUnmounted(() => {
   position: fixed;
   z-index: 10000;
   min-width: 160px;
-  background: #252526;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
+  background: var(--ui-bg-secondary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
   padding: 4px 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--ui-shadow-md);
 }
 
 .menu-item {
@@ -121,7 +121,7 @@ onUnmounted(() => {
   padding: 6px 12px;
   background: transparent;
   border: none;
-  color: #cccccc;
+  color: var(--ui-text-secondary);
   font-size: 13px;
   text-align: left;
   cursor: pointer;
@@ -130,17 +130,17 @@ onUnmounted(() => {
 }
 
 .menu-item:hover:not(.disabled) {
-  background: #094771;
-  color: #ffffff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .menu-item.danger:hover:not(.disabled) {
-  background: #5a1d1d;
-  color: #ff6b6b;
+  background: var(--ui-bg-active);
+  color: var(--ui-danger);
 }
 
 .menu-item.disabled {
-  color: #5a5a5a;
+  color: var(--ui-text-tertiary);
   cursor: not-allowed;
 }
 
@@ -155,7 +155,7 @@ onUnmounted(() => {
 
 .menu-shortcut {
   font-size: 11px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .context-menu-overlay {

@@ -172,11 +172,11 @@ function handleReject() {
 
 .ai-diff-view {
   position: fixed;
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
-  border-left: 3px solid #409eff;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  background: var(--ui-bg-primary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  border-left: 3px solid var(--ui-accent);
+  box-shadow: var(--ui-shadow-lg);
   overflow: hidden;
   pointer-events: auto;
   display: flex;
@@ -188,20 +188,20 @@ function handleReject() {
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  background: #252526;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--ui-bg-secondary);
+  border-bottom: 1px solid var(--ui-border);
   gap: 8px;
 }
 
 .diff-title {
   font-size: 13px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .diff-operation {
   font-size: 11px;
-  color: #409eff;
+  color: var(--ui-accent);
   background: rgba(64, 158, 255, 0.15);
   padding: 1px 6px;
   border-radius: 3px;
@@ -210,17 +210,17 @@ function handleReject() {
 .diff-actions {
   margin-left: auto;
   display: flex;
-  gap: 6px;
+  gap: var(--ui-radius-sm);
 }
 
 .diff-btn {
   padding: 4px 14px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s, opacity 0.15s;
+  transition: background-color var(--ui-transition-fast), opacity var(--ui-transition-fast);
 }
 
 .diff-btn:disabled {
@@ -229,23 +229,23 @@ function handleReject() {
 }
 
 .diff-btn-accept {
-  background: #409eff;
-  color: #ffffff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .diff-btn-accept:hover:not(:disabled) {
-  background: #337ecc;
+  background: var(--ui-accent-hover);
 }
 
 .diff-btn-reject {
-  background: #3c3c3c;
-  color: #cccccc;
-  border: 1px solid #4c4c4c;
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-secondary);
+  border: 1px solid var(--ui-border-hover);
 }
 
 .diff-btn-reject:hover {
-  background: #4c4c4c;
-  color: #ffffff;
+  background: var(--ui-border-hover);
+  color: var(--ui-text-inverse);
 }
 
 /* Diff Content */
@@ -263,7 +263,7 @@ function handleReject() {
 }
 
 .diff-content::-webkit-scrollbar-thumb {
-  background: #4c4c4c;
+  background: var(--ui-border-hover);
   border-radius: 3px;
 }
 
@@ -297,11 +297,11 @@ function handleReject() {
 }
 
 .diff-line-added .line-prefix {
-  color: #4caf50;
+  color: var(--ui-success);
 }
 
 .diff-line-added .line-text {
-  color: #b5e8b5;
+  color: var(--ui-success);
 }
 
 .diff-line-removed {
@@ -309,11 +309,11 @@ function handleReject() {
 }
 
 .diff-line-removed .line-prefix {
-  color: #ef5350;
+  color: var(--ui-danger);
 }
 
 .diff-line-removed .line-text {
-  color: #f5b7b7;
+  color: var(--ui-danger);
 }
 
 .diff-line-unchanged {
@@ -321,11 +321,11 @@ function handleReject() {
 }
 
 .diff-line-unchanged .line-prefix {
-  color: #6e7681;
+  color: var(--ui-text-tertiary);
 }
 
 .diff-line-unchanged .line-text {
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 /* Loading & Empty */
@@ -333,7 +333,7 @@ function handleReject() {
 .diff-empty {
   padding: 20px 12px;
   text-align: center;
-  color: #6e7681;
+  color: var(--ui-text-tertiary);
   font-size: 13px;
 }
 </style>

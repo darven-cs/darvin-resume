@@ -99,24 +99,24 @@ function handleOperation(operation: string) {
   align-items: center;
   gap: 2px;
   padding: 4px 6px;
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  background: var(--ui-bg-primary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-md);
   min-height: 36px;
 }
 
 .toolbar-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ui-radius-sm);
   padding: 4px 10px;
   min-width: 42px;
   height: 28px;
   background: transparent;
   border: none;
-  border-radius: 4px;
-  color: #cccccc;
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-secondary);
   font-size: 12px;
   cursor: pointer;
   transition: background-color 0.1s, color 0.1s;
@@ -124,16 +124,16 @@ function handleOperation(operation: string) {
 }
 
 .toolbar-btn:hover:not(:disabled) {
-  background: #094771;
-  color: #ffffff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .toolbar-btn:active:not(:disabled) {
-  background: #0d5a8c;
+  background: var(--ui-accent-hover);
 }
 
 .toolbar-btn:disabled {
-  color: #5a5a5a;
+  color: var(--ui-text-tertiary);
   cursor: not-allowed;
 }
 
@@ -149,8 +149,8 @@ function handleOperation(operation: string) {
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: 2px solid #4a4a4a;
-  border-top-color: #cccccc;
+  border: 2px solid var(--ui-border);
+  border-top-color: var(--ui-text-secondary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

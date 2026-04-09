@@ -41,13 +41,13 @@ export function GetChatHistory(arg1:string):Promise<Array<ai.ChatMessage>>;
 
 export function GetResume(arg1:string):Promise<model.Resume>;
 
+export function GetShortcuts():Promise<string>;
+
 export function GetSnapshot(arg1:string):Promise<model.Snapshot>;
 
 export function GetSnapshotMarkdown(arg1:string):Promise<string>;
 
 export function GetTheme():Promise<string>;
-
-export function GetShortcuts():Promise<string>;
 
 export function Greet(arg1:string):Promise<string>;
 

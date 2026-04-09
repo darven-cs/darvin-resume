@@ -84,7 +84,7 @@ function handleSelect(templateId: string) {
 .selector-title {
   font-size: 12px;
   font-weight: 600;
-  color: #555;
+  color: var(--ui-text-tertiary);
 }
 
 /* 网格布局：大屏4列，中屏2列，小屏1列 */
@@ -104,9 +104,9 @@ function handleSelect(templateId: string) {
 .template-card {
   display: flex;
   flex-direction: column;
-  border-radius: 6px;
+  border-radius: var(--ui-radius-md);
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background-color 0.15s;
+  transition: transform var(--ui-transition-fast), box-shadow var(--ui-transition-fast), border-color var(--ui-transition-fast), background-color var(--ui-transition-fast);
   border: 2px solid transparent;
   background: #fff;
   overflow: hidden;
@@ -114,11 +114,11 @@ function handleSelect(templateId: string) {
 
 .template-card:hover {
   transform: scale(1.03);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--ui-shadow-md);
 }
 
 .template-card.active {
-  border-color: #0078d4;
+  border-color: var(--ui-accent);
   background-color: rgba(0, 120, 212, 0.06);
 }
 
@@ -136,7 +136,7 @@ function handleSelect(templateId: string) {
   width: 100%;
   height: 100%;
   background: #fff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--ui-border);
   padding: 6px;
   box-sizing: border-box;
 }
@@ -166,14 +166,14 @@ function handleSelect(templateId: string) {
 .preview-section-title {
   font-size: 6px;
   font-weight: 600;
-  border-bottom: 0.5px solid #ccc;
+  border-bottom: 0.5px solid var(--ui-text-secondary);
   margin-bottom: 2px;
   padding-bottom: 1px;
 }
 
 .preview-line {
   height: 3px;
-  background: #e0e0e0;
+  background: var(--ui-border);
   border-radius: 1px;
   margin-bottom: 2px;
 }
@@ -208,7 +208,7 @@ function handleSelect(templateId: string) {
 
 .preview-dual-col .preview-header {
   width: 35%;
-  border-right: 0.5px solid #e0e0e0;
+  border-right: 0.5px solid var(--ui-border);
   padding-right: 3px;
   flex-shrink: 0;
 }
@@ -260,17 +260,17 @@ function handleSelect(templateId: string) {
 .template-name {
   font-size: 11px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: var(--ui-text-primary);
 }
 
 .template-card.active .template-name {
-  color: #0078d4;
+  color: var(--ui-accent);
   font-weight: 600;
 }
 
 .template-tag {
   font-size: 9px;
-  color: #888;
+  color: var(--ui-text-tertiary);
   background: #f0f0f0;
   padding: 1px 5px;
   border-radius: 10px;
@@ -278,6 +278,6 @@ function handleSelect(templateId: string) {
 
 .template-card.active .template-tag {
   background: rgba(0, 120, 212, 0.15);
-  color: #0078d4;
+  color: var(--ui-accent);
 }
 </style>

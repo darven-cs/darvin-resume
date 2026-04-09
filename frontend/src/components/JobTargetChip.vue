@@ -87,19 +87,19 @@ watch(() => props.modelValue, () => {
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: rgba(14, 99, 156, 0.25);
-  border: 1px solid rgba(0, 120, 212, 0.4);
+  background: var(--ui-bg-active);
+  border: 1px solid var(--ui-accent);
   border-radius: 16px;
   cursor: pointer;
   font-size: 12px;
-  color: #79c0ff;
-  transition: background-color 0.15s, border-color 0.15s;
+  color: var(--ui-accent);
+  transition: background-color var(--ui-transition-fast), border-color var(--ui-transition-fast);
   user-select: none;
 }
 
 .chip-display:hover {
-  background: rgba(14, 99, 156, 0.4);
-  border-color: rgba(0, 120, 212, 0.6);
+  background: var(--ui-bg-active);
+  border-color: var(--ui-accent-hover);
 }
 
 .chip-icon {
@@ -107,27 +107,27 @@ watch(() => props.modelValue, () => {
 }
 
 .chip-text {
-  color: #c9d1d9;
+  color: var(--ui-text-secondary);
 }
 
 .chip-edit-hint {
   font-size: 10px;
-  color: #5a5a5a;
+  color: var(--ui-text-tertiary);
   margin-left: 2px;
 }
 
 .chip-display:hover .chip-edit-hint {
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 /* Edit Mode */
 .chip-edit {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ui-radius-sm);
   padding: 2px 4px 2px 6px;
-  background: #1e1e1e;
-  border: 1px solid #0078d4;
+  background: var(--ui-bg-primary);
+  border: 1px solid var(--ui-accent);
   border-radius: 16px;
 }
 
@@ -139,7 +139,7 @@ watch(() => props.modelValue, () => {
 .chip-input {
   background: transparent;
   border: none;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   font-size: 12px;
   width: 160px;
   padding: 2px 0;
@@ -147,7 +147,7 @@ watch(() => props.modelValue, () => {
 }
 
 .chip-input::placeholder {
-  color: #5a5a5a;
+  color: var(--ui-text-tertiary);
 }
 
 .chip-confirm,
@@ -162,18 +162,18 @@ watch(() => props.modelValue, () => {
 }
 
 .chip-confirm {
-  color: #3fb950;
+  color: var(--ui-success);
 }
 
 .chip-confirm:hover {
-  background: rgba(63, 185, 80, 0.2);
+  background: var(--ui-bg-active);
 }
 
 .chip-cancel {
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .chip-cancel:hover {
-  background: rgba(139, 148, 158, 0.2);
+  background: var(--ui-bg-active);
 }
 </style>

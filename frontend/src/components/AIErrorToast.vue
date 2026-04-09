@@ -212,29 +212,29 @@ onUnmounted(() => {
   padding: 14px 16px;
   min-width: 320px;
   max-width: 480px;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-md), 0 0 0 1px rgba(255, 255, 255, 0.1);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 13px;
   line-height: 1.5;
 }
 
 .toast-error {
-  background: #2d1f1f;
-  border: 1px solid #e5484d;
-  color: #ff7b7b;
+  background: var(--ui-bg-active);
+  border: 1px solid var(--ui-danger);
+  color: var(--ui-danger);
 }
 
 .toast-warning {
-  background: #2d2619;
-  border: 1px solid #f5a623;
-  color: #ffd180;
+  background: var(--ui-bg-active);
+  border: 1px solid var(--ui-warning);
+  color: var(--ui-warning);
 }
 
 .toast-info {
-  background: #1f2d2d;
-  border: 1px solid #3db9db;
-  color: #7ec8e3;
+  background: var(--ui-bg-active);
+  border: 1px solid var(--ui-accent);
+  color: var(--ui-accent);
 }
 
 .toast-icon {
@@ -247,9 +247,9 @@ onUnmounted(() => {
   margin-top: 1px;
 }
 
-.toast-error .toast-icon { color: #e5484d; }
-.toast-warning .toast-icon { color: #f5a623; }
-.toast-info .toast-icon { color: #3db9db; }
+.toast-error .toast-icon { color: var(--ui-danger); }
+.toast-warning .toast-icon { color: var(--ui-warning); }
+.toast-info .toast-icon { color: var(--ui-accent); }
 
 .toast-content {
   flex: 1;
@@ -277,7 +277,7 @@ onUnmounted(() => {
 }
 
 .toast-detail code {
-  color: #999;
+  color: var(--ui-text-tertiary);
   font-family: 'SF Mono', 'Consolas', monospace;
   white-space: pre-wrap;
   word-break: break-all;
@@ -286,7 +286,7 @@ onUnmounted(() => {
 .toast-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--ui-radius-sm);
   flex-shrink: 0;
 }
 
@@ -296,21 +296,21 @@ onUnmounted(() => {
   justify-content: center;
   padding: 4px 10px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s, opacity 0.15s;
+  transition: background-color var(--ui-transition-fast), opacity var(--ui-transition-fast);
   white-space: nowrap;
 }
 
 .toast-btn-primary {
-  background: #3d8bfd;
-  color: #fff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .toast-btn-primary:hover {
-  background: #5a9bff;
+  background: var(--ui-accent-hover);
 }
 
 .toast-btn-secondary {
@@ -341,11 +341,11 @@ onUnmounted(() => {
 
 /* Transition animations */
 .toast-enter-active {
-  animation: toast-in 0.2s ease-out;
+  animation: toast-in var(--ui-transition-fast) ease-out;
 }
 
 .toast-leave-active {
-  animation: toast-out 0.15s ease-in;
+  animation: toast-out var(--ui-transition-fast) ease-in;
 }
 
 @keyframes toast-in {

@@ -409,12 +409,12 @@ function handleClose() {
   right: 0;
   width: 400px;
   height: 100vh;
-  background: #ffffff;
-  border-left: 1px solid #e0e0e0;
+  background: var(--ui-bg-primary);
+  border-left: 1px solid var(--ui-border);
   display: flex;
   flex-direction: column;
   z-index: 100;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--ui-shadow-lg);
 }
 
 /* Slide animation */
@@ -433,8 +433,8 @@ function handleClose() {
   height: 48px;
   min-height: 48px;
   padding: 0 12px;
-  background: #f8f8f8;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--ui-bg-secondary);
+  border-bottom: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -443,7 +443,7 @@ function handleClose() {
 .sidebar-title {
   font-size: 14px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--ui-text-primary);
 }
 
 .header-actions {
@@ -456,23 +456,23 @@ function handleClose() {
   height: 28px;
   border: none;
   background: transparent;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
-  transition: background-color 0.15s, color 0.15s;
+  color: var(--ui-text-tertiary);
+  transition: background-color var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .icon-btn:hover {
-  background: #e8e8e8;
-  color: #1a1a1a;
+  background: var(--ui-bg-hover);
+  color: var(--ui-text-primary);
 }
 
 .close-btn:hover {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--ui-danger);
+  color: var(--ui-text-inverse);
 }
 
 /* Messages */
@@ -492,15 +492,15 @@ function handleClose() {
   justify-content: center;
   gap: 12px;
   height: 100%;
-  color: #888;
+  color: var(--ui-text-tertiary);
   font-size: 13px;
 }
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid #e0e0e0;
-  border-top-color: #0078d4;
+  border: 2px solid var(--ui-border);
+  border-top-color: var(--ui-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -533,15 +533,15 @@ function handleClose() {
 }
 
 .message.user .message-bubble {
-  background: #0078d4;
-  color: #ffffff;
-  border-bottom-right-radius: 4px;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
+  border-bottom-right-radius: var(--ui-radius-sm);
 }
 
 .message.assistant .message-bubble {
-  background: #f1f3f4;
-  color: #1a1a1a;
-  border-bottom-left-radius: 4px;
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-primary);
+  border-bottom-left-radius: var(--ui-radius-sm);
 }
 
 .message-content {
@@ -572,14 +572,14 @@ function handleClose() {
   gap: 4px;
   margin-top: 8px;
   padding: 4px 8px;
-  background: rgba(0, 0, 0, 0.06);
+  background: var(--ui-bg-hover);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 11px;
   color: inherit;
   cursor: pointer;
   opacity: 0.7;
-  transition: opacity 0.15s, background-color 0.15s;
+  transition: opacity var(--ui-transition-fast), background-color var(--ui-transition-fast);
 }
 
 .message.user .insert-btn {
@@ -588,7 +588,7 @@ function handleClose() {
 
 .message.assistant .insert-btn:hover {
   opacity: 1;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--ui-bg-active);
 }
 
 .message.user .insert-btn:hover {
@@ -599,8 +599,8 @@ function handleClose() {
 /* Quoted text indicator */
 .quoted-indicator {
   padding: 8px 16px;
-  background: #fff7ed;
-  border-top: 1px solid #fed7aa;
+  background: var(--ui-bg-secondary);
+  border-top: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -609,7 +609,7 @@ function handleClose() {
 .quoted-content {
   flex: 1;
   font-size: 12px;
-  color: #9a3412;
+  color: var(--ui-warning);
   overflow: hidden;
   display: flex;
   gap: 4px;
@@ -632,23 +632,23 @@ function handleClose() {
   border: none;
   background: transparent;
   cursor: pointer;
-  color: #9a3412;
+  color: var(--ui-warning);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   flex-shrink: 0;
 }
 
 .clear-quote:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--ui-bg-hover);
 }
 
 /* Input area */
 .input-area {
   padding: 12px 16px;
-  border-top: 1px solid #e0e0e0;
-  background: #fafafa;
+  border-top: 1px solid var(--ui-border);
+  background: var(--ui-bg-secondary);
 }
 
 .input-wrapper {
@@ -660,25 +660,25 @@ function handleClose() {
 .message-input {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid #d0d0d0;
-  border-radius: 8px;
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-lg);
   font-size: 13px;
   font-family: inherit;
   line-height: 1.4;
   resize: none;
   outline: none;
-  background: #ffffff;
+  background: var(--ui-input-bg);
   max-height: 120px;
   min-height: 36px;
-  transition: border-color 0.15s;
+  transition: border-color var(--ui-transition-fast);
 }
 
 .message-input:focus {
-  border-color: #0078d4;
+  border-color: var(--ui-accent);
 }
 
 .message-input:disabled {
-  background: #f5f5f5;
+  background: var(--ui-bg-tertiary);
   cursor: not-allowed;
 }
 
@@ -686,23 +686,23 @@ function handleClose() {
   width: 36px;
   height: 36px;
   border: none;
-  background: #0078d4;
-  color: #ffffff;
-  border-radius: 8px;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
+  border-radius: var(--ui-radius-lg);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background-color 0.15s, opacity 0.15s;
+  transition: background-color var(--ui-transition-fast), opacity var(--ui-transition-fast);
 }
 
 .send-btn:hover:not(:disabled) {
-  background: #0066b8;
+  background: var(--ui-accent-hover);
 }
 
 .send-btn:disabled {
-  background: #b0b0b0;
+  background: var(--ui-text-tertiary);
   cursor: not-allowed;
 }
 </style>

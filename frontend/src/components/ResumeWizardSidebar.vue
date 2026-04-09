@@ -466,8 +466,8 @@ watch(() => props.visible, (v) => {
   right: 0;
   width: 420px;
   height: 100vh;
-  background: #1e1e1e;
-  border-left: 1px solid #3c3c3c;
+  background: var(--ui-bg-primary);
+  border-left: 1px solid var(--ui-border);
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -490,8 +490,8 @@ watch(() => props.visible, (v) => {
   height: 48px;
   min-height: 48px;
   padding: 0 16px;
-  background: #252526;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--ui-bg-secondary);
+  border-bottom: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -500,7 +500,7 @@ watch(() => props.visible, (v) => {
 .wizard-title {
   font-size: 14px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .close-btn {
@@ -508,18 +508,18 @@ watch(() => props.visible, (v) => {
   height: 28px;
   border: none;
   background: transparent;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8b949e;
-  transition: background-color 0.15s, color 0.15s;
+  color: var(--ui-text-tertiary);
+  transition: background-color var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .close-btn:hover {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--ui-bg-active);
+  color: var(--ui-danger);
 }
 
 /* 步骤指示器 */
@@ -529,8 +529,8 @@ watch(() => props.visible, (v) => {
   justify-content: center;
   padding: 12px 16px;
   gap: 4px;
-  background: #252526;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--ui-bg-secondary);
+  border-bottom: 1px solid var(--ui-border);
 }
 
 .step-dot {
@@ -538,24 +538,24 @@ watch(() => props.visible, (v) => {
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 12px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   cursor: default;
-  transition: color 0.2s, background-color 0.2s;
+  transition: color var(--ui-transition-normal), background-color var(--ui-transition-normal);
 }
 
 .step-dot.completed {
-  color: #4fc3f7;
+  color: var(--ui-accent);
   cursor: pointer;
 }
 
 .step-dot.completed:hover {
-  background: rgba(79, 195, 247, 0.1);
+  background: var(--ui-bg-active);
 }
 
 .step-dot.active {
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   font-weight: 600;
 }
 
@@ -567,18 +567,18 @@ watch(() => props.visible, (v) => {
   align-items: center;
   justify-content: center;
   font-size: 11px;
-  background: #3c3c3c;
-  color: #8b949e;
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-tertiary);
 }
 
 .step-dot.active .step-number {
-  background: #0078d4;
-  color: #ffffff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
 }
 
 .step-dot.completed .step-number {
-  background: #2ea043;
-  color: #ffffff;
+  background: var(--ui-success);
+  color: var(--ui-text-inverse);
 }
 
 .step-label {
@@ -606,7 +606,7 @@ watch(() => props.visible, (v) => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--ui-overlay-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -614,9 +614,9 @@ watch(() => props.visible, (v) => {
 }
 
 .confirm-dialog {
-  background: #2d2d2d;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
   padding: 24px;
   max-width: 360px;
   width: 90%;
@@ -624,7 +624,7 @@ watch(() => props.visible, (v) => {
 
 .confirm-text {
   font-size: 14px;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   margin: 0 0 20px 0;
   line-height: 1.5;
 }
@@ -638,31 +638,31 @@ watch(() => props.visible, (v) => {
 /* 通用按钮 */
 .btn-primary {
   padding: 8px 16px;
-  background: #0e639c;
-  color: #ffffff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 13px;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .btn-primary:hover {
-  background: #1177bb;
+  background: var(--ui-accent-hover);
 }
 
 .btn-secondary {
   padding: 8px 16px;
-  background: #3c3c3c;
-  color: #cccccc;
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-secondary);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 13px;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .btn-secondary:hover {
-  background: #4a4a4a;
+  background: var(--ui-border);
 }
 </style>

@@ -506,11 +506,11 @@ function acceptPolish() {
 /* 进度头 */
 .form-header {
   padding: 12px 20px;
-  border-bottom: 1px solid #3c3c3c;
+  border-bottom: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #252526;
+  background: var(--ui-bg-secondary);
 }
 
 .back-btn {
@@ -519,17 +519,17 @@ function acceptPolish() {
   gap: 4px;
   padding: 4px 8px;
   background: transparent;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #8b949e;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-tertiary);
   font-size: 12px;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color var(--ui-transition-fast), border-color var(--ui-transition-fast);
 }
 
 .back-btn:hover {
-  color: #e0e0e0;
-  border-color: #4c4c4c;
+  color: var(--ui-text-primary);
+  border-color: var(--ui-border-hover);
 }
 
 .form-progress {
@@ -542,19 +542,19 @@ function acceptPolish() {
 .progress-text {
   font-size: 13px;
   font-weight: 500;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .progress-bar {
   height: 3px;
-  background: #3c3c3c;
+  background: var(--ui-border);
   border-radius: 2px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: #0078d4;
+  background: var(--ui-accent);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -579,48 +579,48 @@ function acceptPolish() {
 .field-label {
   font-size: 12px;
   font-weight: 500;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .field-input {
   padding: 8px 10px;
-  background: #2d2d2d;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #e0e0e0;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-primary);
   font-size: 13px;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--ui-transition-fast);
 }
 
 .field-input:focus {
-  border-color: #0078d4;
+  border-color: var(--ui-border-focus);
 }
 
 .field-input::placeholder {
-  color: #5a5a5a;
+  color: var(--ui-text-tertiary);
 }
 
 .field-textarea {
   padding: 8px 10px;
-  background: #2d2d2d;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #e0e0e0;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-primary);
   font-size: 13px;
   font-family: inherit;
   line-height: 1.5;
   outline: none;
   resize: vertical;
-  transition: border-color 0.15s;
+  transition: border-color var(--ui-transition-fast);
 }
 
 .field-textarea:focus {
-  border-color: #0078d4;
+  border-color: var(--ui-border-focus);
 }
 
 .field-textarea::placeholder {
-  color: #5a5a5a;
+  color: var(--ui-text-tertiary);
 }
 
 /* 列表项卡片 */
@@ -631,9 +631,9 @@ function acceptPolish() {
 }
 
 .list-item-card {
-  background: #2a2a2a;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -649,7 +649,7 @@ function acceptPolish() {
 .item-card-title {
   font-size: 13px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .remove-btn {
@@ -657,41 +657,41 @@ function acceptPolish() {
   height: 22px;
   border: none;
   background: transparent;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.15s, color 0.15s;
+  border-radius: var(--ui-radius-sm);
+  transition: background-color var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .remove-btn:hover {
-  background: rgba(220, 38, 38, 0.15);
-  color: #f87171;
+  background: var(--ui-bg-active);
+  color: var(--ui-danger);
 }
 
 .add-btn {
   padding: 8px;
   background: transparent;
-  border: 1px dashed #3c3c3c;
-  border-radius: 4px;
-  color: #8b949e;
+  border: 1px dashed var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-text-tertiary);
   font-size: 13px;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color var(--ui-transition-fast), color var(--ui-transition-fast);
 }
 
 .add-btn:hover {
-  border-color: #0078d4;
-  color: #58a6ff;
+  border-color: var(--ui-accent);
+  color: var(--ui-accent);
 }
 
 /* 技能类别 */
 .skill-category {
-  background: #2a2a2a;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -707,14 +707,14 @@ function acceptPolish() {
 .category-label {
   font-size: 13px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 /* AI 润色结果 */
 .polish-section {
-  border-top: 1px solid #3c3c3c;
+  border-top: 1px solid var(--ui-border);
   padding: 12px 20px;
-  background: #252526;
+  background: var(--ui-bg-secondary);
 }
 
 .polish-header {
@@ -727,7 +727,7 @@ function acceptPolish() {
 .polish-title {
   font-size: 13px;
   font-weight: 600;
-  color: #58a6ff;
+  color: var(--ui-accent);
 }
 
 .polish-close {
@@ -735,17 +735,17 @@ function acceptPolish() {
   height: 22px;
   border: none;
   background: transparent;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
 }
 
 .polish-close:hover {
-  background: rgba(220, 38, 38, 0.15);
-  color: #f87171;
+  background: var(--ui-bg-active);
+  color: var(--ui-danger);
 }
 
 .polish-compare {
@@ -764,14 +764,14 @@ function acceptPolish() {
 
 .polish-label {
   font-size: 11px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   font-weight: 500;
 }
 
 .polish-content {
   margin: 0;
   padding: 8px;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 12px;
   line-height: 1.4;
   white-space: pre-wrap;
@@ -783,13 +783,13 @@ function acceptPolish() {
 .polish-content.original {
   background: rgba(220, 38, 38, 0.08);
   border: 1px solid rgba(220, 38, 38, 0.2);
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .polish-content.polished {
   background: rgba(34, 197, 94, 0.08);
   border: 1px solid rgba(34, 197, 94, 0.2);
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .polish-actions {
@@ -801,11 +801,11 @@ function acceptPolish() {
 /* 底部操作 */
 .form-footer {
   padding: 12px 20px;
-  border-top: 1px solid #3c3c3c;
+  border-top: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #252526;
+  background: var(--ui-bg-secondary);
 }
 
 .btn-polish {
@@ -814,16 +814,16 @@ function acceptPolish() {
   gap: 6px;
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  color: #58a6ff;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-accent);
   font-size: 13px;
   cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
+  transition: border-color var(--ui-transition-fast), background-color var(--ui-transition-fast);
 }
 
 .btn-polish:hover:not(:disabled) {
-  border-color: #58a6ff;
+  border-color: var(--ui-accent);
   background: rgba(88, 166, 255, 0.08);
 }
 
@@ -839,33 +839,33 @@ function acceptPolish() {
 
 .btn-primary {
   padding: 8px 16px;
-  background: #0e639c;
-  color: #ffffff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .btn-primary:hover {
-  background: #1177bb;
+  background: var(--ui-accent-hover);
 }
 
 .btn-secondary {
   padding: 8px 16px;
-  background: #3c3c3c;
-  color: #cccccc;
+  background: var(--ui-bg-tertiary);
+  color: var(--ui-text-secondary);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 13px;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .btn-secondary:hover {
-  background: #4a4a4a;
+  background: var(--ui-border);
 }
 
 .btn-sm {
@@ -879,7 +879,7 @@ function acceptPolish() {
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
+  border-top-color: var(--ui-text-inverse);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

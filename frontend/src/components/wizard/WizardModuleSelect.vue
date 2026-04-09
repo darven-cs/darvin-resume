@@ -145,13 +145,13 @@ function toggleModule(type: string) {
 .select-title {
   font-size: 16px;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
   margin: 0 0 6px 0;
 }
 
 .select-desc {
   font-size: 13px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
   margin: 0;
 }
 
@@ -170,27 +170,27 @@ function toggleModule(type: string) {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #2d2d2d;
-  border: 1px solid #3c3c3c;
-  border-radius: 6px;
+  background: var(--ui-bg-tertiary);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
   cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
+  transition: border-color var(--ui-transition-fast), background-color var(--ui-transition-fast);
 }
 
 .module-item:hover {
-  border-color: #4c4c4c;
-  background: #333;
+  border-color: var(--ui-border-hover);
+  background: var(--ui-bg-tertiary);
 }
 
 .module-item.checked {
-  border-color: #0078d4;
+  border-color: var(--ui-accent);
   background: rgba(0, 120, 212, 0.08);
 }
 
 .module-checkbox {
   width: 16px;
   height: 16px;
-  accent-color: #0078d4;
+  accent-color: var(--ui-accent);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -210,27 +210,27 @@ function toggleModule(type: string) {
 .module-name {
   font-size: 14px;
   font-weight: 500;
-  color: #e0e0e0;
+  color: var(--ui-text-primary);
 }
 
 .module-desc {
   font-size: 12px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 /* 底部操作 */
 .select-footer {
   padding: 16px 20px;
-  border-top: 1px solid #3c3c3c;
+  border-top: 1px solid var(--ui-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #252526;
+  background: var(--ui-bg-secondary);
 }
 
 .selected-count {
   font-size: 13px;
-  color: #8b949e;
+  color: var(--ui-text-tertiary);
 }
 
 .start-btn {
@@ -239,18 +239,18 @@ function toggleModule(type: string) {
 
 .btn-primary {
   padding: 8px 16px;
-  background: #0e639c;
-  color: #ffffff;
+  background: var(--ui-accent);
+  color: var(--ui-text-inverse);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-sm);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--ui-transition-fast);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #1177bb;
+  background: var(--ui-accent-hover);
 }
 
 .btn-primary:disabled {
