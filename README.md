@@ -56,6 +56,25 @@ Darvin-Resume is a **local-first** resume builder designed for CS graduates and 
 - Recycle bin: recover or permanently delete within 30 days
 - Auto-save: 30-second interval, AI completion trigger, page navigation trigger, Ctrl/Cmd+S manual save
 
+**Templates & Export**
+- 4 built-in resume templates with instant switching, content preserved
+- Visual style tuning: color, font size, line height, margins, font family — real-time preview
+- Custom CSS editor with property whitelist, one-click reset to defaults
+- PDF export via system print or Chromedp, strict A4 pagination matching preview 100%
+- Version snapshots: manual/auto creation, diff comparison, one-click rollback
+
+**Data Security & Backup**
+- AES-256-GCM encrypted API key storage with device-unique key
+- One-click encrypted backup export, configurable auto-backup (daily/weekly/monthly)
+- Backup import with automatic pre-restore snapshot, full data integrity
+
+**UI & Experience**
+- Design token system: light/dark/system theme with CSS custom properties
+- Responsive layout: auto single-pane below 1200px, manual view switching
+- Keyboard shortcuts: built-in (Ctrl/Cmd+R/T/D) + customizable with persistence
+- Global toast notifications for all operations with error recovery
+- Template demo previews on empty home page, loading states on all async operations
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -126,9 +145,9 @@ The binary will be in `build/bin/`.
 | 2. Core Editor | Monaco, split-pane, real-time preview, A4 boundary | ✅ Done |
 | 3. AI Core | Claude API, streaming, floating toolbar, diff, chat, parsing | ✅ Done |
 | 4. Resume Management | List, search, AI wizard, blank page, recycle bin, auto-save | ✅ Done |
-| 5. Templates & Export | Built-in templates, style tuning, PDF export, versioning | Planned |
-| 6. Data Security | Encrypted API keys, backup & restore | Planned |
-| 7. UI Polish | Dark mode, responsive, shortcuts, error handling | Planned |
+| 5. Templates & Export | Built-in templates, style tuning, PDF export, version snapshots | ✅ Done |
+| 6. Data Security | AES-256 encrypted API keys, backup & restore, auto-backup | ✅ Done |
+| 7. UI Polish | Design tokens, light/dark theme, responsive, shortcuts, toast, error handling | ✅ Done |
 
 ## License
 
