@@ -184,10 +184,10 @@ jobs:
           choco install nsis -y
           echo "C:\Program Files (x86)\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
-      - name: Build Windows NSIS installer (WebView2 embedded)
+      - name: Build Windows NSIS installer (WebView2 auto-download)
         run: |
           cd frontend; npm install; cd ..
-          wails build --platform windows/amd64 --nsis -webview2 embed
+          wails build --platform windows/amd64 --nsis -webview2 download -trimpath
           Get-ChildItem build/bin/
 
       - name: Upload Windows installer
